@@ -55,6 +55,7 @@
     (false? x) "\"false\"^^xsd:boolean"
     (string? x) (str \" x \" )
     (= java.net.URI (type x)) (str "<" x ">")
+    ;(= java.util.Date (type x)) (str \" x \" "^^xsd:dateTime")
     (vector? x) (str (name (first x)) \: (second x))
     :else (throw (new Exception "Invalid SPARQL variable/literal"))))
 

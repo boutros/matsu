@@ -6,8 +6,14 @@
 (facts
   "fn encode: correctily encodes RDF variables and literals"
   (encode \*) => \*
-  (encode :name) => "?name"
-  (encode 23) => "\"23\"^^xsd:integer")
+  (encode :keyword) => "?keyword"
+  (encode 23) => "\"23\"^^xsd:integer"
+  (encode 9.9) => "\"9.9\"^^xsd:decimal"
+  (encode "string") => "\"string\""
+  (encode true) => "\"true\"^^xsd:boolean"
+  (encode false) => "\"false\"^^xsd:boolean"
+  ;(encode (java.util.Date.)) => "not implemented!"
+  )
 
 (fact
   "fn query: ASK query form is supported"
