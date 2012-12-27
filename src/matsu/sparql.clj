@@ -9,9 +9,8 @@
 ; -----------------------------------------------------------------------------
 
 ; *PREFIXES* is a global map of all namespaces you intend to use
-; The enclosing < > are added dynamically when SPARQL string is compiled
 ; TODO make an atom?
-(def ^:dynamic *PREFIXES* {:dbpedia "http://dbpedia.org/resource/" :foaf "<http://xmlns.com/foaf/0.1/>"})
+(def ^:dynamic *PREFIXES* {:dbpedia "<http://dbpedia.org/resource/>" :foaf "<http://xmlns.com/foaf/0.1/>"})
 
 (defn empty-query []
   "starting query"
@@ -67,34 +66,34 @@
 (defn from-compile [q]
   {:pre [(map? q)]
    :post [(vector? %)]}
-  (if (nil? (q :from))
+  (if (nil? (:from q))
     []
-    (conj ["FROM"] (str \< (q :from) \>))))
+    (conj ["FROM"] (str \< (:from q) \>))))
 
 (defn prefix-compile [q]
-  (if (empty? (q :prefixes))
+  (if (empty? (:prefixes q))
     []
-    (for [p (q :prefixes)]
+    (for [p (:prefixes q)]
       ["PREFIX" (str (name p) \:) (*PREFIXES* p)])))
 
 (defn ask-compile [q]
   {:pre [(map? q)]
    :post [(vector? %)]}
-  (if (q :ask) ["ASK"] []))
+  (if (:ask q) ["ASK"] []))
 
 (defn select-compile [q]
   {:pre [(map? q)]
    :post [(vector? %)]}
-  (if (empty? (q :select))
+  (if (empty? (:select q))
     []
-    (conj ["SELECT"] (vec (map encode (q :select))))))
+    (conj ["SELECT"] (vec (map encode (:select q))))))
 
 (defn where-compile [q]
   {:pre [(map? q)]
    :post [(vector? %)]}
-  (if (empty? (q :where))
+  (if (empty? (:where q))
     []
-    (conj ["WHERE" "{"] (vec (map encode (q :where))) "}")))
+    (conj ["WHERE" "{"] (vec (map encode (:where q))) "}")))
 
 (defn compile-query [q]
   {:pre [(map? q)]
@@ -118,7 +117,7 @@
 
 (defn ask [q]
   {:pre [(map? q)
-         (empty? (q :select))]
+         (empty? (:select q))]
    :post [(map? q)]}
   (assoc q :ask true))
 
@@ -129,7 +128,7 @@
 
 (defn select [q & vars]
   {:pre [(map? q),
-         (nil? (q :ask)),
+         (nil? (:ask q)),
          (empty? (->> vars
                       (remove keyword?)
                       (remove char?)))]
