@@ -155,7 +155,7 @@
    :post [(map? %)]}
   (update-in q [:where] into vars))
 
-(defn with-prefixes [q & prefixes]
+(defn prefix [q & prefixes]
   (update-in q [:prefixes] into prefixes))
 
 (defn optional [& args]

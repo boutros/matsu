@@ -45,7 +45,7 @@
 (fact
   "example2 query from sparql spec"
   (query
-    (with-prefixes :foaf)
+    (prefix :foaf)
     (select :name :mbox)
     (where :x [:foaf "name"] :name \.
            :x [:foaf "mbox"] :mbox))
@@ -54,7 +54,7 @@
 
 (fact
   (query
-    (with-prefixes :foaf)
+    (prefix :foaf)
     (ask)
     (where :person \a [:foaf "Person"]
            \; [:foaf "mbox"] (URI. "mailto:petter@petter.com") \.))
