@@ -39,10 +39,18 @@
             (def ~name q#)))
 
 (defmacro query [q & body]
-          "Takes an optional query-map as first argument"
+          "Let you craft a SPARQL-query by composing functions, like this:
+            (query
+              (select :s)
+              (where :s :p :p))
+          And returns a valid SPARQL 1.1 string:
+            'SELECT ?s WHERE { ?s ?p ?o }'
+
+          The macro can also be called with a query-map as its first argument,
+          alowing you to modify saved queries."
           (if (list? q)
-          `(-> (empty-query) ~q ~@body (compile-query))
-          `(-> ~q ~@body (compile-query))))
+            `(-> (empty-query) ~q ~@body (compile-query))
+            `(-> ~q ~@body (compile-query))))
 
 ; -----------------------------------------------------------------------------
 ; RDF util functions
