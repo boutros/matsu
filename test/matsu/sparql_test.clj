@@ -22,7 +22,7 @@
 (fact
   "query macro can be used with or without a saved query-map"
   (query my-query
-         (where :s :p :o \.))
+         (where : :p :o \.))
   =>
   (query (select :s)
          (where :s :p :o \.)))
@@ -61,5 +61,3 @@
   =>
   "PREFIX foaf: <http://xmlns.com/foaf/0.1/> ASK WHERE { ?person a foaf:Person ; foaf:mbox <mailto:petter@petter.com> . }"
   )
-
-;The SPARQL keyword a is a shortcut for the common predicate rdf:type, giving the class of a resource.

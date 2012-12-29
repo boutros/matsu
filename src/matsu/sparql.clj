@@ -5,7 +5,7 @@
   (:import (java.net URI)))
 
 ; -----------------------------------------------------------------------------
-; Vars & Types
+; Datastructures and vars
 ; -----------------------------------------------------------------------------
 
 ; *PREFIXES* is a global map of all namespaces you intend to use
@@ -13,7 +13,7 @@
 (def ^:dynamic *PREFIXES* {:dbpedia "<http://dbpedia.org/resource/>" :foaf "<http://xmlns.com/foaf/0.1/>"})
 
 (defn empty-query []
-  "query constructor"
+  "query-map constructor"
   {:prefixes []
    :from nil
    :ask nil
@@ -24,17 +24,13 @@
    :offset nil}
   )
 
-; thinking about the map^
-; :query-form = one of ASK | SELECT | DESCRIBE | CONSTRUCT
-; :query-form {:type "SELECT" :contents []}
-; defrecord?
 
 ; -----------------------------------------------------------------------------
 ; Macros
 ; -----------------------------------------------------------------------------
 
 (defmacro defquery [name & body]
-          "Defines a query and binds it to a var"
+          "Defines a query-map and binds it to a var"
           `(let [q# (-> (~empty-query) ~@body)]
             (def ~name q#)))
 
@@ -53,7 +49,7 @@
             `(-> ~q ~@body (compile-query))))
 
 ; -----------------------------------------------------------------------------
-; RDF util functions
+; Util functions
 ; -----------------------------------------------------------------------------
 
 (defn encode [x]
@@ -127,7 +123,6 @@
 ; -----------------------------------------------------------------------------
 ; SPARQL query DSL functions
 ; -----------------------------------------------------------------------------
-
 ; These all takes a map of the query and returns a modified query-map
 
 (defn ask [q]
@@ -158,34 +153,6 @@
 (defn prefix [q & prefixes]
   (update-in q [:prefixes] into prefixes))
 
-(defn optional [& args]
-  (into ["OPTIONAL"] args))
+; (defn optional [& args]
+;   (into ["OPTIONAL"] args))
 
-; -----------------------------------------------------------------------------
-; Fiddling
-; -----------------------------------------------------------------------------
-
-(comment
-
-
-  (query (empty-query)
-         (with-prefixes :dbpedia :foaf)
-         (from "dbpedia.org/resource")
-         (select \*)
-         (where [:dbpedia "blab"] :p :o \;
-                (optional :firstName "skap" \;)
-                          (filter :lastName "somethin"))
-                )
-
-  (defquery start
-            (select :a :b c))
-
-  (query start
-         (where :s :p :o))
-
-  (query
-    (select :s)
-    (where :s :p :o))
-
-
-)
