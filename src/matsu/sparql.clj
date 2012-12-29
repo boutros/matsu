@@ -13,7 +13,7 @@
 (def ^:dynamic *PREFIXES* {:dbpedia "<http://dbpedia.org/resource/>" :foaf "<http://xmlns.com/foaf/0.1/>"})
 
 (defn empty-query []
-  "starting query"
+  "query constructor"
   {:prefixes []
    :from nil
    :ask nil
@@ -43,9 +43,9 @@
 ; -----------------------------------------------------------------------------
 
 (defn encode [x]
-  "Encodes keywords to ?-prefixed variables and other values to RDF literals.
-  Vectors are treated as namespace-qualified and resolves with the first value
-  as namespace."
+  "Encodes keywords to ?-prefixed variables and other values to RDF literals
+  when applicable. Vectors are treated as namespace-qualified and resolves
+  with the first value as namespace."
   (cond
     (char? x) x
     (keyword? x) (str \? (name x))
@@ -57,7 +57,7 @@
     (= java.net.URI (type x)) (str "<" x ">")
     ;(= java.util.Date (type x)) (str \" x \" "^^xsd:dateTime")
     (vector? x) (str (name (first x)) \: (second x))
-    :else (throw (new Exception "Invalid SPARQL variable/literal"))))
+    :else (throw (new Exception "Don't know how to encode that into RDF literal!"))))
 
 ; -----------------------------------------------------------------------------
 ; Compiler functions
