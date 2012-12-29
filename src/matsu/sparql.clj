@@ -33,10 +33,16 @@
 ; Macros
 ; -----------------------------------------------------------------------------
 
-(defmacro query [& body]
-          `(-> ~@body (compile-query)))
+(defmacro defquery [name & body]
+          "Defines a query and binds it to a var"
+          `(let [q# (-> (~empty-query) ~@body)]
+            (def ~name q#)))
 
-;; todo add empty-query if not first param is query map (record?)
+(defmacro query [q & body]
+          "Takes an optional query-map as first argument"
+          (if (list? q)
+          `(-> (empty-query) ~q ~@body (compile-query))
+          `(-> ~q ~@body (compile-query))))
 
 ; -----------------------------------------------------------------------------
 ; RDF util functions
@@ -161,4 +167,17 @@
          (where [:dbpedia "blab"] :p :o \;
                 (optional :firstName "skap" \;)
                           (filter :lastName "somethin"))
-                ))
+                )
+
+  (defquery start
+            (select :a :b c))
+
+  (query start
+         (where :s :p :o))
+
+  (query
+    (select :s)
+    (where :s :p :o))
+
+
+)

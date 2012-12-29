@@ -15,25 +15,34 @@
   ;(encode (java.util.Date.)) => "not implemented!"
   )
 
+; Testing the macros
+(defquery my-query
+          (select :s))
+
+(fact
+  "query macro can be used with or without a saved query-map"
+  (query my-query
+         (where :s :p :o \.))
+  =>
+  (query (select :s)
+         (where :s :p :o \.)))
+
 (fact
   "fn query: ASK query form is supported"
-  (query (empty-query)
-         (ask)
+  (query (ask)
          (where :s :p :o \.)) => "ASK WHERE { ?s ?p ?o . }"
   )
 
 (fact
   "example query from Sparql spec"
-  (query (empty-query)
-         (select :title)
+  (query (select :title)
          (where (URI. "http://example.org/book/book1") (URI. "http://purl.org/dc/elements/1.1/title") :title \.))
    => "SELECT ?title WHERE { <http://example.org/book/book1> <http://purl.org/dc/elements/1.1/title> ?title . }"
 )
 
 (fact
   "example2 query from sparql spec"
-  (query (empty-query)
-         (with-prefixes :foaf)
+  (query (with-prefixes :foaf)
          (select :name :mbox)
          (where :x [:foaf "name"] :name \.
                 :x [:foaf "mbox"] :mbox))
@@ -41,8 +50,7 @@
   )
 
 (fact
-  (query (empty-query)
-         (with-prefixes :foaf)
+  (query (with-prefixes :foaf)
          (ask)
          (where :person \a [:foaf "Person"]
                 \; [:foaf "mbox"] (URI. "mailto:petter@petter.com") \.))
