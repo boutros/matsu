@@ -75,32 +75,32 @@
 ; -----------------------------------------------------------------------------
 ; Transforms the various query parts into vectors of strings
 
-(defn from-compile [q]
+(defn- from-compile [q]
   {:pre [(map? q)]
    :post [(vector? %)]}
   (if (nil? (:from q))
     []
     (conj ["FROM"] (str \< (:from q) \>))))
 
-(defn prefix-compile [q]
+(defn- prefix-compile [q]
   (if (empty? (:prefixes q))
     []
     (for [p (:prefixes q)]
       ["PREFIX" (str (name p) \:) (*PREFIXES* p)])))
 
-(defn ask-compile [q]
+(defn- ask-compile [q]
   {:pre [(map? q)]
    :post [(vector? %)]}
   (if (:ask q) ["ASK"] []))
 
-(defn select-compile [q]
+(defn- select-compile [q]
   {:pre [(map? q)]
    :post [(vector? %)]}
   (if (empty? (:select q))
     []
     (conj ["SELECT"] (vec (map encode (:select q))))))
 
-(defn where-compile [q]
+(defn- where-compile [q]
   {:pre [(map? q)]
    :post [(vector? %)]}
   (if (empty? (:where q))
