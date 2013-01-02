@@ -74,40 +74,32 @@
 ; -----------------------------------------------------------------------------
 ; Compiler functions
 ; -----------------------------------------------------------------------------
-; Transforms the various query parts into vectors of strings
+; Transforms the various query parts into a vectors of strings, or nil if the
+; particular function is not used in the query
 
 (defn- query-form-compile [q]
-  {:pre [(map? q)]
-   :post [(vector? %)]}
-  (if (empty? (get-in q [:query-form :form]))
-    []
+  {:pre [(map? q)]}
+  (when-not (empty? (get-in q [:query-form :form]))
     (conj [] (get-in q [:query-form :form]) (vec (map encode (get-in q [:query-form :content]))))))
 
 (defn- from-compile [q]
-  {:pre [(map? q)]
-   :post [(vector? %)]}
-  (if (nil? (:from q))
-    []
+  {:pre [(map? q)]}
+  (when-not (nil? (:from q))
     (conj ["FROM"] (str \< (:from q) \>))))
 
 (defn- prefix-compile [q]
-  (if (empty? (:prefixes q))
-    []
+  (when-not (empty? (:prefixes q))
     (for [p (:prefixes q)]
       ["PREFIX" (str (name p) \:) (*PREFIXES* p)])))
 
 (defn- where-compile [q]
-  {:pre [(map? q)]
-   :post [(vector? %)]}
-  (if (empty? (:where q))
-    []
+  {:pre [(map? q)]}
+  (when-not (empty? (:where q))
     (conj ["WHERE" "{"] (vec (map encode (:where q))) "}")))
 
 (defn- limit-compile [q]
-  {:pre [(map? q)]
-   :post [(vector? %)]}
-  (if (nil? (:limit q))
-    []
+  {:pre [(map? q)]}
+  (when-not (nil? (:limit q))
     (conj [] "LIMIT" (:limit q))))
 
 (defn compile-query [q]
@@ -122,6 +114,7 @@
              (where-compile q)
              (limit-compile q))
        (flatten)
+       (remove nil?)
        (string/join " ")))
 
 ; -----------------------------------------------------------------------------
