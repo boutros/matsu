@@ -7,4 +7,4 @@
                                   [com.stuartsierra/lazytest "1.2.3"]]}}
   :repositories {"stuart" "http://stuartsierra.com/maven2"}
   :dependencies [[org.clojure/clojure "1.4.0"]]
-  :main matsu.sparql)
+  :main boutros.matsu.sparql)

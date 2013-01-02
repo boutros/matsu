@@ -1,4 +1,4 @@
-(ns matsu.sparql
+(ns boutros.matsu.sparql
   (:refer-clojure :exclude [filter])
   (:require [clojure.set :as set]
             [clojure.string :as string])
@@ -10,6 +10,7 @@
 
 ; *PREFIXES* is a global map of all namespaces you intend to use
 ; TODO make an atom?
+; rename to *NAMESPACES*
 (def ^:dynamic *PREFIXES* {:dbpedia "<http://dbpedia.org/resource/>" :foaf "<http://xmlns.com/foaf/0.1/>"})
 
 (defn empty-query []
