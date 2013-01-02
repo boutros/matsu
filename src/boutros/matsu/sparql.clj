@@ -80,7 +80,9 @@
 (defn- query-form-compile [q]
   {:pre [(map? q)]}
   (when-not (empty? (get-in q [:query-form :form]))
-    (conj [] (get-in q [:query-form :form]) (vec (map encode (get-in q [:query-form :content]))))))
+    (conj []
+          (get-in q [:query-form :form])
+          (vec (map encode (get-in q [:query-form :content]))))))
 
 (defn- from-compile [q]
   {:pre [(map? q)]}
