@@ -35,11 +35,11 @@
     (are [a b] (= (encode a) b)
          \*                          \*
          :keyword                    "?keyword"
-         23                          "\"23\"^^xsd:integer"
-         9.9                         "\"9.9\"^^xsd:decimal"
+         23                          23 ;"\"23\"^^xsd:integer"
+         9.9                         9.9 ;"\"9.9\"^^xsd:decimal"
          "string"                    "\"string\""
-         true                        "\"true\"^^xsd:boolean"
-         false                       "\"false\"^^xsd:boolean"
+         true                        true ;"\"true\"^^xsd:boolean"
+         false                       false ;"\"false\"^^xsd:boolean"
          (URI. "http://dbpedia.org") "<http://dbpedia.org>"
          [:foaf "mbox"]              "foaf:mbox")))
 
