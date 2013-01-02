@@ -11,7 +11,9 @@
 ; *PREFIXES* is a global map of all namespaces you intend to use
 ; TODO make an atom?
 ; rename to *NAMESPACES*
-(def ^:dynamic *PREFIXES* {:dbpedia "<http://dbpedia.org/resource/>" :foaf "<http://xmlns.com/foaf/0.1/>"})
+(def ^:dynamic *PREFIXES* {:dbpedia "<http://dbpedia.org/resource/>"
+                           :foaf "<http://xmlns.com/foaf/0.1/>"
+                           :rdfs "<http://www.w3.org/2000/01/rdf-schema#>"})
 
 (defn empty-query []
   "query-map constructor"
@@ -101,6 +103,13 @@
     []
     (conj ["WHERE" "{"] (vec (map encode (:where q))) "}")))
 
+(defn- limit-compile [q]
+  {:pre [(map? q)]
+   :post [(vector? %)]}
+  (if (nil? (:limit q))
+    []
+    (conj [] "LIMIT" (:limit q))))
+
 (defn compile-query [q]
   {:pre [(map? q)]
    :post [(string? %)]}
@@ -110,7 +119,8 @@
              (prefix-compile q)
              (query-form-compile q)
              (from-compile q)
-             (where-compile q))
+             (where-compile q)
+             (limit-compile q))
        (flatten)
        (string/join " ")))
 
@@ -147,6 +157,9 @@
 
 (defn prefix [q & prefixes]
   (update-in q [:prefixes] into prefixes))
+
+(defn limit [q & n]
+  (assoc q :limit n))
 
 ; (defn optional [& args]
 ;   (into ["OPTIONAL"] args))

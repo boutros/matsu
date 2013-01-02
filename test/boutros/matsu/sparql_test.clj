@@ -87,4 +87,14 @@
                    \; [:foaf "mbox"] (URI. "mailto:petter@petter.com") \.))
 
           "PREFIX foaf: <http://xmlns.com/foaf/0.1/> ASK WHERE { ?person a foaf:Person ; foaf:mbox <mailto:petter@petter.com> . }")))
+
+  (testing "limit"
+    (is (=
+          (query
+            (prefix :rdfs)
+            (select :subject :label)
+            (where :subject [:rdfs "label"] :label)
+            (limit 5))
+
+          "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?subject ?label WHERE { ?subject rdfs:label ?label } LIMIT 5")))
   )
