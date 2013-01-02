@@ -109,21 +109,4 @@
           )))
 
 
-    ; (testing "group"
-    ;   (is (=
-    ;         (query
-    ;           (ask)
-    ;           (group :s :p :o \.))
-
-    ;         "ASK { ?s ?p ?o . }")))
-
-  ; (testing "filter"
-  ;   (is (=
-  ;         (query
-  ;           (prefix :prop)
-  ;           (select :subject :label)
-  ;           (where :subject [:rdfs "label"] :label)
-  ;           (limit 5))
-
-  ;         "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?subject ?label WHERE { ?subject rdfs:label ?label } LIMIT 5"))))
   )
