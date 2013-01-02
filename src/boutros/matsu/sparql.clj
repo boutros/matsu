@@ -12,9 +12,11 @@
 ; TODO make an atom?
 
 (def ^:dynamic *PREFIXES* {:dbpedia "<http://dbpedia.org/resource/>"
-                           :foaf "<http://xmlns.com/foaf/0.1/>"
-                           :rdfs "<http://www.w3.org/2000/01/rdf-schema#>"
-                           :prop "<http://dbpedia.org/property/>"})
+                           :foaf    "<http://xmlns.com/foaf/0.1/>"
+                           :rdfs    "<http://www.w3.org/2000/01/rdf-schema#>"
+                           :prop    "<http://dbpedia.org/property/>"
+                           :dc      "<http://purl.org/dc/elements/1.1/>"
+                           :ns      "<http://example.org/ns#>"})
 
 (defn empty-query []
   "query-map constructor"

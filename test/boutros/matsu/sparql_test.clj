@@ -120,4 +120,17 @@
           "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox ?hpage WHERE { ?x foaf:name ?name . OPTIONAL { ?x foaf:mbox ?mbox } . OPTIONAL { ?x foaf:homepage ?hpage } }"
           )))
 
+  (testing "filter inside optional"
+    (is (=
+          (query
+            (prefix :dc :ns)
+            (select :title :price)
+            (where :x [:dc "title"] :title \.
+                   (optional :x [:ns "price"] :price \.
+                             (filter :price \< 30))))
+
+    "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ?price WHERE { ?x dc:title ?title . OPTIONAL { ?x ns:price ?price . FILTER(?price < 30) } }"
+    )))
+
+
   )
