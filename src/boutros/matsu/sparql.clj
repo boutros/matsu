@@ -94,18 +94,6 @@
     (for [p (:prefixes q)]
       ["PREFIX" (str (name p) \:) (*PREFIXES* p)])))
 
-(defn- ask-compile [q]
-  {:pre [(map? q)]
-   :post [(vector? %)]}
-  (if (:ask q) ["ASK"] []))
-
-(defn- select-compile [q]
-  {:pre [(map? q)]
-   :post [(vector? %)]}
-  (if (empty? (:select q))
-    []
-    (conj ["SELECT"] (vec (map encode (:select q))))))
-
 (defn- where-compile [q]
   {:pre [(map? q)]
    :post [(vector? %)]}
