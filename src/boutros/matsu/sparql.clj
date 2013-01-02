@@ -115,8 +115,8 @@
   (->> (conj []
              (prefix-compile q)
              (ask-compile q)
-             (from-compile q)
              (select-compile q)
+             (from-compile q)
              (where-compile q))
        (flatten)
        (string/join " ")))
