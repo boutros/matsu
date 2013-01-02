@@ -108,5 +108,16 @@
           "PREFIX dbpedia: <http://dbpedia.org/resource/> PREFIX prop: <http://dbpedia.org/property/> ASK { dbpedia:Amazon_River prop:length ?amazon . dbpedia:Nile prop:length ?nile . FILTER(?amazon > ?nile) . }"
           )))
 
+  (testing "optional"
+    (is (=
+          (query
+            (prefix :foaf)
+            (select :name :mbox :hpage)
+            (where :x [:foaf "name"] :name \.
+                   (optional :x [:foaf "mbox"] :mbox) \.
+                   (optional :x [:foaf "homepage"] :hpage)))
+
+          "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox ?hpage WHERE { ?x foaf:name ?name . OPTIONAL { ?x foaf:mbox ?mbox } . OPTIONAL { ?x foaf:homepage ?hpage } }"
+          )))
 
   )

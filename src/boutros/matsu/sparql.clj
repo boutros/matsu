@@ -175,8 +175,9 @@
   {:post [(map? %)]}
    {:content (str "FILTER(" (string/join " " (vec (map encode vars))) ")" )})
 
-; (defn optional [& args]
-;   (into ["OPTIONAL"] args))
+(defn optional [& vars]
+  {:post [(map? %)]}
+   {:content (str "OPTIONAL { " (string/join " " (vec (map encode vars))) " }" )})
 
 ; (defn group [q & vars]
 ;   {:pre [(map? q)]
