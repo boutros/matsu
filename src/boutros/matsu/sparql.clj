@@ -17,8 +17,7 @@
   "query-map constructor"
   {:prefixes []
    :from nil
-   :ask nil
-   :select []
+   :query-form {:form nil :content []}
    :where []
    :order-by nil
    :limit nil
@@ -75,6 +74,13 @@
 ; -----------------------------------------------------------------------------
 ; Transforms the various query parts into vectors of strings
 
+(defn- query-form-compile [q]
+  {:pre [(map? q)]
+   :post [(vector? %)]}
+  (if (empty? (get-in q [:query-form :form]))
+    []
+    (conj [] (get-in q [:query-form :form]) (vec (map encode (get-in q [:query-form :content]))))))
+
 (defn- from-compile [q]
   {:pre [(map? q)]
    :post [(vector? %)]}
@@ -114,8 +120,7 @@
   returns a vaild SPARQL 1.1 query string"
   (->> (conj []
              (prefix-compile q)
-             (ask-compile q)
-             (select-compile q)
+             (query-form-compile q)
              (from-compile q)
              (where-compile q))
        (flatten)
@@ -130,7 +135,7 @@
   {:pre [(map? q)
          (empty? (:select q))]
    :post [(map? q)]}
-  (assoc q :ask true))
+  (assoc q :query-form {:form "ASK" :content []}))
 
 (defn from [q graph]
   {:pre [(map? q)]
@@ -138,13 +143,9 @@
   (assoc q :from graph))
 
 (defn select [q & vars]
-  {:pre [(map? q),
-         (nil? (:ask q)),
-         (empty? (->> vars
-                      (remove keyword?)
-                      (remove char?)))]
+  {:pre [(map? q)]
    :post [(map? %)]}
-  (assoc q :select (vec vars)))
+  (assoc q :query-form {:form "SELECT" :content (vec vars)}))
 
 (defn where [q & vars]
   {:pre [(map? q) ]
