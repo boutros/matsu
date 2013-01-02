@@ -125,8 +125,7 @@
 ; These all takes a map of the query and returns a modified query-map
 
 (defn ask [q]
-  {:pre [(map? q)
-         (empty? (:select q))]
+  {:pre [(map? q)]
    :post [(map? q)]}
   (assoc q :query-form {:form "ASK" :content []}))
 
