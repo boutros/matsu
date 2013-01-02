@@ -147,6 +147,11 @@
    :post [(map? %)]}
   (assoc q :query-form {:form "SELECT" :content (vec vars)}))
 
+(defn select-distinct [q & vars]
+  {:pre [(map? q)]
+   :post [(map? %)]}
+  (assoc q :query-form {:form "SELECT DISTINCT" :content (vec vars)}))
+
 (defn where [q & vars]
   {:pre [(map? q) ]
    :post [(map? %)]}

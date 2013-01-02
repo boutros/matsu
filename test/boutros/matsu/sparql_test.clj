@@ -61,6 +61,14 @@
 
           "SELECT ?s WHERE { ?s ?p ?o }")))
 
+  (testing "select-distinct"
+    (is (=
+          (query
+            (select-distinct :type)
+            (where :s \a :type))
+
+          "SELECT DISTINCT ?type WHERE { ?s a ?type }")))
+
   (testing "prefix and namespaced qualifiers"
     (is (=
           (query
