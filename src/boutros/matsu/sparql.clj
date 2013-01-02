@@ -60,7 +60,7 @@
   when applicable. Vectors are treated as namespace-qualified and resolves
   with the first value as namespace.
 
-  Maps are used for special cases, to avoid compilation."
+  Maps are used for special cases, to avoid compilation inside where-clauses."
   (cond
     (char? x) x
     (keyword? x) (str \? (name x))
@@ -88,14 +88,12 @@
 
 (defn- query-form-compile [q]
   {:pre [(map? q)]}
-  (when-not (empty? (get-in q [:query-form :form]))
+  (when-let [form (get-in q [:query-form :form])]
     (conj []
-        (let [form (get-in q [:query-form :form])]
-          (cond
-            (= form "ASK") (conj ["ASK"] (group-subcompile (get-in q [:query-form :content])))
-            :else
-              (conj [] (get-in q [:query-form :form])
-              (vec (map encode (get-in q [:query-form :content])))))))))
+      (if
+        (= form "ASK") (conj ["ASK"] (group-subcompile (get-in q [:query-form :content])))
+        (conj [] (get-in q [:query-form :form])
+              (vec (map encode (get-in q [:query-form :content]))))))))
 
 (defn- from-compile [q]
   {:pre [(map? q)]}
@@ -109,13 +107,13 @@
 
 (defn- where-compile [q]
   {:pre [(map? q)]}
-  (when-not (empty? (:where q))
-    (conj ["WHERE" "{"] (vec (map encode (:where q))) "}")))
+  (when-let [xs (seq (:where q))]
+    (conj ["WHERE" "{"] (vec (map encode xs)) "}")))
 
 (defn- limit-compile [q]
   {:pre [(map? q)]}
-  (when-not (nil? (:limit q))
-    (conj [] "LIMIT" (:limit q))))
+  (when-let [n (:limit q)]
+    (conj [] "LIMIT" n)))
 
 (defn compile-query [q]
   {:pre [(map? q)]
