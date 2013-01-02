@@ -157,7 +157,7 @@
   (assoc q :query-form {:form "SELECT DISTINCT" :content (vec vars)}))
 
 (defn where [q & vars]
-  {:pre [(map? q) ]
+  {:pre [(map? q)]
    :post [(map? %)]}
   (update-in q [:where] into vars))
 
@@ -165,11 +165,14 @@
   (update-in q [:prefixes] into prefixes))
 
 (defn limit [q & n]
+  {:pre [(map? q)]
+  :post [(map? %)]}
   (assoc q :limit n))
 
 ; Special functions which copmile inline groups inside where clauses:
 
 (defn filter [& vars]
+  {:post [(map? %)]}
    {:content (str "FILTER(" (string/join " " (vec (map encode vars))) ")" )})
 
 ; (defn optional [& args]
