@@ -1,4 +1,5 @@
 (ns boutros.matsu.sparql-test
+  (:refer-clojure :exclude [filter])
   (:use clojure.test
         boutros.matsu.sparql)
   (:import (java.net URI)))
@@ -82,19 +83,48 @@
     (is (=
           (query
             (prefix :foaf)
-            (ask)
-            (where :person \a [:foaf "Person"]
-                   \; [:foaf "mbox"] (URI. "mailto:petter@petter.com") \.))
+            (ask :person \a [:foaf "Person"]
+                  \; [:foaf "mbox"] (URI. "mailto:petter@petter.com") \.))
 
-          "PREFIX foaf: <http://xmlns.com/foaf/0.1/> ASK WHERE { ?person a foaf:Person ; foaf:mbox <mailto:petter@petter.com> . }")))
+          "PREFIX foaf: <http://xmlns.com/foaf/0.1/> ASK { ?person a foaf:Person ; foaf:mbox <mailto:petter@petter.com> . }")))
 
-  (testing "limit"
+    (testing "limit"
+      (is (=
+            (query
+              (prefix :rdfs)
+              (select :subject :label)
+              (where :subject [:rdfs "label"] :label)
+              (limit 5))
+
+            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?subject ?label WHERE { ?subject rdfs:label ?label } LIMIT 5")))
+
+  (testing "filter"
     (is (=
           (query
-            (prefix :rdfs)
-            (select :subject :label)
-            (where :subject [:rdfs "label"] :label)
-            (limit 5))
+            (prefix :dbpedia :prop)
+            (ask [:dbpedia "Amazon_River"] [:prop "length"] :amazon \.
+                 [:dbpedia "Nile"] [:prop "length"] :nile \.
+                 (filter :amazon \> :nile )))
 
-          "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?subject ?label WHERE { ?subject rdfs:label ?label } LIMIT 5")))
+          "PREFIX dbpedia: <http://dbpedia.org/resource/> PREFIX prop: <http://dbpedia.org/property/> ASK { dbpedia:Amazon_River prop:length ?amazon . dbpedia:Nile prop:length ?nile . FILTER(?amazon > ?nile) }"
+          )))
+
+
+    ; (testing "group"
+    ;   (is (=
+    ;         (query
+    ;           (ask)
+    ;           (group :s :p :o \.))
+
+    ;         "ASK { ?s ?p ?o . }")))
+
+  ; (testing "filter"
+  ;   (is (=
+  ;         (query
+  ;           (prefix :prop)
+  ;           (select :subject :label)
+  ;           (where :subject [:rdfs "label"] :label)
+  ;           (limit 5))
+
+  ;         "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?subject ?label WHERE { ?subject rdfs:label ?label } LIMIT 5"))))
   )

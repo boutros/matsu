@@ -10,10 +10,11 @@
 
 ; *PREFIXES* is a global map of all namespaces you intend to use
 ; TODO make an atom?
-; rename to *NAMESPACES*
+
 (def ^:dynamic *PREFIXES* {:dbpedia "<http://dbpedia.org/resource/>"
                            :foaf "<http://xmlns.com/foaf/0.1/>"
-                           :rdfs "<http://www.w3.org/2000/01/rdf-schema#>"})
+                           :rdfs "<http://www.w3.org/2000/01/rdf-schema#>"
+                           :prop "<http://dbpedia.org/property/>"})
 
 (defn empty-query []
   "query-map constructor"
@@ -57,7 +58,9 @@
 (defn encode [x]
   "Encodes keywords to ?-prefixed variables and other values to RDF literals
   when applicable. Vectors are treated as namespace-qualified and resolves
-  with the first value as namespace."
+  with the first value as namespace.
+
+  Maps are used for special cases, to avoid compilation."
   (cond
     (char? x) x
     (keyword? x) (str \? (name x))
@@ -69,6 +72,7 @@
     (= java.net.URI (type x)) (str "<" x ">")
     ;(= java.util.Date (type x)) (str \" x \" "^^xsd:dateTime")
     (vector? x) (str (name (first x)) \: (second x))
+    (map? x) (:content x)
     :else (throw (new Exception "Don't know how to encode that into RDF literal!"))))
 
 ; -----------------------------------------------------------------------------
@@ -155,6 +159,15 @@
 (defn limit [q & n]
   (assoc q :limit n))
 
+; Special functions which copmile inline groups inside where clauses:
+
+(defn filter [& vars]
+   {:content (str "FILTER(" (string/join " " (vec (map encode vars))) ")" )})
+
 ; (defn optional [& args]
 ;   (into ["OPTIONAL"] args))
 
+; (defn group [q & vars]
+;   {:pre [(map? q)]
+;    :post [(map? q)]}
+;    (update-in q [:group] into vars))
