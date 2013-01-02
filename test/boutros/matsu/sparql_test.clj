@@ -49,10 +49,9 @@
   (testing "ask"
     (is (=
           (query
-            (ask)
-            (where :s :p :o \.))
+            (ask :s :p :o \.))
 
-          "ASK WHERE { ?s ?p ?o . }")))
+          "ASK { ?s ?p ?o . }")))
 
   (testing "select"
     (is (=
@@ -70,7 +69,7 @@
 
           "SELECT DISTINCT ?type WHERE { ?s a ?type }")))
 
-  (testing "prefix and namespaced qualifiers"
+  (testing "prefixed names"
     (is (=
           (query
             (prefix :foaf)

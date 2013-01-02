@@ -81,12 +81,21 @@
 ; Transforms the various query parts into a vectors of strings, or nil if the
 ; particular function is not used in the query
 
+(defn- group-subcompile [v]
+  {:pre [(vector? v)]
+   :post [(vector? %)]}
+  (conj ["{"] (map encode v) "}"))
+
 (defn- query-form-compile [q]
   {:pre [(map? q)]}
   (when-not (empty? (get-in q [:query-form :form]))
     (conj []
-          (get-in q [:query-form :form])
-          (vec (map encode (get-in q [:query-form :content]))))))
+        (let [form (get-in q [:query-form :form])]
+          (cond
+            (= form "ASK") (conj ["ASK"] (group-subcompile (get-in q [:query-form :content])))
+            :else
+              (conj [] (get-in q [:query-form :form])
+              (vec (map encode (get-in q [:query-form :content])))))))))
 
 (defn- from-compile [q]
   {:pre [(map? q)]}
@@ -126,12 +135,13 @@
 ; -----------------------------------------------------------------------------
 ; SPARQL query DSL functions
 ; -----------------------------------------------------------------------------
-; These all takes a map of the query and returns a modified query-map
 
-(defn ask [q]
+; These all takes a map of the query and returns a modified query-map:
+
+(defn ask [q & vars]
   {:pre [(map? q)]
    :post [(map? q)]}
-  (assoc q :query-form {:form "ASK" :content []}))
+  (assoc q :query-form {:form "ASK" :content (vec vars)}))
 
 (defn from [q graph]
   {:pre [(map? q)]
