@@ -103,9 +103,9 @@
             (prefix :dbpedia :prop)
             (ask [:dbpedia "Amazon_River"] [:prop "length"] :amazon \.
                  [:dbpedia "Nile"] [:prop "length"] :nile \.
-                 (filter :amazon \> :nile )))
+                 (filter :amazon \> :nile ) \.))
 
-          "PREFIX dbpedia: <http://dbpedia.org/resource/> PREFIX prop: <http://dbpedia.org/property/> ASK { dbpedia:Amazon_River prop:length ?amazon . dbpedia:Nile prop:length ?nile . FILTER(?amazon > ?nile) }"
+          "PREFIX dbpedia: <http://dbpedia.org/resource/> PREFIX prop: <http://dbpedia.org/property/> ASK { dbpedia:Amazon_River prop:length ?amazon . dbpedia:Nile prop:length ?nile . FILTER(?amazon > ?nile) . }"
           )))
 
 
