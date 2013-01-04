@@ -90,47 +90,39 @@
     (testing "limit"
       (is (=
             (query
-              (prefix :rdfs)
-              (select :subject :label)
-              (where :subject [:rdfs "label"] :label)
+              (select :s :o)
+              (where :s :p :o)
               (limit 5))
 
-            "PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?subject ?label WHERE { ?subject rdfs:label ?label } LIMIT 5")))
+            "SELECT ?s ?o WHERE { ?s ?p ?o } LIMIT 5")))
 
   (testing "filter"
     (is (=
           (query
-            (prefix :dbpedia :prop)
-            (ask [:dbpedia "Amazon_River"] [:prop "length"] :amazon \.
-                 [:dbpedia "Nile"] [:prop "length"] :nile \.
-                 (filter :amazon \> :nile ) \.))
+            (ask :s1 :p1 :o1 \.
+                 :s2 :p2 :o2 \.
+                 (filter :o2 \> :o1 ) \.))
 
-          "PREFIX dbpedia: <http://dbpedia.org/resource/> PREFIX prop: <http://dbpedia.org/property/> ASK { dbpedia:Amazon_River prop:length ?amazon . dbpedia:Nile prop:length ?nile . FILTER(?amazon > ?nile) . }"
-          )))
+          "ASK { ?s1 ?p1 ?o1 . ?s2 ?p2 ?o2 . FILTER(?o2 > ?o1) . }")))
 
   (testing "optional"
     (is (=
           (query
-            (prefix :foaf)
-            (select :name :mbox :hpage)
-            (where :x [:foaf "name"] :name \.
-                   (optional :x [:foaf "mbox"] :mbox) \.
-                   (optional :x [:foaf "homepage"] :hpage)))
+            (select :o1 :o2)
+            (where :s1 :p1 :o1 \.
+                   (optional :s2 :p2 :o2) \.))
 
-          "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox ?hpage WHERE { ?x foaf:name ?name . OPTIONAL { ?x foaf:mbox ?mbox } . OPTIONAL { ?x foaf:homepage ?hpage } }"
-          )))
+          "SELECT ?o1 ?o2 WHERE { ?s1 ?p1 ?o1 . OPTIONAL { ?s2 ?p2 ?o2 } . }")))
 
   (testing "filter inside optional"
     (is (=
           (query
-            (prefix :dc :ns)
-            (select :title :price)
-            (where :x [:dc "title"] :title \.
-                   (optional :x [:ns "price"] :price \.
+            (select :s :price)
+            (where :s :p :o \.
+                   (optional :s :p2 :price \.
                              (filter :price \< 30))))
 
-    "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ?price WHERE { ?x dc:title ?title . OPTIONAL { ?x ns:price ?price . FILTER(?price < 30) } }"
-    )))
+    "SELECT ?s ?price WHERE { ?s ?p ?o . OPTIONAL { ?s ?p2 ?price . FILTER(?price < 30) } }")))
 
 
   )
