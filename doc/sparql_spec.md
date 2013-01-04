@@ -82,7 +82,7 @@ SELECT ?v WHERE { ?v ?p 42 }
 ```
 
 ####CLOJURE
-```
+```clojure
 (query
   (select :v)
   (where :v :p 42))
@@ -103,10 +103,63 @@ SELECT ?v WHERE { ?v ?p "abc"^^<http://example.org/datatype#specialDatatype> }
 
 ### 2.4 Blank Node Labels in Query Results
 
+####SPARQL
+```sparql
+PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
+SELECT ?x ?name
+WHERE  { ?x foaf:name ?name }
+
+```
+
+####CLOJURE
+```clojure
+(query ...)
+```
 
 ### 2.5 Creating Values with Expressions
 
+####SPARQL
+```sparql
+PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
+SELECT ( CONCAT(?G, " ", ?S) AS ?name )
+WHERE  { ?P foaf:givenName ?G ; foaf:surname ?S }
+```
+
+####CLOJURE
+```clojure
+(query ...)
+```
+
+####SPARQL
+```sparql
+PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
+SELECT ?name
+WHERE  {
+   ?P foaf:givenName ?G ;
+      foaf:surname ?S
+   BIND(CONCAT(?G, " ", ?S) AS ?name)
+}
+```
+
+####CLOJURE
+```clojure
+(query ...)
+```
 
 ### 2.6 Building RDF Graphs
+
+####SPARQL
+```sparql
+PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
+PREFIX org:    <http://example.com/ns#>
+
+CONSTRUCT { ?x foaf:name ?name }
+WHERE  { ?x org:employeeName ?name }
+```
+
+####CLOJURE
+```clojure
+(query ...)
+```
 
 ## 3 RDF Term Constraints (Informative)
