@@ -11,7 +11,6 @@ The following namespaces are assumed to be present in the `*PREFIXES*` map:
 
 ### 2.1 Writing a Simple Query
 
-####SPARQL
 ```sparql
 SELECT ?title
 WHERE
@@ -20,7 +19,6 @@ WHERE
 }
 ```
 
-####CLOJURE
 ```clojure
 (query
   (select :title)
@@ -29,7 +27,6 @@ WHERE
 
 ### 2.2 Multiple Matches
 
-####SPARQL
 ```sparql
 PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
 SELECT ?name ?mbox
@@ -38,7 +35,6 @@ WHERE
     ?x foaf:mbox ?mbox }
 ```
 
-####CLOJURE
 ```clojure
 (query
   (prefix :foaf)
@@ -50,48 +46,40 @@ WHERE
 ### 2.3 Matching RDF Literals
 
 
-####SPARQL
 ```sparql
 SELECT ?v WHERE { ?v ?p "cat" }
 ```
 
-####CLOJURE
 ```clojure
 (query
   (select :v)
   (where :v :p "cat"))
 ```
 
-####SPARQL
 ```sparql
 SELECT ?v WHERE { ?v ?p "cat"@en }
 ```
 
-####CLOJURE
 ```clojure
 (query
   (select :v)
   (where :v :p ["cat" :en]))
 ```
 
-####SPARQL
 ```sparql
 SELECT ?v WHERE { ?v ?p 42 }
 ```
 
-####CLOJURE
 ```clojure
 (query
   (select :v)
   (where :v :p 42))
 ```
 
-####SPARQL
 ```sparql
 SELECT ?v WHERE { ?v ?p "abc"^^<http://example.org/datatype#specialDatatype> }
 ```
 
-####CLOJURE
 ```clojure
 (query
   (select :v)
@@ -100,33 +88,28 @@ SELECT ?v WHERE { ?v ?p "abc"^^<http://example.org/datatype#specialDatatype> }
 
 ### 2.4 Blank Node Labels in Query Results
 
-####SPARQL
 ```sparql
 PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
 SELECT ?x ?name
 WHERE  { ?x foaf:name ?name }
 ```
 
-####CLOJURE
 ```clojure
 (query ...)
 ```
 
 ### 2.5 Creating Values with Expressions
 
-####SPARQL
 ```sparql
 PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
 SELECT ( CONCAT(?G, " ", ?S) AS ?name )
 WHERE  { ?P foaf:givenName ?G ; foaf:surname ?S }
 ```
 
-####CLOJURE
 ```clojure
 (query ...)
 ```
 
-####SPARQL
 ```sparql
 PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
 SELECT ?name
@@ -137,14 +120,12 @@ WHERE  {
 }
 ```
 
-####CLOJURE
 ```clojure
 (query ...)
 ```
 
 ### 2.6 Building RDF Graphs
 
-####SPARQL
 ```sparql
 PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
 PREFIX org:    <http://example.com/ns#>
@@ -153,7 +134,6 @@ CONSTRUCT { ?x foaf:name ?name }
 WHERE  { ?x org:employeeName ?name }
 ```
 
-####CLOJURE
 ```clojure
 (query ...)
 ```
