@@ -83,7 +83,9 @@ SELECT ?v WHERE { ?v ?p 42 }
 
 ####CLOJURE
 ```
-(query ...)
+(query
+  (select :v)
+  (where :v :p 42))
 ```
 
 ####SPARQL
@@ -93,8 +95,10 @@ SELECT ?v WHERE { ?v ?p "abc"^^<http://example.org/datatype#specialDatatype> }
 ```
 
 ####CLOJURE
-```
-(query ...)
+```clojure
+(query
+  (select :v)
+  (where :v :p (raw "\"abc\"^^<http://example.org/datatype#specialDatatype>")))
 ```
 
 ### 2.4 Blank Node Labels in Query Results

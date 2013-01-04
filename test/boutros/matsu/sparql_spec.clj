@@ -37,5 +37,19 @@
           (where :v :p ["cat" :en]))
 
         "SELECT ?v WHERE { ?v ?p \"cat\"@en }"))
+
+  (is (=
+        (query
+          (select :v)
+          (where :v :p 42))
+
+        "SELECT ?v WHERE { ?v ?p 42 }"))
+
+  (is (=
+        (query
+          (select :v)
+          (where :v :p (raw "\"abc\"^^<http://example.org/datatype#specialDatatype>")))
+
+        "SELECT ?v WHERE { ?v ?p \"abc\"^^<http://example.org/datatype#specialDatatype> }"))
   )
 

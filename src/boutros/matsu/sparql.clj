@@ -183,6 +183,10 @@
   {:post [(map? %)]}
    {:content (str "OPTIONAL { " (string/join " " (vec (map encode vars))) " }" )})
 
+(defn raw [string]
+  {:post [(map? %)]}
+   {:content string })
+
 ; (defn group [q & vars]
 ;   {:pre [(map? q)]
 ;    :post [(map? q)]}

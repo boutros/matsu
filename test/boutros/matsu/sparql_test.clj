@@ -132,5 +132,13 @@
 
           "SELECT ?s WHERE { ?s ?p \"une pipe\"@fr }")))
 
+  (testing "raw"
+    (is (=
+          (query
+            (select :title)
+            (where :s :p :title \.
+                   (raw "FILTER langMatches( lang(?title), \"FR\" )")))
+
+          "SELECT ?title WHERE { ?s ?p ?title . FILTER langMatches( lang(?title), \"FR\" ) }")))
 
   )
