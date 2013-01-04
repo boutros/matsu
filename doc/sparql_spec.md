@@ -12,7 +12,7 @@ The following namespaces are assumed to be present in the `*PREFIXES*` map:
 ### 2.1 Writing a Simple Query
 
 ####SPARQL
-```
+```sparql
 SELECT ?title
 WHERE
 {
@@ -30,7 +30,7 @@ WHERE
 ### 2.2 Multiple Matches
 
 ####SPARQL
-```
+```sparql
 PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
 SELECT ?name ?mbox
 WHERE
@@ -51,7 +51,7 @@ WHERE
 
 
 ####SPARQL
-```
+```sparql
 SELECT ?v WHERE { ?v ?p "cat" }
 ```
 
@@ -63,7 +63,7 @@ SELECT ?v WHERE { ?v ?p "cat" }
 ```
 
 ####SPARQL
-```
+```sparql
 SELECT ?v WHERE { ?v ?p "cat"@en }
 
 ```
@@ -72,13 +72,11 @@ SELECT ?v WHERE { ?v ?p "cat"@en }
 ```clojure
 (query
   (select :v)
-  (where :v :p ["cat" :en]))(query
-          (select :v)
-          (where :v :p "cat"))
+  (where :v :p ["cat" :en]))
 ```
 
 ####SPARQL
-```
+```sparql
 SELECT ?v WHERE { ?v ?p 42 }
 
 ```
@@ -89,7 +87,7 @@ SELECT ?v WHERE { ?v ?p 42 }
 ```
 
 ####SPARQL
-```
+```sparql
 SELECT ?v WHERE { ?v ?p "abc"^^<http://example.org/datatype#specialDatatype> }
 
 ```
