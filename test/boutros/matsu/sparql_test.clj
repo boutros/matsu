@@ -124,5 +124,13 @@
 
     "SELECT ?s ?price WHERE { ?s ?p ?o . OPTIONAL { ?s ?p2 ?price . FILTER(?price < 30) } }")))
 
+  (testing "language tags"
+    (is (=
+          (query
+            (select :s)
+            (where :s :p ["une pipe" :fr]))
+
+          "SELECT ?s WHERE { ?s ?p \"une pipe\"@fr }")))
+
 
   )

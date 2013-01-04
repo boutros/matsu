@@ -1,6 +1,6 @@
 #SPARQL 1.1 spesification
 
-An attempt to translate all the example queries from the [SPARQL 1.1 W3C Recommendation](http://www.w3.org/TR/sparql11-query/) to Matsu syntax. This document corresponds to the tests in `/test/boutros/matsu/sparql_spec.clj`.
+An attempt to translate all the example queries from the [SPARQL 1.1 W3C Recommendation](http://www.w3.org/TR/sparql11-query/) into Matsu syntax. This document corresponds to the tests in `/test/boutros/matsu/sparql_spec.clj`.
 
 The following namespaces are assumed to be present in *PREFIXES*:
 ```
@@ -46,3 +46,65 @@ WHERE
   (where :x [:foaf "name"] :name \.
          :x [:foaf "mbox"] :mbox))
 ```
+
+### 2.3 Matching RDF Literals
+
+
+####SPARQL
+```
+SELECT ?v WHERE { ?v ?p "cat" }
+```
+
+####CLOJURE
+```
+(query
+  (select :v)
+  (where :v :p "cat"))
+```
+
+####SPARQL
+```
+SELECT ?v WHERE { ?v ?p "cat"@en }
+
+```
+
+####CLOJURE
+```
+(query
+  (select :v)
+  (where :v :p ["cat" :en]))(query
+          (select :v)
+          (where :v :p "cat"))
+```
+
+####SPARQL
+```
+SELECT ?v WHERE { ?v ?p 42 }
+
+```
+
+####CLOJURE
+```
+(query ...)
+```
+
+####SPARQL
+```
+SELECT ?v WHERE { ?v ?p "abc"^^<http://example.org/datatype#specialDatatype> }
+
+```
+
+####CLOJURE
+```
+(query ...)
+```
+
+### 2.4 Blank Node Labels in Query Results
+
+
+### 2.5 Creating Values with Expressions
+
+
+### 2.6 Building RDF Graphs
+
+## 3 RDF Term Constraints (Informative)

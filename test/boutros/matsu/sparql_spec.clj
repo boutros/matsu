@@ -24,6 +24,18 @@
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE { ?x foaf:name ?name . ?x foaf:mbox ?mbox }"))
 
+  (is (=
+        (query
+          (select :v)
+          (where :v :p "cat"))
 
+        "SELECT ?v WHERE { ?v ?p \"cat\" }"))
+
+  (is (=
+        (query
+          (select :v)
+          (where :v :p ["cat" :en]))
+
+        "SELECT ?v WHERE { ?v ?p \"cat\"@en }"))
   )
 

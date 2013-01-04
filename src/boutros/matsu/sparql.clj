@@ -59,8 +59,8 @@
 
 (defn encode [x]
   "Encodes keywords to ?-prefixed variables and other values to RDF literals
-  when applicable. Vectors are treated as namespace-qualified and resolves
-  with the first value as namespace.
+  when applicable. Vectors are treated as namespace-qualified if first value is
+  a keyword, or as string with language tag if the second value is a keyword.
 
   Maps are used for special cases, to avoid compilation inside where-clauses."
   (cond
@@ -73,7 +73,9 @@
     (string? x) (str \" x \" )
     (= java.net.URI (type x)) (str "<" x ">")
     ;(= java.util.Date (type x)) (str \" x \" "^^xsd:dateTime")
-    (vector? x) (str (name (first x)) \: (second x))
+    (vector? x) (if (string? (first x))
+                  (str \" (first x) "\"@" (name (second x)))
+                  (str (name (first x)) \: (second x)))
     (map? x) (:content x)
     :else (throw (new Exception "Don't know how to encode that into RDF literal!"))))
 
