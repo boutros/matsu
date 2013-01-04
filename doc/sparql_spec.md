@@ -65,7 +65,6 @@ SELECT ?v WHERE { ?v ?p "cat" }
 ####SPARQL
 ```sparql
 SELECT ?v WHERE { ?v ?p "cat"@en }
-
 ```
 
 ####CLOJURE
@@ -78,7 +77,6 @@ SELECT ?v WHERE { ?v ?p "cat"@en }
 ####SPARQL
 ```sparql
 SELECT ?v WHERE { ?v ?p 42 }
-
 ```
 
 ####CLOJURE
@@ -91,7 +89,6 @@ SELECT ?v WHERE { ?v ?p 42 }
 ####SPARQL
 ```sparql
 SELECT ?v WHERE { ?v ?p "abc"^^<http://example.org/datatype#specialDatatype> }
-
 ```
 
 ####CLOJURE
@@ -108,7 +105,6 @@ SELECT ?v WHERE { ?v ?p "abc"^^<http://example.org/datatype#specialDatatype> }
 PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
 SELECT ?x ?name
 WHERE  { ?x foaf:name ?name }
-
 ```
 
 ####CLOJURE
