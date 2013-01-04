@@ -184,7 +184,8 @@
    {:content (str "OPTIONAL { " (string/join " " (vec (map encode vars))) " }" )})
 
 (defn raw [string]
-  {:post [(map? %)]}
+  {:pre [(string? string)]
+   :post [(map? %)]}
    {:content string })
 
 ; (defn group [q & vars]
