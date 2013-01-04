@@ -95,7 +95,10 @@ WHERE  { ?x foaf:name ?name }
 ```
 
 ```clojure
-(query ...)
+(query
+  (prefix :foaf)
+  (select :x :name)
+  (where :x [:foaf "name"] :name))
 ```
 
 ### 2.5 Creating Values with Expressions
@@ -107,8 +110,14 @@ WHERE  { ?P foaf:givenName ?G ; foaf:surname ?S }
 ```
 
 ```clojure
-(query ...)
+(query
+  (prefix :foaf)
+  (select \( (concat :G " " :S) 'AS :name \) )
+  (where :P [:foaf "givenName"] :G
+         \; [:foaf "surname"] :S))
 ```
+*NOT* happy about this syntax, must think about how to handle SPARQL expressions
+
 
 ```sparql
 PREFIX foaf:   <http://xmlns.com/foaf/0.1/>

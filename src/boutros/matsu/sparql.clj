@@ -1,5 +1,5 @@
 (ns boutros.matsu.sparql
-  (:refer-clojure :exclude [filter])
+  (:refer-clojure :exclude [filter concat])
   (:require [clojure.set :as set]
             [clojure.string :as string])
   (:import (java.net URI)))
@@ -65,6 +65,7 @@
   Maps are used for special cases, to avoid compilation inside where-clauses."
   (cond
     (char? x) x
+    (symbol? x) x
     (keyword? x) (str \? (name x))
     (integer? x) x ;(str  \" x \" "^^xsd:integer")
     (float? x) x ;(str  \" x \" "^^xsd:decimal")
@@ -78,6 +79,10 @@
                   (str (name (first x)) \: (second x)))
     (map? x) (:content x)
     :else (throw (new Exception "Don't know how to encode that into RDF literal!"))))
+
+(defn encode-comma [x]
+  "adds a commma after the encoded value"
+  (str (encode x) ","))
 
 ; -----------------------------------------------------------------------------
 ; Compiler functions
@@ -173,7 +178,7 @@
   :post [(map? %)]}
   (assoc q :limit n))
 
-; Special functions which compile inline groups inside where clauses:
+; Special functions which compile inline groups inside select/where clauses:
 
 (defn filter [& vars]
   {:post [(map? %)]}
@@ -187,6 +192,11 @@
   {:pre [(string? string)]
    :post [(map? %)]}
    {:content string })
+
+(defn concat [& vars]
+  {:post [(map? %)]}
+  {:content (str "CONCAT("(string/join " " (map encode-comma (butlast vars)))
+                 " " (encode (last vars))")") })
 
 ; (defn group [q & vars]
 ;   {:pre [(map? q)]

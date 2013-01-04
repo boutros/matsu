@@ -1,5 +1,5 @@
 (ns boutros.matsu.sparql-spec
-  (:refer-clojure :exclude [filter])
+  (:refer-clojure :exclude [filter concat])
   (:use clojure.test
         boutros.matsu.sparql)
   (:import (java.net URI)))
@@ -51,5 +51,22 @@
           (where :v :p (raw "\"abc\"^^<http://example.org/datatype#specialDatatype>")))
 
         "SELECT ?v WHERE { ?v ?p \"abc\"^^<http://example.org/datatype#specialDatatype> }"))
+
+  (is (=
+        (query
+          (prefix :foaf)
+          (select :x :name)
+          (where :x [:foaf "name"] :name))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?x ?name WHERE { ?x foaf:name ?name }"))
+
+  (is (=
+        (query
+          (prefix :foaf)
+          (select \( (concat :G " " :S) 'AS :name \) )
+          (where :P [:foaf "givenName"] :G
+                 \; [:foaf "surname"] :S))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ( CONCAT(?G, \" \", ?S) AS ?name ) WHERE { ?P foaf:givenName ?G ; foaf:surname ?S }"))
   )
 
