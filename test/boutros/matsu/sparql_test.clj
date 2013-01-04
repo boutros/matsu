@@ -87,14 +87,14 @@
 
           "PREFIX foaf: <http://xmlns.com/foaf/0.1/> ASK { ?person a foaf:Person ; foaf:mbox <mailto:petter@petter.com> . }")))
 
-    (testing "limit"
-      (is (=
-            (query
-              (select :s :o)
-              (where :s :p :o)
-              (limit 5))
+  (testing "limit"
+    (is (=
+          (query
+            (select :s :o)
+            (where :s :p :o)
+            (limit 5))
 
-            "SELECT ?s ?o WHERE { ?s ?p ?o } LIMIT 5")))
+          "SELECT ?s ?o WHERE { ?s ?p ?o } LIMIT 5")))
 
   (testing "filter"
     (is (=
