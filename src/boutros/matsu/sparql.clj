@@ -142,7 +142,7 @@
 
 (defn ask [q & vars]
   {:pre [(map? q)]
-   :post [(map? q)]}
+   :post [(map? %)]}
   (assoc q :query-form {:form "ASK" :content (vec vars)}))
 
 (defn from [q graph]
@@ -173,7 +173,7 @@
   :post [(map? %)]}
   (assoc q :limit n))
 
-; Special functions which copmile inline groups inside where clauses:
+; Special functions which compile inline groups inside where clauses:
 
 (defn filter [& vars]
   {:post [(map? %)]}
