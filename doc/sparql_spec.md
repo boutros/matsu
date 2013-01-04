@@ -1,8 +1,8 @@
 #SPARQL 1.1 spesification
 
-An attempt to translate all the example queries from the [SPARQL 1.1 W3C Recommendation](http://www.w3.org/TR/sparql11-query/) into Matsu syntax. This document corresponds to the tests in `/test/boutros/matsu/sparql_spec.clj`.
+An attempt to translate all the example queries from the [SPARQL 1.1 W3C Recommendation](http://www.w3.org/TR/sparql11-query/) into Matsu syntax. This document corresponds with the tests in `/test/boutros/matsu/sparql_spec.clj`.
 
-The following namespaces are assumed to be present in *PREFIXES*:
+The following namespaces are assumed to be present in the `*PREFIXES*` map:
 ```
 {:foaf "<>" etc}
 ```
@@ -21,7 +21,7 @@ WHERE
 ```
 
 ####CLOJURE
-```
+```clojure
 (query
   (select :title)
   (where (URI. "http://example.org/book/book1") (URI. "http://example.org/book/book1") :title) \.))
@@ -39,7 +39,7 @@ WHERE
 ```
 
 ####CLOJURE
-```
+```clojure
 (query
   (prefix :foaf)
   (select :name :mbox)
@@ -56,7 +56,7 @@ SELECT ?v WHERE { ?v ?p "cat" }
 ```
 
 ####CLOJURE
-```
+```clojure
 (query
   (select :v)
   (where :v :p "cat"))
@@ -69,7 +69,7 @@ SELECT ?v WHERE { ?v ?p "cat"@en }
 ```
 
 ####CLOJURE
-```
+```clojure
 (query
   (select :v)
   (where :v :p ["cat" :en]))(query

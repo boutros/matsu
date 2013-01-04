@@ -122,7 +122,7 @@
                    (optional :s :p2 :price \.
                              (filter :price \< 30))))
 
-    "SELECT ?s ?price WHERE { ?s ?p ?o . OPTIONAL { ?s ?p2 ?price . FILTER(?price < 30) } }")))
+          "SELECT ?s ?price WHERE { ?s ?p ?o . OPTIONAL { ?s ?p2 ?price . FILTER(?price < 30) } }")))
 
   (testing "language tags"
     (is (=
