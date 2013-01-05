@@ -10,14 +10,12 @@
 
 (defn empty-query []
   "query-map constructor"
-  {:prefixes []
-   :from nil
+  {:from nil
    :query-form {:form nil :content []}
    :where []
    :order-by nil
    :limit nil
-   :offset nil}
-  )
+   :offset nil})
 
 (def PREFIXES (atom {}))
 
@@ -131,7 +129,6 @@
     (first (for [p
                  (->> s (re-seq #"(\b\w+):\w") (map last))]
              (str "PREFIX " p ": " (ns-or-error (keyword p)) " " )))
-    ;
     s))
 
 (defn compile-query [q]
@@ -148,7 +145,6 @@
        (remove nil?)
        (string/join " ")
        (infer-prefixes)))
-
 
 ; -----------------------------------------------------------------------------
 ; SPARQL query DSL functions
@@ -205,8 +201,3 @@
   {:post [(map? %)]}
   {:content (str "CONCAT("(string/join " " (map encode-comma (butlast vars)))
                  " " (encode (last vars))")") })
-
-; (defn group [q & vars]
-;   {:pre [(map? q)]
-;    :post [(map? q)]}
-;    (update-in q [:group] into vars))
