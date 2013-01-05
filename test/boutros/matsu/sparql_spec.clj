@@ -108,5 +108,14 @@
                  (filter-regex :title "web" "i")))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { ?x dc:title ?title FILTER regex(?title, \"web\", \"i\") }"))
+
+  (is (=
+        (query
+          (select :title :price)
+          (where :s [:ns "price"] :price \.
+                 (filter :price \< 30.5)
+                 :x [:dc "title"] :title \.))
+
+        "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ?price WHERE { ?x ns:price ?price . FILTER (?price < 30.5) ?x dc:title ?title . }"))
   )
 
