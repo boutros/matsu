@@ -93,5 +93,20 @@
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX org: <http://example.com/ns#> CONSTRUCT { ?x foaf:name ?name } WHERE{ ?x org:employeeName ?name }"))
 
+  (is (=
+        (query
+          (select :title)
+          (where :x [:dc "title"] :title
+                 (filter-regex :title "^SPARQL")))
+
+        "PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { ?x dc:title ?title FILTER regex(?title, \"^SPARQL\") }"))
+
+  (is (=
+        (query
+          (select :title)
+          (where :x [:dc "title"] :title
+                 (filter-regex :title "web" "i")))
+
+        "PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { ?x dc:title ?title FILTER regex(?title, \"web\", \"i\") }"))
   )
 

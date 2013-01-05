@@ -81,7 +81,7 @@
                   (str \" (first x) "\"@" (name (second x)))
                   (str (name (first x)) \: (second x)))
     (map? x) (:content x)
-    :else (throw (new Exception "Don't know how to encode that into RDF literal!"))))
+    :else (throw (new Exception (format "Don't know how to encode %s into RDF literal!" x)))))
 
 (defn encode-comma [x]
   "adds a commma after the encoded value"
@@ -193,6 +193,14 @@
 (defn filter [& vars]
   {:post [(map? %)]}
    {:content (str "FILTER(" (string/join " " (vec (map encode vars))) ")" )})
+
+(defn filter-regex [v regex & flags]
+  {:post [(map? %)]}
+   {:content (str "FILTER regex(" (encode v)
+                  ", "
+                  (encode regex)
+                  (when flags (str ", " (encode (first flags))))
+                  ")" )})
 
 (defn optional [& vars]
   {:post [(map? %)]}

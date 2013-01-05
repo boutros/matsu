@@ -3,7 +3,7 @@
 An attempt to translate all the example queries from the [SPARQL 1.1 specification from W3C](http://www.w3.org/TR/sparql11-query/) into Matsu syntax. This document corresponds with the tests in `/test/boutros/matsu/sparql_spec.clj`.
 
 The following namespaces are assumed to be registered:
-```
+```clojure
 @PREFIXES
 {:foaf    "<http://xmlns.com/foaf/0.1/>"
  :org     "<http://example.com/ns#>"}
@@ -153,3 +153,55 @@ WHERE  { ?x org:employeeName ?name }
 ```
 
 ## 3 RDF Term Constraints (Informative)
+
+### 3.1 Restricting the Value of Strings
+
+```sparql
+PREFIX  dc:  <http://purl.org/dc/elements/1.1/>
+SELECT  ?title
+WHERE   { ?x dc:title ?title
+          FILTER regex(?title, "^SPARQL")
+        }
+```
+
+```clojure
+(query
+  (select :title)
+  (where :x [:dc "title"] :title
+         (filter-regex :title "^SPARQL")))
+```
+
+```sparql
+PREFIX  dc:  <http://purl.org/dc/elements/1.1/>
+SELECT  ?title
+WHERE   { ?x dc:title ?title
+          FILTER regex(?title, "web", "i" )
+        }
+```
+
+
+```clojure
+(query
+  (select :title)
+  (where :x [:dc "title"] :title
+         (filter-regex :title "web" "i")))
+```
+
+### 3.2 Restricting Numeric Values
+
+```sparql
+PREFIX  dc:  <http://purl.org/dc/elements/1.1/>
+PREFIX  ns:  <http://example.org/ns#>
+SELECT  ?title ?price
+WHERE   { ?x ns:price ?price .
+          FILTER (?price < 30.5)
+          ?x dc:title ?title . }
+```
+
+```clojure
+(query ...)
+```
+
+## SPARQL Syntax
+
+### 4.2 Syntax for Triple Patterns
