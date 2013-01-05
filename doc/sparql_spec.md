@@ -236,11 +236,12 @@ WHERE   { :book1  dc:title  $title }
 
 ```clojure
 (query
-  (select '$title)
-  (where ':book1 [:dc title] '$title))
+  ...) ;TODO
 ```
-TODO It's not allowed to have a keyword `::` in Clojure, so we must think of another way...
-In SPARQL I would prefer to use BASE instead:
+Dollar-prefixed variables are not supported by Matsu (`$title` is equal to `?title` in SPARQL)
+
+It's not allowed to have a keyword `::` in Clojure, so we must think of another way for the namespace shortcut...
+Maybe use BASE instead.
 
 ```
 BASE    <http://example.org/book/>

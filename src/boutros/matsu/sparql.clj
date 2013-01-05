@@ -81,7 +81,7 @@
                   (str \" (first x) "\"@" (name (second x)))
                   (str (name (first x)) \: (second x)))
     (map? x) (:content x)
-    :else (throw (new Exception (format "Don't know how to encode %s into RDF literal!" x)))))
+    :else (throw (Exception. (format "Don't know how to encode %s into RDF literal!" x)))))
 
 (defn encode-comma [x]
   "adds a commma after the encoded value"
