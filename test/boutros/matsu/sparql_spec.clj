@@ -133,5 +133,47 @@
           (select :title)
           (where [:book1] [:dc "title"] :title))
 
-        "BASE <http://example.org/book/> PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { <book1> dc:title ?title }"))
-  )
+        "BASE <http://example.org/book/> PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { <book1> dc:title ?title }")))
+
+(deftest part-5
+  (is (=
+        (query
+          (select :name :mbox)
+          (where :x [:foaf "name"] :name \.
+                 :x [:foaf "mbox"] :mbox \.))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE { ?x foaf:name ?name . ?x foaf:mbox ?mbox . }"))
+
+    ; (is (=
+    ;     (query
+    ;       )
+
+    ;     "PREFIX foaf:    <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE  { { ?x foaf:name ?name . } { ?x foaf:mbox ?mbox . } }"))
+    )
+
+(deftest part-6
+  (is (=
+        (query
+          (select :name :mbox)
+          (where :x [:foaf "name"] :name \.
+                 (optional :x [:foaf "mbox"] :mbox)))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE { ?x foaf:name ?name . OPTIONAL { ?x foaf:mbox ?mbox } }"))
+
+    (is (=
+          (query
+            (select :title :price)
+            (where :x [:dc "title"] :title \.
+                   (optional :x [:ns "price"] :price (filter :price \< 30))))
+
+          "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns:<http://example.org/ns#> SELECT ?title ?price WHERE { ?x dc:title ?title . OPTIONAL { ?x ns:price ?price . FILTER (?price < 30) }}" ))
+
+    (is (=
+          (query
+            (select :name :mbox :hpage)
+            (where :x [:foaf "name"] :name \.
+                   (optional :x [:foaf "mbox"] :mbox) \.
+                   (optional :x [:foaf "homepage"] :hpage)))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox ?hpage WHERE { ?x foaf:name ?name . OPTIONAL { ?x foaf:mbox ?mbox } . OPTIONAL { ?x foaf:homepage ?hpage } }"))
+    )

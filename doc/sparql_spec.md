@@ -256,3 +256,84 @@ WHERE   { <book1>  dc:title  ?title }
     (select :title)
     (where [book1] [:dc "title"] :title))
 ```
+
+## 5 Graph Patterns
+
+### 5.2 Group Graph Patterns
+
+```sparql
+PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+SELECT ?name ?mbox
+WHERE  {
+          ?x foaf:name ?name .
+          ?x foaf:mbox ?mbox .
+       }
+```
+
+```clojure
+(query
+  (select :name :mbox)
+  (where :x [:foaf "name"] :name \.
+         :x [:foaf "mbox"] :mbox \.))
+```
+
+```sparql
+PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+SELECT ?name ?mbox
+WHERE  { { ?x foaf:name ?name . }
+         { ?x foaf:mbox ?mbox . }
+       }
+```
+
+```clojure
+(query ...)
+```
+hm..
+
+## 6 Including Optional Values
+
+### 6.1 Optional Pattern Matching
+
+```sparql
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+SELECT ?name ?mbox
+WHERE  { ?x foaf:name  ?name .
+         OPTIONAL { ?x  foaf:mbox  ?mbox }
+       }
+```
+
+```clojure
+(query ...)
+```
+
+### 6.2 Constraints in Optional Pattern Matching
+
+```sparql
+PREFIX  dc:  <http://purl.org/dc/elements/1.1/>
+PREFIX  ns:  <http://example.org/ns#>
+SELECT  ?title ?price
+WHERE   { ?x dc:title ?title .
+          OPTIONAL { ?x ns:price ?price . FILTER (?price < 30) }
+        }
+```
+
+```clojure
+(query ...)
+```
+
+### 6.3 Multiple Optional Graph Patterns
+
+```sparql
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+SELECT ?name ?mbox ?hpage
+WHERE  { ?x foaf:name  ?name .
+         OPTIONAL { ?x foaf:mbox ?mbox } .
+         OPTIONAL { ?x foaf:homepage ?hpage }
+       }
+```
+
+```clojure
+(query ...)
+```
+
+## 7 Matching Alternatives
