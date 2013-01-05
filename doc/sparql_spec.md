@@ -2,9 +2,11 @@
 
 An attempt to translate all the example queries from the [SPARQL 1.1 specification from W3C](http://www.w3.org/TR/sparql11-query/) into Matsu syntax. This document corresponds with the tests in `/test/boutros/matsu/sparql_spec.clj`.
 
-The following namespaces are assumed to be present in the `PREFIXES` map:
+The following namespaces are assumed to be registered:
 ```
-{:foaf "<>" etc}
+@PREFIXES
+{:foaf    "<http://xmlns.com/foaf/0.1/>"
+ :org     "<http://example.com/ns#>"}
 ```
 
 ## 2 Making Simple Queries (Informative)
@@ -131,9 +133,8 @@ WHERE  {
   (select :name)
   (where :P [:foaf "givenName"] :G
          \; [:foaf "surname"] :S
-         (bind (concat :G " " :S) 'AS :name)))
+         (bind [(concat :G " " :S) :name])))
 ```
-Maybe change syntax to: `(bind [(expr) :name])` ? Agrees with clojure let syntax
 
 ### 2.6 Building RDF Graphs
 
