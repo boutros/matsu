@@ -213,3 +213,43 @@ WHERE   { ?x ns:price ?price .
 ## SPARQL Syntax
 
 ### 4.2 Syntax for Triple Patterns
+
+```sparql
+PREFIX  dc: <http://purl.org/dc/elements/1.1/>
+SELECT  ?title
+WHERE   { <http://example.org/book/book1> dc:title ?title }
+```
+
+```clojure
+(query
+  (select :title)
+  (where (URI. "http://example.org/book/book1") [:dc "title"] :title))
+```
+
+```sparql
+PREFIX  dc: <http://purl.org/dc/elements/1.1/>
+PREFIX  : <http://example.org/book/>
+
+SELECT  $title
+WHERE   { :book1  dc:title  $title }
+```
+
+```clojure
+(query
+  (select '$title)
+  (where ':book1 [:dc title] '$title))
+```
+TODO It's not allowed to have a keyword `::` in Clojure, so we must think of another way...
+In SPARQL I would prefer to use BASE instead:
+
+```
+BASE    <http://example.org/book/>
+PREFIX  dc: <http://purl.org/dc/elements/1.1/>
+
+SELECT  $title
+WHERE   { <book1>  dc:title  ?title }
+```
+
+```clojure
+(query ...)
+```

@@ -117,6 +117,14 @@
                  (filter :price \< 30.5)
                  :x [:dc "title"] :title \.))
 
-        "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ?price WHERE { ?x ns:price ?price . FILTER (?price < 30.5) ?x dc:title ?title . }"))
-  )
+        "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ?price WHERE { ?x ns:price ?price . FILTER (?price < 30.5) ?x dc:title ?title . }")))
 
+(deftest part-4
+  (is (=
+        (query
+          (select :title)
+          (where (URI. "http://example.org/book/book1") [:dc "title"] :title))
+
+        "PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { <http://example.org/book/book1> dc:title ?title }"))
+
+  )
