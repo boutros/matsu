@@ -91,8 +91,9 @@
           (construct :x [:foaf "name"] :name)
           (where :x [:org "employeeName"] :name))
 
-        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX org: <http://example.com/ns#> CONSTRUCT { ?x foaf:name ?name } WHERE{ ?x org:employeeName ?name }"))
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX org: <http://example.com/ns#> CONSTRUCT { ?x foaf:name ?name } WHERE{ ?x org:employeeName ?name }")))
 
+(deftest part-3
   (is (=
         (query
           (select :title)

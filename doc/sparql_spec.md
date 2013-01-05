@@ -6,7 +6,9 @@ The following namespaces are assumed to be registered:
 ```clojure
 @PREFIXES
 {:foaf    "<http://xmlns.com/foaf/0.1/>"
- :org     "<http://example.com/ns#>"}
+ :org     "<http://example.com/ns#>"
+ :dc      "<http://purl.org/dc/elements/1.1/>""
+ :ns      "<http://example.org/ns#>"}
 ```
 
 ## 2 Making Simple Queries (Informative)
@@ -115,7 +117,8 @@ WHERE  { ?P foaf:givenName ?G ; foaf:surname ?S }
   (where :P [:foaf "givenName"] :G
          \; [:foaf "surname"] :S))
 ```
-*NOT* happy about this syntax, must think about how to handle SPARQL expressions
+*NOT* happy about this syntax, must think about how to handle SPARQL expressions.
+Maybe `(select [(concat :G " " :S) :name])` if vector is `[(list?) keyword?]`
 
 
 ```sparql
