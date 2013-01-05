@@ -10,30 +10,36 @@ Everything is ALPHA and subject to change. Do not use yet!
 
 Matsu lets you construct SPARQL queries using composable clojure functions:
 
-    (query
-      (select :person)
-      (where :person \a [:foaf "Person"]
-             \; [:foaf "mbox"] (URI. "mailto:me@me.com") \.))
+```clojure
+(query
+  (select :person)
+  (where :person \a [:foaf "Person"]
+         \; [:foaf "mbox"] (URI. "mailto:me@me.com") \.))
+```
 
 Which would yield the following string:
 
-    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
-    SELECT ?person
-    WHERE
-      {
-        ?person a foaf:Person
-        ; foaf:mbox <mailto:me@me.com> .
-      }
+```sparql
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+SELECT ?person
+WHERE
+  {
+    ?person a foaf:Person
+    ; foaf:mbox <mailto:me@me.com> .
+  }
+```
 
 Althught without newlines or indentation. A pretty-printer might be added in the future.
 
 The prefixes are automatically infered provided that they exists in the global `*PREFIXES*` map. An error will be thrown if it cannot be resolved. You can also specify them in your query like this:
 
-    (query
-      (with-prefixes {:foaf "http://blblbl"}
-        (select :person)
-        (where :person \a [:foaf "Person"]
-               \; [:foaf "mbox"] (URI. "mailto:me@me.com") \.)))
+```clojure
+(query
+  (with-prefixes {:foaf "http://blblbl"}
+    (select :person)
+    (where :person \a [:foaf "Person"]
+           \; [:foaf "mbox"] (URI. "mailto:me@me.com") \.)))
+```
 
 Matsu makes it easy to construct complex queries:
 
