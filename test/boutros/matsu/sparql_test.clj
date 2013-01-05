@@ -4,7 +4,7 @@
         boutros.matsu.sparql)
   (:import (java.net URI)))
 
-; Setup
+; Namespaces
 
 (register-namespaces {:dbpedia "<http://dbpedia.org/resource/>"
                       :foaf    "<http://xmlns.com/foaf/0.1/>"
@@ -12,6 +12,12 @@
                       :prop    "<http://dbpedia.org/property/>"
                       :dc      "<http://purl.org/dc/elements/1.1/>"
                       :ns      "<http://example.org/ns#>"})
+
+(deftest missing-namespace
+  (is (thrown? IllegalArgumentException
+               (query
+                 (select \*)
+                 (where [:missing "dada"] :p :o)))))
 ; Macros
 
 (defquery q1

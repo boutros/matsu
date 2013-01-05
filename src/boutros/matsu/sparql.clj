@@ -5,14 +5,8 @@
   (:import (java.net URI)))
 
 ; -----------------------------------------------------------------------------
-; Datastructures and vars
+; Datastructures
 ; -----------------------------------------------------------------------------
-
-(def PREFIXES (atom {}))
-
-(defn register-namespaces [m]
-  {:pre [(map? m)]}
-  (swap! PREFIXES merge m))
 
 (defn empty-query []
   "query-map constructor"
@@ -25,6 +19,21 @@
    :offset nil}
   )
 
+(def PREFIXES (atom {}))
+
+; -----------------------------------------------------------------------------
+; Namespace functions
+; -----------------------------------------------------------------------------
+
+(defn register-namespaces [m]
+  {:pre [(map? m)]}
+  (swap! PREFIXES merge m))
+
+(defn- ns-or-error [k]
+  {:pre [(keyword? k)]}
+  (if-let [v (k @PREFIXES)]
+    v
+   (throw (IllegalArgumentException. (str "Cannot resolve namespace: " k)))))
 
 ; -----------------------------------------------------------------------------
 ; Macros
@@ -115,14 +124,14 @@
   (when-let [n (:limit q)]
     (conj [] "LIMIT" n)))
 
-(defn- infer-prefixes [s]
+(defn- infer-prefixes   [s]
   {:pre [(string? s)]
    :post [(string? %)]}
   (str
     (first (for [p
                  (->> s (re-seq #"(\b\w+):\w") (map last))]
-             (str "PREFIX " p ": " ((keyword p) @PREFIXES) " " )))
-    ;(get @PREFIXES p (throw IllegalArgumentException. "cannot resolve namespace")))
+             (str "PREFIX " p ": " (ns-or-error (keyword p)) " " )))
+    ;
     s))
 
 (defn compile-query [q]
