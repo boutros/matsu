@@ -109,11 +109,6 @@
   (when-not (nil? (:from q))
     (conj ["FROM"] (str \< (:from q) \>))))
 
-(defn- prefix-compile [q]
-  (when-not (empty? (:prefixes q))
-    (for [p (:prefixes q)]
-      ["PREFIX" (str (name p) \:) (*PREFIXES* p)])))
-
 (defn- where-compile [q]
   {:pre [(map? q)]}
   (when-let [xs (seq (:where q))]
@@ -124,20 +119,30 @@
   (when-let [n (:limit q)]
     (conj [] "LIMIT" n)))
 
+(defn- infer-prefixes [s]
+  {:pre [(string? s)]
+   :post [(string? %)]}
+  (str
+    (first (for [p
+                 (->> s (re-seq #"(\b\w+):\w") (map last))]
+             (str "PREFIX " p ": " ((keyword p) *PREFIXES*) " " )))
+    s))
+
 (defn compile-query [q]
   {:pre [(map? q)]
    :post [(string? %)]}
   "Takes a map representing SPARQL graph patterns, bindings and modifiers and
   returns a vaild SPARQL 1.1 query string"
   (->> (conj []
-             (prefix-compile q)
              (query-form-compile q)
              (from-compile q)
              (where-compile q)
              (limit-compile q))
        (flatten)
        (remove nil?)
-       (string/join " ")))
+       (string/join " ")
+       (infer-prefixes)))
+
 
 ; -----------------------------------------------------------------------------
 ; SPARQL query DSL functions

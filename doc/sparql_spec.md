@@ -37,7 +37,6 @@ WHERE
 
 ```clojure
 (query
-  (prefix :foaf)
   (select :name :mbox)
   (where :x [:foaf "name"] :name \.
          :x [:foaf "mbox"] :mbox))
@@ -96,7 +95,6 @@ WHERE  { ?x foaf:name ?name }
 
 ```clojure
 (query
-  (prefix :foaf)
   (select :x :name)
   (where :x [:foaf "name"] :name))
 ```
@@ -111,7 +109,6 @@ WHERE  { ?P foaf:givenName ?G ; foaf:surname ?S }
 
 ```clojure
 (query
-  (prefix :foaf)
   (select \( (concat :G " " :S) 'AS :name \) )
   (where :P [:foaf "givenName"] :G
          \; [:foaf "surname"] :S))

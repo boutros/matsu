@@ -17,9 +17,17 @@ Matsu lets you construct SPARQL queries using composable clojure functions:
 
 Which would yield the following string:
 
-(Althught without newlines or indentation. A pretty-printer might be added in the future.)
+    PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+    SELECT ?person
+    WHERE
+      {
+        ?person a foaf:Person
+        ; foaf:mbox <mailto:me@me.com> .
+      }
 
-The prefixes are automatically inserted provided that they exists in the global `*PREFIXES*` map. You can also specify them in your query like this:
+Althught without newlines or indentation. A pretty-printer might be added in the future.
+
+The prefixes are automatically infered provided that they exists in the global `*PREFIXES*` map. An error will be thrown if it cannot be resolved. You can also specify them in your query like this:
 
     (query
       (with-prefixes {:foaf "http://blblbl"}

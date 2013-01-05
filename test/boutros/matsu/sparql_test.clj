@@ -72,7 +72,6 @@
   (testing "prefixed names"
     (is (=
           (query
-            (prefix :foaf)
             (select :name :mbox)
             (where :x [:foaf "name"] :name \.
                    :x [:foaf "mbox"] :mbox))
@@ -81,7 +80,6 @@
 
     (is (=
           (query
-            (prefix :foaf)
             (ask :person \a [:foaf "Person"]
                   \; [:foaf "mbox"] (URI. "mailto:petter@petter.com") \.))
 
@@ -142,3 +140,7 @@
           "SELECT ?title WHERE { ?s ?p ?title . FILTER langMatches( lang(?title), \"FR\" ) }")))
 
   )
+
+(deftest sparql-functions
+  (testing "concat"
+    (is (= 1) 1)))
