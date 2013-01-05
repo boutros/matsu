@@ -10,7 +10,8 @@
 
 (defn empty-query []
   "query-map constructor"
-  {:from nil
+  {:base nil
+   :from nil
    :query-form {:form nil :content []}
    :where []
    :order-by nil
@@ -77,9 +78,10 @@
     (string? x) (str \" x \" )
     (= java.net.URI (type x)) (str "<" x ">")
     ;(= java.util.Date (type x)) (str \" x \" "^^xsd:dateTime")
-    (vector? x) (if (string? (first x))
-                  (str \" (first x) "\"@" (name (second x)))
-                  (str (name (first x)) \: (second x)))
+    (vector? x) (cond
+                  (not (next x)) (str \< (name (first x)) \>)
+                  (string? (first x)) (str \" (first x) "\"@" (name (second x)))
+                  :else (str (name (first x)) \: (second x)))
     (map? x) (:content x)
     :else (throw (Exception. (format "Don't know how to encode %s into RDF literal!" x)))))
 
@@ -123,7 +125,7 @@
   (when-let [n (:limit q)]
     (conj [] "LIMIT" n)))
 
-(defn- infer-prefixes   [s]
+(defn- infer-prefixes [s]
   {:pre [(string? s)]
    :post [(string? %)]}
   (str
@@ -132,26 +134,38 @@
              (str "PREFIX " p ": " (ns-or-error (keyword p)) " " )))
     s))
 
+(defn- add-base [b s]
+  (if (nil? b)
+    s
+    (str  "BASE " (encode b) " " s)))
+
 (defn compile-query [q]
   {:pre [(map? q)]
    :post [(string? %)]}
   "Takes a map representing SPARQL graph patterns, bindings and modifiers and
   returns a vaild SPARQL 1.1 query string"
-  (->> (conj []
-             (query-form-compile q)
-             (from-compile q)
-             (where-compile q)
-             (limit-compile q))
-       (flatten)
-       (remove nil?)
-       (string/join " ")
-       (infer-prefixes)))
+  (let [base (get q :base)]
+    (->> (conj []
+               (query-form-compile q)
+               (from-compile q)
+               (where-compile q)
+               (limit-compile q))
+         (flatten)
+         (remove nil?)
+         (string/join " ")
+         (infer-prefixes)
+         (add-base base))))
 
 ; -----------------------------------------------------------------------------
 ; SPARQL query DSL functions
 ; -----------------------------------------------------------------------------
 
 ; These all takes a map of the query and returns a modified query-map:
+
+(defn base [q uri]
+  {:pre [(map? q)]
+   :post [(map? %)]}
+  (assoc q :base uri))
 
 (defn ask [q & vars]
   {:pre [(map? q)]

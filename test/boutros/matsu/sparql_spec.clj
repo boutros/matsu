@@ -127,4 +127,11 @@
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { <http://example.org/book/book1> dc:title ?title }"))
 
+    (is (=
+        (query
+          (base (URI. "http://example.org/book/"))
+          (select :title)
+          (where [:book1] [:dc "title"] :title))
+
+        "BASE <http://example.org/book/> PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { <book1> dc:title ?title }"))
   )

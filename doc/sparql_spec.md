@@ -236,12 +236,11 @@ WHERE   { :book1  dc:title  $title }
 
 ```clojure
 (query
-  ...) ;TODO
+  ...)
 ```
-Dollar-prefixed variables are not supported by Matsu (`$title` is equal to `?title` in SPARQL)
+Currently not possible, since Clojure doesn't allow the keyword `::`. Use `base` instead, see below.
 
-It's not allowed to have a keyword `::` in Clojure, so we must think of another way for the namespace shortcut...
-Maybe use BASE instead.
+Dollar-prefixed variables are not supported either (`$title` is equal to `?title` anyway).
 
 ```
 BASE    <http://example.org/book/>
@@ -252,5 +251,8 @@ WHERE   { <book1>  dc:title  ?title }
 ```
 
 ```clojure
-(query ...)
+  (query
+    (base (URI. "http://example.org/book"))
+    (select :title)
+    (where [book1] [:dc "title"] :title))
 ```
