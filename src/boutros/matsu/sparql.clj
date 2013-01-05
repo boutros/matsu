@@ -8,15 +8,11 @@
 ; Datastructures and vars
 ; -----------------------------------------------------------------------------
 
-; *PREFIXES* is a global map of all namespaces you intend to use
-; TODO make an atom?
+(def PREFIXES (atom {}))
 
-(def ^:dynamic *PREFIXES* {:dbpedia "<http://dbpedia.org/resource/>"
-                           :foaf    "<http://xmlns.com/foaf/0.1/>"
-                           :rdfs    "<http://www.w3.org/2000/01/rdf-schema#>"
-                           :prop    "<http://dbpedia.org/property/>"
-                           :dc      "<http://purl.org/dc/elements/1.1/>"
-                           :ns      "<http://example.org/ns#>"})
+(defn register-namespaces [m]
+  {:pre [(map? m)]}
+  (swap! PREFIXES merge m))
 
 (defn empty-query []
   "query-map constructor"
@@ -125,7 +121,8 @@
   (str
     (first (for [p
                  (->> s (re-seq #"(\b\w+):\w") (map last))]
-             (str "PREFIX " p ": " ((keyword p) *PREFIXES*) " " )))
+             (str "PREFIX " p ": " ((keyword p) @PREFIXES) " " )))
+    ;(get @PREFIXES p (throw IllegalArgumentException. "cannot resolve namespace")))
     s))
 
 (defn compile-query [q]
@@ -174,9 +171,6 @@
   {:pre [(map? q)]
    :post [(map? %)]}
   (update-in q [:where] into vars))
-
-(defn prefix [q & prefixes]
-  (update-in q [:prefixes] into prefixes))
 
 (defn limit [q & n]
   {:pre [(map? q)]

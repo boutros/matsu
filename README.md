@@ -31,7 +31,7 @@ WHERE
 
 Althught without newlines or indentation. A pretty-printer might be added in the future.
 
-The prefixes are automatically infered provided that they exists in the global `*PREFIXES*` map. An error will be thrown if it cannot be resolved. You can also specify them in your query like this:
+The prefixes are automatically infered provided that they exists in the global `PREFIXES` map. An error will be thrown if it cannot be resolved. You can also specify them in your query like this:
 
 ```clojure
 (query

@@ -4,6 +4,17 @@
         boutros.matsu.sparql)
   (:import (java.net URI)))
 
+; Setup
+
+(register-namespaces {:dbpedia "<http://dbpedia.org/resource/>"
+                      :foaf    "<http://xmlns.com/foaf/0.1/>"
+                      :rdfs    "<http://www.w3.org/2000/01/rdf-schema#>"
+                      :prop    "<http://dbpedia.org/property/>"
+                      :dc      "<http://purl.org/dc/elements/1.1/>"
+                      :ns      "<http://example.org/ns#>"})
+
+; Tests
+
 (deftest part-2
   "2 Making Simple Queries (Informative)"
   (is (=

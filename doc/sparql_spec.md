@@ -2,7 +2,7 @@
 
 An attempt to translate all the example queries from the [SPARQL 1.1 specification from W3C](http://www.w3.org/TR/sparql11-query/) into Matsu syntax. This document corresponds with the tests in `/test/boutros/matsu/sparql_spec.clj`.
 
-The following namespaces are assumed to be present in the `*PREFIXES*` map:
+The following namespaces are assumed to be present in the `PREFIXES` map:
 ```
 {:foaf "<>" etc}
 ```
