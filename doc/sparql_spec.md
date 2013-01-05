@@ -146,7 +146,9 @@ WHERE  { ?x org:employeeName ?name }
 ```
 
 ```clojure
-(query ...)
+(query
+  (construct :x [:foaf "name"] :name)
+  (where :x [:org "employeeName"] :name))
 ```
 
 ## 3 RDF Term Constraints (Informative)

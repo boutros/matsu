@@ -102,10 +102,11 @@
   {:pre [(map? q)]}
   (when-let [form (get-in q [:query-form :form])]
     (conj []
-      (if
+      (cond
         (= form "ASK") (conj ["ASK"] (group-subcompile (get-in q [:query-form :content])))
-        (conj [] (get-in q [:query-form :form])
-              (vec (map encode (get-in q [:query-form :content]))))))))
+        (= form "CONSTRUCT") (conj ["CONSTRUCT" "{"] (vec (map encode (get-in q [:query-form :content]))) "}")
+        :else (conj [] (get-in q [:query-form :form])
+                (vec (map encode (get-in q [:query-form :content]))))))))
 
 (defn- from-compile [q]
   {:pre [(map? q)]}
@@ -171,6 +172,11 @@
   {:pre [(map? q)]
    :post [(map? %)]}
   (assoc q :query-form {:form "SELECT DISTINCT" :content (vec vars)}))
+
+(defn construct [q & vars]
+  {:pre [(map? q)]
+   :post [(map? %)]}
+  (assoc q :query-form {:form "CONSTRUCT" :content (vec vars)}))
 
 (defn where [q & vars]
   {:pre [(map? q)]

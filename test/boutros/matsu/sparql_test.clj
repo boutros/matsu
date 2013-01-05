@@ -11,7 +11,8 @@
                       :rdfs    "<http://www.w3.org/2000/01/rdf-schema#>"
                       :prop    "<http://dbpedia.org/property/>"
                       :dc      "<http://purl.org/dc/elements/1.1/>"
-                      :ns      "<http://example.org/ns#>"})
+                      :ns      "<http://example.org/ns#>"
+                      :org     "<http://example.com/ns#>"})
 
 (deftest missing-namespace
   (is (thrown? IllegalArgumentException
@@ -152,6 +153,14 @@
                    (raw "FILTER langMatches( lang(?title), \"FR\" )")))
 
           "SELECT ?title WHERE { ?s ?p ?title . FILTER langMatches( lang(?title), \"FR\" ) }")))
+
+  (testing "contstruct"
+    (is (=
+          (query
+            (construct :s :p :o)
+            (where :s :p2 :o))
+
+          "CONSTRUCT { ?s ?p ?o } WHERE { ?s ?p2 ?o }")))
 
   )
 

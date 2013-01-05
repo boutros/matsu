@@ -11,7 +11,8 @@
                       :rdfs    "<http://www.w3.org/2000/01/rdf-schema#>"
                       :prop    "<http://dbpedia.org/property/>"
                       :dc      "<http://purl.org/dc/elements/1.1/>"
-                      :ns      "<http://example.org/ns#>"})
+                      :ns      "<http://example.org/ns#>"
+                      :org     "<http://example.com/ns#>"})
 
 ; Tests
 
@@ -82,8 +83,16 @@
           (select :name)
           (where :P [:foaf "givenName"] :G
                  \; [:foaf "surname"] :S
+                ;(bind [concat :G " " :S) :name])
                  (bind (concat :G " " :S) 'AS :name)))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?P foaf:givenName ?G ; foaf:surname ?S BIND(CONCAT(?G, \" \", ?S) AS ?name) }"))
+  (is (=
+        (query
+          (construct :x [:foaf "name"] :name)
+          (where :x [:org "employeeName"] :name))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX org: <http://example.com/ns#> CONSTRUCT { ?x foaf:name ?name } WHERE{ ?x org:employeeName ?name }"))
+
   )
 
