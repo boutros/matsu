@@ -127,8 +127,13 @@ WHERE  {
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :name)
+  (where :P [:foaf "givenName"] :G
+         \; [:foaf "surname"] :S
+         (bind (concat :G " " :S) 'AS :name)))
 ```
+Maybe change syntax to: `(bind [(expr) :name])` ? Agrees with clojure let syntax
 
 ### 2.6 Building RDF Graphs
 

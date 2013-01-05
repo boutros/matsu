@@ -76,5 +76,14 @@
                  \; [:foaf "surname"] :S))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ( CONCAT(?G, \" \", ?S) AS ?name ) WHERE { ?P foaf:givenName ?G ; foaf:surname ?S }"))
+
+  (is (=
+        (query
+          (select :name)
+          (where :P [:foaf "givenName"] :G
+                 \; [:foaf "surname"] :S
+                 (bind (concat :G " " :S) 'AS :name)))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?P foaf:givenName ?G ; foaf:surname ?S BIND(CONCAT(?G, \" \", ?S) AS ?name) }"))
   )
 

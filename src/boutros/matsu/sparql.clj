@@ -201,3 +201,7 @@
   {:post [(map? %)]}
   {:content (str "CONCAT("(string/join " " (map encode-comma (butlast vars)))
                  " " (encode (last vars))")") })
+
+(defn bind [& vars]
+  {:post [(map? %)]}
+  {:content (str "BIND("(string/join " " (map encode vars)) ")") })
