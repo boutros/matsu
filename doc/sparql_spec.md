@@ -205,7 +205,7 @@ WHERE   { ?x ns:price ?price .
 ```clojure
 (query
   (select :title :price)
-    (where :s [:ns "price"] :price \.
+    (where :x [:ns "price"] :price \.
            (filter :price \< 30.5)
            :x [:dc "title"] :title \.))
 ```

@@ -91,7 +91,7 @@
           (construct :x [:foaf "name"] :name)
           (where :x [:org "employeeName"] :name))
 
-        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX org: <http://example.com/ns#> CONSTRUCT { ?x foaf:name ?name } WHERE{ ?x org:employeeName ?name }")))
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX org: <http://example.com/ns#> CONSTRUCT { ?x foaf:name ?name } WHERE { ?x org:employeeName ?name }")))
 
 (deftest part-3
   (is (=
@@ -113,11 +113,11 @@
   (is (=
         (query
           (select :title :price)
-          (where :s [:ns "price"] :price \.
+          (where :x [:ns "price"] :price \.
                  (filter :price \< 30.5)
                  :x [:dc "title"] :title \.))
 
-        "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ?price WHERE { ?x ns:price ?price . FILTER (?price < 30.5) ?x dc:title ?title . }")))
+        "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ?price WHERE { ?x ns:price ?price . FILTER(?price < 30.5) ?x dc:title ?title . }")))
 
 (deftest part-4
   (is (=
@@ -164,9 +164,9 @@
           (query
             (select :title :price)
             (where :x [:dc "title"] :title \.
-                   (optional :x [:ns "price"] :price (filter :price \< 30))))
+                   (optional :x [:ns "price"] :price \. (filter :price \< 30))))
 
-          "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns:<http://example.org/ns#> SELECT ?title ?price WHERE { ?x dc:title ?title . OPTIONAL { ?x ns:price ?price . FILTER (?price < 30) }}" ))
+          "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ?price WHERE { ?x dc:title ?title . OPTIONAL { ?x ns:price ?price . FILTER(?price < 30) } }" ))
 
     (is (=
           (query

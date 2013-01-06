@@ -129,9 +129,8 @@
   {:pre [(string? s)]
    :post [(string? %)]}
   (str
-    (first (for [p
-                 (->> s (re-seq #"(\b\w+):\w") (map last))]
-             (str "PREFIX " p ": " (ns-or-error (keyword p)) " " )))
+    (apply str (apply sorted-set (for [[_ p] (re-seq #"(\b\w+):\w" s) :when (not= p (name :mailto))]
+             (str "PREFIX " p ": " (ns-or-error (keyword p)) " " ))))
     s))
 
 (defn- add-base [b s]
