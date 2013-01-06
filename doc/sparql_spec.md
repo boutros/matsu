@@ -303,7 +303,10 @@ WHERE  { ?x foaf:name  ?name .
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :name :mbox)
+  (where :x [:foaf "name"] :name \.
+         (optional :x [:foaf "mbox"] :mbox)))
 ```
 
 ### 6.2 Constraints in Optional Pattern Matching
@@ -318,7 +321,10 @@ WHERE   { ?x dc:title ?title .
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :title :price)
+  (where :x [:dc "title"] :title \.
+         (optional :x [:ns "price"] :price \. (filter :price \< 30))))
 ```
 
 ### 6.3 Multiple Optional Graph Patterns
@@ -333,7 +339,11 @@ WHERE  { ?x foaf:name  ?name .
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :name :mbox :hpage)
+  (where :x [:foaf "name"] :name \.
+         (optional :x [:foaf "mbox"] :mbox) \.
+         (optional :x [:foaf "homepage"] :hpage)))
 ```
 
 ## 7 Matching Alternatives
