@@ -12,7 +12,9 @@
                       :prop    "<http://dbpedia.org/property/>"
                       :dc      "<http://purl.org/dc/elements/1.1/>"
                       :ns      "<http://example.org/ns#>"
-                      :org     "<http://example.com/ns#>"})
+                      :org     "<http://example.com/ns#>"
+                      :dc10    "<http://purl.org/dc/elements/1.0/>"
+                      :dc11    "<http://purl.org/dc/elements/1.1/>"})
 
 ; Tests
 
@@ -177,5 +179,28 @@
                    (optional :x [:foaf "mbox"] :mbox) \.
                    (optional :x [:foaf "homepage"] :hpage)))
 
-        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox ?hpage WHERE { ?x foaf:name ?name . OPTIONAL { ?x foaf:mbox ?mbox } . OPTIONAL { ?x foaf:homepage ?hpage } }"))
-    )
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox ?hpage WHERE { ?x foaf:name ?name . OPTIONAL { ?x foaf:mbox ?mbox } . OPTIONAL { ?x foaf:homepage ?hpage } }")))
+
+(deftest part-7
+  (is (=
+        (query
+          (select :title)
+          (where (union (group :book [:dc10 "title"] :title)
+                        (group :book [:dc11 "title"] :title))))
+
+        "PREFIX dc10: <http://purl.org/dc/elements/1.0/> PREFIX dc11: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { { ?book dc10:title ?title } UNION { ?book dc11:title ?title } }"))
+
+  (is (=
+        (query
+          (select :x :y)
+          (where (union (group :book [:dc10 "title"] :x)
+                        (group :book [:dc11 "title"] :y))))
+
+        "PREFIX dc10: <http://purl.org/dc/elements/1.0/> PREFIX dc11: <http://purl.org/dc/elements/1.1/> SELECT ?x ?y WHERE { { ?book dc10:title ?x } UNION { ?book dc11:title ?y } }"))
+  (is (=
+        (query
+          (select :title :author)
+          (where (union (group :book [:dc10 "title"] :title \. :book [:dc10 "creator"] :author)
+                        (group :book [:dc11 "title"] :title \. :book [:dc11 "creator"] :author))))
+        "PREFIX dc10: <http://purl.org/dc/elements/1.0/> PREFIX dc11: <http://purl.org/dc/elements/1.1/> SELECT ?title ?author WHERE { { ?book dc10:title ?title . ?book dc10:creator ?author } UNION { ?book dc11:title ?title . ?book dc11:creator ?author } }")))
+

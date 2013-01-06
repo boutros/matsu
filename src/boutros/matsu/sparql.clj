@@ -201,7 +201,11 @@
   :post [(map? %)]}
   (assoc q :limit n))
 
-; Special functions which compile inline groups inside select/where clauses:
+; Functions which compile inline groups inside select/where clauses:
+
+(defn union [& groups]
+  {:post [(map? %)]}
+  {:content (string/join " UNION " (vec (map encode groups))) })
 
 (defn group [& vars]
   {:post [(map? %)]}

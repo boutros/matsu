@@ -360,7 +360,10 @@ WHERE  { { ?book dc10:title  ?title } UNION { ?book dc11:title  ?title } }
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :title)
+  (where (union (group :book [:dc10 "title"] :title)
+                (group :book [:dc11 "title"] :title))))
 ```
 
 ```sparql
@@ -372,7 +375,10 @@ WHERE  { { ?book dc10:title ?x } UNION { ?book dc11:title  ?y } }
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :x :y)
+  (where (union (group :book [:dc10 "title"] :x)
+                (group :book [:dc11 "title"] :y))))
 ```
 
 ```sparql
@@ -387,6 +393,9 @@ WHERE  { { ?book dc10:title ?title .  ?book dc10:creator ?author }
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :title :author)
+  (where (union (group :book [:dc10 "title"] :title \. :book [:dc10 "creator"] :author)
+                (group :book [:dc11 "title"] :title \. :book [:dc11 "creator"] :author))))
 ```
 ## 8 Negation
