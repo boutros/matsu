@@ -203,6 +203,10 @@
 
 ; Special functions which compile inline groups inside select/where clauses:
 
+(defn group [& vars]
+  {:post [(map? %)]}
+   {:content (str "{ " (string/join " " (vec (map encode vars))) " }" )})
+
 (defn filter [& vars]
   {:post [(map? %)]}
    {:content (str "FILTER(" (string/join " " (vec (map encode vars))) ")" )})

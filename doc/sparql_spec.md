@@ -286,9 +286,12 @@ WHERE  { { ?x foaf:name ?name . }
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :name :mbox)
+  (where (group :x [:foaf "name"] :name \.)
+         (group :x [:foaf "mbox"] :mbox \.)))
 ```
-hm..
+
 
 ## 6 Including Optional Values
 
@@ -347,3 +350,43 @@ WHERE  { ?x foaf:name  ?name .
 ```
 
 ## 7 Matching Alternatives
+
+```sparql
+PREFIX dc10:  <http://purl.org/dc/elements/1.0/>
+PREFIX dc11:  <http://purl.org/dc/elements/1.1/>
+
+SELECT ?title
+WHERE  { { ?book dc10:title  ?title } UNION { ?book dc11:title  ?title } }
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX dc10:  <http://purl.org/dc/elements/1.0/>
+PREFIX dc11:  <http://purl.org/dc/elements/1.1/>
+
+SELECT ?x ?y
+WHERE  { { ?book dc10:title ?x } UNION { ?book dc11:title  ?y } }
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX dc10:  <http://purl.org/dc/elements/1.0/>
+PREFIX dc11:  <http://purl.org/dc/elements/1.1/>
+
+SELECT ?title ?author
+WHERE  { { ?book dc10:title ?title .  ?book dc10:creator ?author }
+         UNION
+         { ?book dc11:title ?title .  ?book dc11:creator ?author }
+       }
+```
+
+```clojure
+(query ...)
+```
+## 8 Negation

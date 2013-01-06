@@ -144,11 +144,13 @@
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE { ?x foaf:name ?name . ?x foaf:mbox ?mbox . }"))
 
-    ; (is (=
-    ;     (query
-    ;       )
+    (is (=
+        (query
+          (select :name :mbox)
+          (where (group :x [:foaf "name"] :name \.)
+                 (group :x [:foaf "mbox"] :mbox \.)))
 
-    ;     "PREFIX foaf:    <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE  { { ?x foaf:name ?name . } { ?x foaf:mbox ?mbox . } }"))
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE { { ?x foaf:name ?name . } { ?x foaf:mbox ?mbox . } }"))
     )
 
 (deftest part-6
