@@ -282,6 +282,17 @@
                  (minus :x [:q] :m \.
                         (filter :n \= :m))))
 
-        "BASE <http://example.com/> SELECT * WHERE { ?x <p> ?n MINUS { ?x <q> ?m . FILTER(?n = ?m) } }"))
+        "BASE <http://example.com/> SELECT * WHERE { ?x <p> ?n MINUS { ?x <q> ?m . FILTER(?n = ?m) } }")))
 
+(deftest part-10
+  (is (=
+        (query
+          (select :title :price)
+          (where (group :x [:ns "price"] :p \.
+                        :x [:ns "discount"] :discount
+                        (bind [(raw "?p*(1-?discount)") :price]))
+                 (group :x [:dc "title"] :title \.)
+                 (filter :price \< 20)))
+
+        "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ?price WHERE { { ?x ns:price ?p . ?x ns:discount ?discount BIND(?p*(1-?discount) AS ?price) } { ?x dc:title ?title . } FILTER(?price < 20) }"))
   )

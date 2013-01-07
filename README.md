@@ -57,7 +57,32 @@ You can bind queries to vars with `defquery` and use them as basis for other que
 
 The aim of Matsu is to cover the full SPARQL 1.1 specification. But no doubt there will be edge cases where Matsu falls short. In such cases you can always insert a raw string into your query with `raw`:
 
-    EXAMPLE
+```clojure
+(query
+  (select :title :price)
+  (where (group :x [:ns "price"] :p \.
+                :x [:ns "discount"] :discount
+                (bind [(raw "?p*(1-?discount)") :price]))
+         (group :x [:dc "title"] :title \.)
+         (filter :price \< 20)))
+```
+
+Yielding the following SPARQL string:
+
+```sparql
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+PREFIX ns: <http://example.org/ns#>
+
+SELECT ?title ?price
+WHERE {
+        { ?x ns:price ?p .
+           ?x ns:discount ?discount
+           BIND(?p*(1-?discount) AS ?price)
+        }
+        { ?x dc:title ?title . }
+        FILTER(?price < 20)
+      }
+```
 
 Remember that quotation marks must be escaped. Characters as well as quoted symbols will also render unchanged:
 
@@ -72,10 +97,12 @@ See the tests for more examples on query syntax.
 ## Limitations
 * The `WHERE` keyword is not optional, like it is in SPARQL
 * Single colon keyword prefix is not possible, use the equivalent `BASE`-form instead
+* Dollar-prefixed variables not supported
 * Subqueries not supported yet
 * Property path syntax not supported yet
+* Specifying variables with `VALUES` in data block not possible yet
 
-There are some other limitations, but most, if not all, can easily be circumvented by interpolating raw strings with the `raw` function.
+There might be other limitations, especially with complex, nested queries. But most, if not all of the limitations can be circumvented by interpolating raw strings into the query with the `raw` function.
 
 ## Interals
 

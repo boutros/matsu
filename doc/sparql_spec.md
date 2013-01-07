@@ -580,15 +580,21 @@ PREFIX  ns:  <http://example.org/ns#>
 SELECT  ?title ?price
 {  { ?x ns:price ?p .
      ?x ns:discount ?discount
-     BIND (?p*(1-?discount) AS ?price)
+     BIND(?p*(1-?discount) AS ?price)
    }
    {?x dc:title ?title . }
    FILTER(?price < 20)
 }
 ```
-
+Not quite possible yet without resorting to `raw`:
 ```clojure
-(query ...)
+(query
+  (select :title :price)
+  (where (group :x [:ns "price"] :p \.
+                :x [:ns "discount"] :discount
+                (bind [(raw "?p*(1-?discount)") :price]))
+         (group :x [:dc "title"] :title \.)
+         (filter :price \< 20)))
 ```
 
 ```sparql

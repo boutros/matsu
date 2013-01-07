@@ -14,6 +14,7 @@
    :from nil
    :query-form {:form nil :content []}
    :where []
+   ;:where {:keyword true :content [] }
    :order-by nil
    :limit nil
    :offset nil})
