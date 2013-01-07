@@ -399,3 +399,143 @@ WHERE  { { ?book dc10:title ?title .  ?book dc10:creator ?author }
                 (group :book [:dc11 "title"] :title \. :book [:dc11 "creator"] :author))))
 ```
 ## 8 Negation
+
+### 8.1 Filtering Using Graph Patterns
+
+```sparql
+PREFIX  rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX  foaf:   <http://xmlns.com/foaf/0.1/>
+
+SELECT ?person
+WHERE
+{
+    ?person rdf:type  foaf:Person .
+    FILTER NOT EXISTS { ?person foaf:name ?name }
+}
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX  rdf:    <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+PREFIX  foaf:   <http://xmlns.com/foaf/0.1/>
+
+SELECT ?person
+WHERE
+{
+    ?person rdf:type  foaf:Person .
+    FILTER EXISTS { ?person foaf:name ?name }
+}
+```
+
+```clojure
+(query ...)
+```
+
+### 8.2 Removing Possible Solutions
+
+```sparql
+PREFIX :       <http://example/>
+PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
+
+SELECT DISTINCT ?s
+WHERE {
+   ?s ?p ?o .
+   MINUS {
+      ?s foaf:givenName "Bob" .
+   }
+}
+```
+
+```clojure
+(query ...)
+```
+
+### 8.3 Relationship and differences between NOT EXISTS and MINUS
+
+```sparql
+SELECT *
+{
+  ?s ?p ?o
+  FILTER NOT EXISTS { ?x ?y ?z }
+}
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+SELECT *
+{
+   ?s ?p ?o
+   MINUS
+     { ?x ?y ?z }
+}
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX : <http://example/>
+SELECT *
+{
+  ?s ?p ?o
+  FILTER NOT EXISTS { :a :b :c }
+}
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX : <http://example/>
+SELECT *
+{
+  ?s ?p ?o
+  MINUS { :a :b :c }
+}
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX : <http://example.com/>
+SELECT * WHERE {
+        ?x :p ?n
+        FILTER NOT EXISTS {
+                ?x :q ?m .
+                FILTER(?n = ?m)
+        }
+}
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX : <http://example/>
+SELECT * WHERE {
+        ?x :p ?n
+        MINUS {
+                ?x :q ?m .
+                FILTER(?n = ?m)
+        }
+}
+```
+
+```clojure
+(query ...)
+```
+
+## 9 Property Paths
+
+TODO
