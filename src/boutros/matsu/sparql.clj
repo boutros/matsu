@@ -215,6 +215,18 @@
   {:post [(map? %)]}
    {:content (str "FILTER(" (string/join " " (vec (map encode vars))) ")" )})
 
+(defn filter-not-exists [& vars]
+  {:post [(map? %)]}
+   {:content (str "FILTER NOT EXISTS { " (string/join " " (vec (map encode vars))) " }" )})
+
+(defn filter-exists [& vars]
+  {:post [(map? %)]}
+   {:content (str "FILTER EXISTS { " (string/join " " (vec (map encode vars))) " }" )})
+
+(defn minus [& vars]
+  {:post [(map? %)]}
+   {:content (str "MINUS { " (string/join " " (vec (map encode vars))) " }" )})
+
 (defn filter-regex [v regex & flags]
   {:post [(map? %)]}
    {:content (str "FILTER regex(" (encode v)

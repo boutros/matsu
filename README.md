@@ -69,6 +69,12 @@ See the tests for more examples on query syntax.
 
 + Complete working example querying dbpedia in docs/example.clj
 
+## Limitations
+* `WHERE` keyword is not optional like in SPARQL
+* Single keyword prefix is not possible, use the equivalent `BASE`-form instead
+
+There are some other limitations, but most, if not all, can easily be circumvented by interpolating raw strings with the `raw` function.
+
 ## Interals
 
 The query is represented by a map

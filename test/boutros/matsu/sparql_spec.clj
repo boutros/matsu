@@ -14,7 +14,8 @@
                       :ns      "<http://example.org/ns#>"
                       :org     "<http://example.com/ns#>"
                       :dc10    "<http://purl.org/dc/elements/1.0/>"
-                      :dc11    "<http://purl.org/dc/elements/1.1/>"})
+                      :dc11    "<http://purl.org/dc/elements/1.1/>"
+                      :rdf     "<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"})
 
 ; Tests
 
@@ -202,5 +203,85 @@
           (select :title :author)
           (where (union (group :book [:dc10 "title"] :title \. :book [:dc10 "creator"] :author)
                         (group :book [:dc11 "title"] :title \. :book [:dc11 "creator"] :author))))
+
         "PREFIX dc10: <http://purl.org/dc/elements/1.0/> PREFIX dc11: <http://purl.org/dc/elements/1.1/> SELECT ?title ?author WHERE { { ?book dc10:title ?title . ?book dc10:creator ?author } UNION { ?book dc11:title ?title . ?book dc11:creator ?author } }")))
 
+(deftest part-8
+  (is (=
+        (query
+          (select :person)
+          (where :person [:rdf "type"] [:foaf "Person"] \.
+                 (filter-not-exists :person [:foaf "name"] :name)))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> SELECT ?person WHERE { ?person rdf:type foaf:Person . FILTER NOT EXISTS { ?person foaf:name ?name } }"))
+  (is (=
+        (query
+          (select :person)
+          (where :person [:rdf "type"] [:foaf "Person"] \.
+                 (filter-exists :person [:foaf "name"] :name)))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> SELECT ?person WHERE { ?person rdf:type foaf:Person . FILTER EXISTS { ?person foaf:name ?name } }"))
+
+  (is (=
+        (query
+          (select-distinct :s)
+          (where :s :p :o \.
+                 (minus :s [:foaf "givenName"] "Bob" \.)))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT DISTINCT ?s WHERE { ?s ?p ?o . MINUS { ?s foaf:givenName \"Bob\" . } }"))
+
+  (is (=
+        (query
+          (select \*)
+          (where :s :p :o
+                 (filter-not-exists :x :y :z)))
+
+        "SELECT * WHERE { ?s ?p ?o FILTER NOT EXISTS { ?x ?y ?z } }"))
+
+  (is (=
+        (query
+          (select \*)
+          (where :s :p :o
+                 (minus :x :y :z)))
+
+        "SELECT * WHERE { ?s ?p ?o MINUS { ?x ?y ?z } }"))
+
+  (is (=
+        (query
+          (base (URI. "http://example/"))
+          (select \*)
+          (where :s :p :o
+                 (filter-not-exists [:a] [:b] [:c])))
+
+        "BASE <http://example/> SELECT * WHERE { ?s ?p ?o FILTER NOT EXISTS { <a> <b> <c> } }"))
+
+  (is (=
+        (query
+          (base (URI. "http://example/"))
+          (select \*)
+          (where :s :p :o
+                 (minus [:a] [:b] [:c])))
+
+        "BASE <http://example/> SELECT * WHERE { ?s ?p ?o MINUS { <a> <b> <c> } }"))
+
+  (is (=
+        (query
+          (base (URI. "http://example.com/"))
+          (select \*)
+          (where :x [:p] :n
+                 (filter-not-exists :x [:q] :m \.
+                                    (filter :n \= :m))))
+
+        "BASE <http://example.com/> SELECT * WHERE { ?x <p> ?n FILTER NOT EXISTS { ?x <q> ?m . FILTER(?n = ?m) } }"))
+
+  (is (=
+        (query
+          (base (URI. "http://example.com/"))
+          (select \*)
+          (where :x [:p] :n
+                 (minus :x [:q] :m \.
+                        (filter :n \= :m))))
+
+        "BASE <http://example.com/> SELECT * WHERE { ?x <p> ?n MINUS { ?x <q> ?m . FILTER(?n = ?m) } }"))
+
+  )

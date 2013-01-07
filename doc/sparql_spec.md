@@ -411,7 +411,10 @@ WHERE
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :person)
+  (where :person [:rdf "type"] [:foaf "Person"] \.
+         (filter-not-exists :person [:foaf "name"] :name)))
 ```
 
 ```sparql
@@ -427,7 +430,10 @@ WHERE
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :person)
+  (where :person [:rdf "type"] [:foaf "Person"] \.
+         (filter-exists :person [:foaf "name"] :name)))
 ```
 
 ### 8.2 Removing Possible Solutions
@@ -446,7 +452,10 @@ WHERE {
 ```
 
 ```clojure
-(query ...)
+(query
+  (select-distinct :s)
+  (where :s :p :o \.
+         (minus :s [:foaf "givenName"] "Bob" \.)))
 ```
 
 ### 8.3 Relationship and differences between NOT EXISTS and MINUS
@@ -458,9 +467,12 @@ SELECT *
   FILTER NOT EXISTS { ?x ?y ?z }
 }
 ```
-
+Currently not possible without the `WHERE` keyword (which is optional in SPARQL):
 ```clojure
-(query ...)
+(query
+  (select \*)
+  (where :s :p :o
+         (filter-not-exists :x :y :z)))
 ```
 
 ```sparql
@@ -473,7 +485,10 @@ SELECT *
 ```
 
 ```clojure
-(query ...)
+(query
+  (select \*)
+  (where :s :p :o
+         (minus :x :y :z)))
 ```
 
 ```sparql
@@ -484,9 +499,13 @@ SELECT *
   FILTER NOT EXISTS { :a :b :c }
 }
 ```
-
+Using `BASE` URI instead of `:`
 ```clojure
-(query ...)
+(query
+  (base (URI. "http://example/"))
+  (select \*)
+  (where :s :p :o
+         (filter-not-exists [:a] [:b] [:c])))
 ```
 
 ```sparql
@@ -499,7 +518,11 @@ SELECT *
 ```
 
 ```clojure
-(query ...)
+(query
+  (base (URI. "http://example/"))
+  (select \*)
+  (where :s :p :o
+         (minus [:a] [:b] [:c])))
 ```
 
 ```sparql
@@ -514,7 +537,12 @@ SELECT * WHERE {
 ```
 
 ```clojure
-(query ...)
+(query
+  (base (URI. "http://example.com/"))
+  (select \*)
+  (where :x [:p] :n
+         (filter-not-exists :x [:q] :m \.
+                            (filter :n \= :m))))
 ```
 
 ```sparql
@@ -529,7 +557,12 @@ SELECT * WHERE {
 ```
 
 ```clojure
-(query ...)
+(query
+  (base (URI. "http://example.com/"))
+  (select \*)
+  (where :x [:p] :n
+         (minus :x [:q] :m \.
+                (filter :n \= :m))))
 ```
 
 ## 9 Property Paths
