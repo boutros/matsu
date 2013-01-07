@@ -71,23 +71,22 @@
     (char? x) x
     (symbol? x) x
     (keyword? x) (str \? (name x))
-    (integer? x) x ;(str  \" x \" "^^xsd:integer")
-    (float? x) x ;(str  \" x \" "^^xsd:decimal")
-    (true? x) x ;"\"true\"^^xsd:boolean"
-    (false? x) x ;"\"false\"^^xsd:boolean"
+    (integer? x) x                    ;(str  \" x \" "^^xsd:integer")
+    (float? x) x                      ;(str  \" x \" "^^xsd:decimal")
+    (true? x) x                       ;"\"true\"^^xsd:boolean"
+    (false? x) x                      ;"\"false\"^^xsd:boolean"
     (string? x) (str \" x \" )
     (= java.net.URI (type x)) (str "<" x ">")
     ;(= java.util.Date (type x)) (str \" x \" "^^xsd:dateTime")
     (vector? x) (cond
                   (not (next x)) (str \< (name (first x)) \>)
                   (string? (first x)) (str \" (first x) "\"@" (name (second x)))
-                  (map? (first x)) (str "( " (:content (first x)) " AS " (encode (second x)) " )")
+                  (and (map? (first x)) (keyword? (second x))) (str "( " (:content (first x)) " AS " (encode (second x)) " )")
                   :else (str (name (first x)) \: (second x)))
     (map? x) (:content x)
     :else (throw (Exception. (format "Don't know how to encode %s into RDF literal!" x)))))
 
-(defn encode-comma [x]
-  "adds a commma after the encoded value"
+(defn encode-with-comma [x]
   (str (encode x) ","))
 
 ; -----------------------------------------------------------------------------
@@ -105,10 +104,10 @@
   {:pre [(map? q)]}
   (when-let [form (get-in q [:query-form :form])]
     (conj []
-      (cond
-        (= form "ASK") (conj ["ASK"] (group-subcompile (get-in q [:query-form :content])))
-        (= form "CONSTRUCT") (conj ["CONSTRUCT" "{"] (vec (map encode (get-in q [:query-form :content]))) "}")
-        :else (conj [] (get-in q [:query-form :form])
+      (case form
+        "ASK" (conj ["ASK"] (group-subcompile (get-in q [:query-form :content])))
+        "CONSTRUCT" (conj ["CONSTRUCT" "{"] (vec (map encode (get-in q [:query-form :content]))) "}")
+        (conj [] (get-in q [:query-form :form])
                 (vec (map encode (get-in q [:query-form :content]))))))))
 
 (defn- from-compile [q]
@@ -134,10 +133,10 @@
              (str "PREFIX " p ": " (ns-or-error (keyword p)) " " ))))
     s))
 
-(defn- add-base [b s]
-  (if (nil? b)
+(defn- add-base [uri s]
+  (if (nil? uri)
     s
-    (str  "BASE " (encode b) " " s)))
+    (str  "BASE " (encode uri) " " s)))
 
 (defn compile-query [q]
   {:pre [(map? q)]
@@ -235,7 +234,7 @@
 
 (defn concat [& vars]
   {:post [(map? %)]}
-  {:content (str "CONCAT("(string/join " " (map encode-comma (butlast vars)))
+  {:content (str "CONCAT("(string/join " " (map encode-with-comma (butlast vars)))
                  " " (encode (last vars))")") })
 
 (defn bind [v]
