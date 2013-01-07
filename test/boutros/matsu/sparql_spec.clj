@@ -74,7 +74,7 @@
 
   (is (=
         (query
-          (select \( (concat :G " " :S) 'AS :name \) )
+          (select [(concat :G " " :S) :name])
           (where :P [:foaf "givenName"] :G
                  \; [:foaf "surname"] :S))
 

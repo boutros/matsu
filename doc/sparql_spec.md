@@ -113,14 +113,10 @@ WHERE  { ?P foaf:givenName ?G ; foaf:surname ?S }
 
 ```clojure
 (query
-  (select \( (concat :G " " :S) 'AS :name \) )
+  (select [(concat :G " " :S) :name])
   (where :P [:foaf "givenName"] :G
          \; [:foaf "surname"] :S))
 ```
-*NOT* happy about this syntax, must think about how to handle SPARQL expressions.
-
-Maybe `(select [(concat :G " " :S) :name])` if vector is `[(list?) keyword?]`
-
 
 ```sparql
 PREFIX foaf:   <http://xmlns.com/foaf/0.1/>

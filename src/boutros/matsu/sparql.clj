@@ -81,6 +81,7 @@
     (vector? x) (cond
                   (not (next x)) (str \< (name (first x)) \>)
                   (string? (first x)) (str \" (first x) "\"@" (name (second x)))
+                  (map? (first x)) (str "( " (:content (first x)) " AS " (encode (second x)) " )")
                   :else (str (name (first x)) \: (second x)))
     (map? x) (:content x)
     :else (throw (Exception. (format "Don't know how to encode %s into RDF literal!" x)))))

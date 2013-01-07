@@ -6,9 +6,13 @@ A Clojure SPARQL query constructor
 
 Everything is ALPHA and subject to change. Do not use yet!
 
+## Installation
+
+Not yet available on clojars.
+
 ## Usage
 
-Matsu lets you construct SPARQL queries using composable clojure functions:
+Matsu is a DSL for constructing SPARQL queries:
 
 ```clojure
 (query
@@ -33,7 +37,7 @@ Althught without newlines or indentation. A pretty-printer might be added in the
 
 The prefixes are automatically infered provided that they exists in the global `PREFIXES` map. An exception will be thrown if the prefix cannot be resolved.
 
-You can also supply prefixes with the query:
+You can also supply prefixes with the query, which will override the global `prefixes`:
 
 ```clojure
 (query
