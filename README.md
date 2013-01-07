@@ -72,6 +72,8 @@ See the tests for more examples on query syntax.
 ## Limitations
 * The `WHERE` keyword is not optional, like it is in SPARQL
 * Single colon keyword prefix is not possible, use the equivalent `BASE`-form instead
+* Subqueries not supported yet
+* Property path syntax not supported yet
 
 There are some other limitations, but most, if not all, can easily be circumvented by interpolating raw strings with the `raw` function.
 

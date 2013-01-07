@@ -567,4 +567,86 @@ SELECT * WHERE {
 
 ## 9 Property Paths
 
-TODO
+I haven't decided how to implement the propert path syntax yet.
+
+## 10 Assignment
+
+### 10.1 BIND: Assigning to Variables
+
+```sparql
+PREFIX  dc:  <http://purl.org/dc/elements/1.1/>
+PREFIX  ns:  <http://example.org/ns#>
+
+SELECT  ?title ?price
+{  { ?x ns:price ?p .
+     ?x ns:discount ?discount
+     BIND (?p*(1-?discount) AS ?price)
+   }
+   {?x dc:title ?title . }
+   FILTER(?price < 20)
+}
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX dc:   <http://purl.org/dc/elements/1.1/>
+PREFIX :     <http://example.org/book/>
+PREFIX ns:   <http://example.org/ns#>
+
+SELECT ?book ?title ?price
+{
+   VALUES ?book { :book1 :book3 }
+   ?book dc:title ?title ;
+         ns:price ?price .
+}
+```
+
+```clojure
+(query ...)
+```
+### 10.2 VALUES: Providing inline data
+
+```sparql
+PREFIX dc:   <http://purl.org/dc/elements/1.1/>
+PREFIX :     <http://example.org/book/>
+PREFIX ns:   <http://example.org/ns#>
+
+SELECT ?book ?title ?price
+{
+   ?book dc:title ?title ;
+         ns:price ?price .
+   VALUES (?book ?title)
+   { (UNDEF "SPARQL Tutorial")
+     (:book2 UNDEF)
+   }
+}
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX dc:   <http://purl.org/dc/elements/1.1/>
+PREFIX :     <http://example.org/book/>
+PREFIX ns:   <http://example.org/ns#>
+
+SELECT ?book ?title ?price
+{
+   ?book dc:title ?title ;
+         ns:price ?price .
+}
+VALUES (?book ?title)
+{ (UNDEF "SPARQL Tutorial")
+  (:book2 UNDEF)
+}
+```
+
+```clojure
+(query ...)
+```
+
+## 11 Aggregates
