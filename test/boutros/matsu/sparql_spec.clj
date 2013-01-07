@@ -1,5 +1,5 @@
 (ns boutros.matsu.sparql-spec
-  (:refer-clojure :exclude [filter concat])
+  (:refer-clojure :exclude [filter concat group-by])
   (:use clojure.test
         boutros.matsu.sparql)
   (:import (java.net URI)))
@@ -295,4 +295,37 @@
                  (filter :price \< 20)))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ?price WHERE { { ?x ns:price ?p . ?x ns:discount ?discount BIND(?p*(1-?discount) AS ?price) } { ?x dc:title ?title . } FILTER(?price < 20) }"))
+  )
+
+(deftest part-11
+  (is (=
+        (query
+          (base (URI. "http://books.example/"))
+          (select [(sum :lprice) :totalPrice])
+          (where :org [:affiliates] :auth \.
+                 :auth [:writesBook] :book \.
+                 :book [:price] :lprice \.)
+          (group-by :org)
+          (having (sum :lprice) \> 10))
+
+        "BASE <http://books.example/> SELECT ( SUM(?lprice) AS ?totalPrice ) WHERE { ?org <affiliates> ?auth . ?auth <writesBook> ?book . ?book <price> ?lprice . } GROUP BY ?org HAVING( SUM(?lprice) > 10 )"))
+
+    (is (=
+          (query
+            (select [(avg :y) :avg])
+            (where :a [:x] :x
+                   \; [:y] :y \.)
+            (group-by :x))
+
+          "SELECT ( AVG(?y) AS ?avg ) WHERE { ?a <x> ?x ; <y> ?y . } GROUP BY ?x"))
+
+    (is (=
+          (query
+            (base (URI. "http://data.example/"))
+            (select [(avg :size) :asize])
+            (where :x [:size] :size)
+            (group-by :x)
+            (having (avg :size) \> 10))
+
+          "BASE <http://data.example/> SELECT ( AVG(?size) AS ?asize ) WHERE { ?x <size> ?size } GROUP BY ?x HAVING( AVG(?size) > 10 )"))
   )

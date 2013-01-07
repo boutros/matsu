@@ -1,5 +1,5 @@
 (ns boutros.matsu.sparql
-  (:refer-clojure :exclude [filter concat])
+  (:refer-clojure :exclude [filter concat group-by])
   (:require [clojure.set :as set]
             [clojure.string :as string])
   (:import (java.net URI)))
@@ -16,6 +16,8 @@
    :where []
    ;:where {:keyword true :content [] }
    :order-by nil
+   :group-by nil
+   :having nil
    :limit nil
    :offset nil})
 
@@ -126,6 +128,17 @@
   (when-let [n (:limit q)]
     (conj [] "LIMIT" n)))
 
+(defn- group-by-compile [q]
+  {:pre [(map? q)]}
+  (when-let [v (:group-by q)]
+    (conj [] "GROUP BY" (encode v))))
+
+(defn- having-compile [q]
+  {:pre [(map? q)]}
+  (when-let [xs (seq (:having q))]
+    (conj [] "HAVING(" (vec (map encode xs)) ")" )))
+
+
 (defn- infer-prefixes [s]
   {:pre [(string? s)]
    :post [(string? %)]}
@@ -149,7 +162,9 @@
                (query-form-compile q)
                (from-compile q)
                (where-compile q)
-               (limit-compile q))
+               (limit-compile q)
+               (group-by-compile q)
+               (having-compile q))
          (flatten)
          (remove nil?)
          (string/join " ")
@@ -202,6 +217,16 @@
   :post [(map? %)]}
   (assoc q :limit n))
 
+(defn group-by [q v]
+  {:pre [(map? q)]
+  :post [(map? %)]}
+  (assoc q :group-by v))
+
+(defn having [q & expr]
+  {:pre [(map? q)]
+  :post [(map? %)]}
+  (assoc q :having (vec expr)))
+
 ; Functions which compile inline groups inside select/where clauses:
 
 (defn union [& groups]
@@ -245,6 +270,14 @@
    :post [(map? %)]}
    {:content string })
 
+(defn sum [v]
+  {:post [(map? %)]}
+   {:content (str "SUM(" (encode v) ")" )})
+
+(defn avg [v]
+  {:post [(map? %)]}
+   {:content (str "AVG(" (encode v) ")" )})
+
 (defn concat [& vars]
   {:post [(map? %)]}
   {:content (str "CONCAT("(string/join " " (map encode-with-comma (butlast vars)))
@@ -254,4 +287,4 @@
   {:pre [(vector? v)]
    :post [(map? %)]}
   (let [[expr name] v]
-  {:content (str "BIND(" (encode expr) " AS " (encode name) ")") }))
+    {:content (str "BIND(" (encode expr) " AS " (encode name) ")") }))

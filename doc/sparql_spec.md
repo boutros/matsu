@@ -611,7 +611,7 @@ SELECT ?book ?title ?price
 ```
 
 ```clojure
-(query ...)
+(query ...) ;currently not possible
 ```
 ### 10.2 VALUES: Providing inline data
 
@@ -632,7 +632,7 @@ SELECT ?book ?title ?price
 ```
 
 ```clojure
-(query ...)
+(query ...) ;currently not possible
 ```
 
 ```sparql
@@ -652,7 +652,99 @@ VALUES (?book ?title)
 ```
 
 ```clojure
-(query ...)
+(query ...) ;currently not possible
 ```
 
 ## 11 Aggregates
+
+### 11.1 Aggregate Example
+
+```sparql
+PREFIX : <http://books.example/>
+SELECT (SUM(?lprice) AS ?totalPrice)
+WHERE {
+  ?org :affiliates ?auth .
+  ?auth :writesBook ?book .
+  ?book :price ?lprice .
+}
+GROUP BY ?org
+HAVING (SUM(?lprice) > 10)
+```
+
+```clojure
+(query
+  (base (URI. "http://books.example/"))
+  (select [(sum :lprice) :totalPrice])
+  (where :org [:affiliates] :auth \.
+         :auth [:writesBook] :book \.
+         :book [:price] :lprice \.)
+  (group-by :org)
+  (having (sum :lprice) \> 10))
+```
+
+### 11.2 GROUP BY
+
+```sparql
+SELECT (AVG(?y) AS ?avg)
+WHERE {
+  ?a :x ?x ;
+     :y ?y .
+}
+GROUP BY ?x
+```
+
+```clojure
+(query
+  (select [(avg :y) :avg])
+  (where :a [:x] :x
+         \; [:y] :y \.)
+  (group-by :x))
+```
+
+### 11.3 HAVING
+
+```sparql
+PREFIX : <http://data.example/>
+SELECT (AVG(?size) AS ?asize)
+WHERE {
+  ?x :size ?size
+}
+GROUP BY ?x
+HAVING(AVG(?size) > 10)
+```
+
+```clojure
+(query ...)
+```
+
+### 11.4 Aggregate Projection Restrictions
+
+```sparql
+PREFIX : <http://example.com/data/#>
+SELECT ?x (MIN(?y) * 2 AS ?min)
+WHERE {
+  ?x :p ?y .
+  ?x :q ?z .
+} GROUP BY ?x (STR(?z))
+```
+
+```clojure
+(query ...)
+```
+
+### 11.5 Aggregate Example (with errors)
+
+```sparql
+PREFIX : <http://example.com/data/#>
+SELECT ?g (AVG(?p) AS ?avg) ((MIN(?p) + MAX(?p)) / 2 AS ?c)
+WHERE {
+  ?g :p ?p .
+}
+GROUP BY ?g
+```
+
+```clojure
+(query ...)
+```
+
+## 12 Subqueries
