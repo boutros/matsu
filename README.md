@@ -8,7 +8,7 @@ Everything is ALPHA and subject to change. Do not use yet!
 
 ## Installation
 
-Not yet available on clojars.
+Soon available on clojars.
 
 ## Usage
 
@@ -70,8 +70,8 @@ See the tests for more examples on query syntax.
 + Complete working example querying dbpedia in docs/example.clj
 
 ## Limitations
-* `WHERE` keyword is not optional like in SPARQL
-* Single keyword prefix is not possible, use the equivalent `BASE`-form instead
+* The `WHERE` keyword is not optional, like it is in SPARQL
+* Single colon keyword prefix is not possible, use the equivalent `BASE`-form instead
 
 There are some other limitations, but most, if not all, can easily be circumvented by interpolating raw strings with the `raw` function.
 
