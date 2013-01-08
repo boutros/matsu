@@ -142,18 +142,18 @@ See the tests for more examples on query syntax.
 * The `WHERE` keyword is not optional, like it is in SPARQL
 * Single colon keyword prefix is not possible, use the equivalent `BASE`-form instead
 * Dollar-prefixed variables not supported
-* Subqueries not supported yet
-* Property path syntax not supported yet
-* Specifying variables with `VALUES` in data block not possible yet
-* Federated queries (SERVICE) not supported yet
-* CONSTRUCT short form not supported yet (CONSTRUCT WHERE { ... })
 
 There might be other limitations, especially when dealing with SPARQL expressions. But most, if not all of the limitations can be circumvented by interpolating raw strings into the query with the `raw` function.
 
 ## Todos
-* Datetime encoding, java to ^^xsd:dateTime
+* Syntacic sugar to avoid with quoting (macros)
 * SPARQL update
-* Maybe utilize a parser, like cgrand's parsley, for more powerful query manipulations.
+* Datetime encoding, java to ^^xsd:dateTime
+* Subqueries
+* Property path syntax
+* Specifying variables with `VALUES` in data block
+* Federated queries (SERVICE)
+* CONSTRUCT short form (CONSTRUCT WHERE { ... })
 
 ## Interals
 
