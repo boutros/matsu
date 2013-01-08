@@ -10,7 +10,7 @@ The following namespaces are assumed to be registered:
  :dc      "<http://purl.org/dc/elements/1.1/>"
  :ns      "<http://example.org/ns#>"
  :data    "<http://example.org/foaf/>"
- :vcard   "<http://www.w3.org/2001/vcard-rdf/3.0#>
+ :vcard   "<http://www.w3.org/2001/vcard-rdf/3.0#>"
  :app     "<http://example.org/ns#>"
  :xsd     "<http://www.w3.org/2001/XMLSchema#>"
  :ent     "<http://org.example.com/employees#>"}
