@@ -16,7 +16,8 @@
                       :dc10    "<http://purl.org/dc/elements/1.0/>"
                       :dc11    "<http://purl.org/dc/elements/1.1/>"
                       :rdf     "<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
-                      :data    "<http://example.org/foaf/>"})
+                      :data    "<http://example.org/foaf/>"
+                      :vcard   "<http://www.w3.org/2001/vcard-rdf/3.0#>"})
 
 ; Tests
 
@@ -518,4 +519,33 @@
                  :x [:ns "discount"] :discount))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ( ?p AS ?fullPrice) (?fullPrice*(1-?discount) AS ?customerPrice ) WHERE { ?x ns:price ?p . ?x dc:title ?title . ?x ns:discount ?discount }"))
+
+  (is (=
+        (query
+          (construct (URI. "http://example.org/person#Alice") [:vcard "FN"] :name)
+          (where :x [:foaf "name"] :name))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX vcard: <http://www.w3.org/2001/vcard-rdf/3.0#> CONSTRUCT { <http://example.org/person#Alice> vcard:FN ?name } WHERE { ?x foaf:name ?name }"))
+
+  (is (=
+        (query
+          (construct :x [:vcard "N"] '_:v \.
+                     '_:v [:vcard "givenName"] :gname \.
+                     '_:v [:vcard "familyName"] :fname)
+          (where (union
+                   (group :x [:foaf "firstname"] :gname)
+                   (group :x [:foaf "givenname"] :gname)) \.
+                 (union
+                   (group :x [:foaf "surname"] :fname)
+                   (group :x [:foaf "family_name"] :fname)) \.))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX vcard: <http://www.w3.org/2001/vcard-rdf/3.0#> CONSTRUCT { ?x vcard:N _:v . _:v vcard:givenName ?gname . _:v vcard:familyName ?fname } WHERE { { ?x foaf:firstname ?gname } UNION { ?x foaf:givenname ?gname } . { ?x foaf:surname ?fname } UNION { ?x foaf:family_name ?fname } . }"))
+
+  (is (=
+        (query
+          (construct :s :p :o)
+          (where (graph (URI. "http://example.org/aGraph") (group :s :p :o) \.)))
+
+        "CONSTRUCT { ?s ?p ?o } WHERE { GRAPH <http://example.org/aGraph> { ?s ?p ?o } . }"))
+
   )

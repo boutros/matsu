@@ -9,7 +9,8 @@ The following namespaces are assumed to be registered:
  :org     "<http://example.com/ns#>"
  :dc      "<http://purl.org/dc/elements/1.1/>"
  :ns      "<http://example.org/ns#>"
- :data    "<http://example.org/foaf/>"}
+ :data    "<http://example.org/foaf/>"
+ :vcard   "<http://www.w3.org/2001/vcard-rdf/3.0#>"}
 ```
 
 ## 2 Making Simple Queries (Informative)
@@ -1153,7 +1154,9 @@ WHERE       { ?x foaf:name ?name }
 ```
 
 ```clojure
-(query ...)
+(query
+  (construct (URI. "http://example.org/person#Alice") [:vcard "FN"] :name)
+  (where :x [:foaf "name"] :name))
 ```
 
 ```sparql
@@ -1169,9 +1172,18 @@ WHERE
     { ?x foaf:surname   ?fname } UNION  { ?x foaf:family_name ?fname } .
  }
 ```
-
+TODO think about how to to deal with blank nodes, for now, just quote:
 ```clojure
-(query ...)
+(query
+  (construct :x [:vcard "N"] '_:v \.
+             '_:v [:vcard "givenName"] :gname \.
+             '_:v [:vcard "familyName"] :fname)
+  (where (union
+           (group :x [:foaf "firstname"] :gname)
+           (group :x [:foaf "givenname"] :gname)) \.
+         (union
+           (group :x [:foaf "surname"] :fname)
+           (group :x [:foaf "family_name"] :fname)) \.))
 ```
 
 ```sparql
@@ -1179,7 +1191,9 @@ CONSTRUCT { ?s ?p ?o } WHERE { GRAPH <http://example.org/aGraph> { ?s ?p ?o } . 
 ```
 
 ```clojure
-(query ...)
+(query
+  (construct :s :p :o)
+  (where (graph (URI. "http://example.org/aGraph") (group :s :p :o) \.)))
 ```
 
 ```sparql
