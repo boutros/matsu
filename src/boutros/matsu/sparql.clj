@@ -112,49 +112,39 @@
                 (vec (map encode (get-in q [:query-form :content]))))))))
 
 (defn- from-compile [q]
-  {:pre [(map? q)]}
   (when-not (nil? (:from q))
     (conj ["FROM"] (encode (:from q)))))
 
 (defn- from-named-compile [q]
-  {:pre [(map? q)]}
   (when-let [graphs (seq (:from-named q))]
     (conj []
       (for [g graphs] ["FROM NAMED" (encode g)]))))
 
 (defn- where-compile [q]
-  {:pre [(map? q)]}
   (when-let [xs (seq (:where q))]
     (conj ["WHERE" "{"] (vec (map encode xs)) "}")))
 
 (defn- limit-compile [q]
-  {:pre [(map? q)]}
   (when-let [n (:limit q)]
     (conj [] "LIMIT" n)))
 
 (defn- offset-compile [q]
-  {:pre [(map? q)]}
   (when-let [n (:offset q)]
     (conj [] "OFFSET" n)))
 
 (defn- order-by-compile [q]
-  {:pre [(map? q)]}
   (when-let [xs (seq (:order-by q))]
     (conj ["ORDER BY"] (vec (map encode xs)))))
 
 (defn- group-by-compile [q]
-  {:pre [(map? q)]}
   (when-let [xs (seq (:group-by q))]
     (conj ["GROUP BY"] (vec (map encode xs)))))
 
 (defn- having-compile [q]
-  {:pre [(map? q)]}
   (when-let [xs (seq (:having q))]
     (conj ["HAVING("] (vec (map encode xs)) ")" )))
 
 (defn- infer-prefixes [s]
-  {:pre [(string? s)]
-   :post [(string? %)]}
   (str
     (apply str (apply sorted-set (for [[_ p] (re-seq #"(\b[a-zA-Z0-9]+):[a-zA-Z]" s) :when (not= p (name :mailto))]
              (str "PREFIX " p ": " (ns-or-error (keyword p)) " " ))))
@@ -196,81 +186,51 @@
 (declare desc)
 
 (defn base [q uri]
-  {:pre [(map? q)]
-   :post [(map? %)]}
   (assoc q :base uri))
 
 (defn ask [q & vars]
-  {:pre [(map? q)]
-   :post [(map? %)]}
   (assoc q :query-form {:form "ASK" :content (vec vars)}))
 
 (defn describe [q & vars]
-  {:pre [(map? q)]
-   :post [(map? %)]}
   (assoc q :query-form {:form "DESCRIBE" :content (vec vars)}))
 
 (defn from [q graph]
-  {:pre [(map? q)]
-   :post [(map? %)]}
   (assoc q :from graph))
 
 (defn from-named [q & graphs]
-  {:pre [(map? q)]
-   :post [(map? %)]}
   (assoc q :from-named (vec graphs)))
 
 (defn select [q & vars]
-  {:pre [(map? q)]
-   :post [(map? %)]}
   (assoc q :query-form {:form "SELECT" :content (vec vars)}))
 
 (defn select-distinct [q & vars]
-  {:pre [(map? q)]
-   :post [(map? %)]}
   (assoc q :query-form {:form "SELECT DISTINCT" :content (vec vars)}))
 
 (defn select-reduced [q & vars]
-  {:pre [(map? q)]
-   :post [(map? %)]}
   (assoc q :query-form {:form "SELECT REDUCED" :content (vec vars)}))
 
 (defn construct [q & vars]
-  {:pre [(map? q)]
-   :post [(map? %)]}
   (assoc q :query-form {:form "CONSTRUCT" :content (vec vars)}))
 
 (defn where [q & vars]
-  {:pre [(map? q)]
-   :post [(map? %)]}
   (update-in q [:where] into vars))
 
 (defn limit [q & n]
-  {:pre [(map? q)]
-  :post [(map? %)]}
   (assoc q :limit n))
 
 (defn offset [q & n]
-  {:pre [(map? q)]
-  :post [(map? %)]}
   (assoc q :offset n))
 
 (defn order-by [q & expr]
-  {:pre [(map? q)]
-  :post [(map? %)]}
   (assoc q :order-by (vec expr)))
 
 (defn order-by-desc [q v]
   (order-by q (desc v)))
 
 (defn group-by [q & expr]
-  {:pre [(map? q)]
-  :post [(map? %)]}
   (assoc q :group-by (vec expr)))
 
 (defn having [q & expr]
-  {:pre [(map? q)]
-  :post [(map? %)]}
   (assoc q :having (vec expr)))
 
 ; Functions which compile inline groups inside select/where clauses:
@@ -279,48 +239,48 @@
   {:content (string/join " UNION " (vec (map encode groups))) })
 
 (defn group [& vars]
-   {:content (str "{ " (string/join " " (vec (map encode vars))) " }" )})
+  {:content (str "{ " (string/join " " (vec (map encode vars))) " }" )})
 
 (defn graph [& vars]
-   {:content (str "GRAPH " (string/join " " (vec (map encode vars))))})
+  {:content (str "GRAPH " (string/join " " (vec (map encode vars))))})
 
 (defn filter [& vars]
-   {:content (str "FILTER(" (string/join " " (vec (map encode vars))) ")" )})
+  {:content (str "FILTER(" (string/join " " (vec (map encode vars))) ")" )})
 
 (defn filter-not-exists [& vars]
-   {:content (str "FILTER NOT EXISTS { " (string/join " " (vec (map encode vars))) " }" )})
+  {:content (str "FILTER NOT EXISTS { " (string/join " " (vec (map encode vars))) " }" )})
 
 (defn filter-exists [& vars]
-   {:content (str "FILTER EXISTS { " (string/join " " (vec (map encode vars))) " }" )})
+  {:content (str "FILTER EXISTS { " (string/join " " (vec (map encode vars))) " }" )})
 
 (defn minus [& vars]
-   {:content (str "MINUS { " (string/join " " (vec (map encode vars))) " }" )})
+  {:content (str "MINUS { " (string/join " " (vec (map encode vars))) " }" )})
 
 (defn filter-regex [v regex & flags]
-   {:content (str "FILTER regex(" (encode v)
-                  ", "
-                  (encode regex)
-                  (when flags (str ", " (encode (first flags))))
-                  ")" )})
+  {:content (str "FILTER regex(" (encode v)
+                 ", "
+                 (encode regex)
+                 (when flags (str ", " (encode (first flags))))
+                 ")" )})
 
 (defn optional [& vars]
-   {:content (str "OPTIONAL { " (string/join " " (vec (map encode vars))) " }" )})
+  {:content (str "OPTIONAL { " (string/join " " (vec (map encode vars))) " }" )})
 
 (defn raw [string]
   {:pre [(string? string)]}
-   {:content string })
+  {:content string })
 
 (defn desc [v]
-   {:content (str "DESC(" (encode v) ")" )})
+  {:content (str "DESC(" (encode v) ")" )})
 
 (defn asc [v]
-   {:content (str "ASC(" (encode v) ")" )})
+  {:content (str "ASC(" (encode v) ")" )})
 
 (defn sum [v]
-   {:content (str "SUM(" (encode v) ")" )})
+  {:content (str "SUM(" (encode v) ")" )})
 
 (defn avg [v]
-   {:content (str "AVG(" (encode v) ")" )})
+  {:content (str "AVG(" (encode v) ")" )})
 
 (defn concat [& vars]
   {:content (str "CONCAT("(string/join ", " (map encode vars)) ")") })
@@ -331,10 +291,10 @@
     {:content (str "BIND(" (encode expr) " AS " (encode name) ")") }))
 
 (defn bound [v]
-   {:content (str "bound(" (encode v) ")" )})
+  {:content (str "bound(" (encode v) ")" )})
 
 (defn !bound [v]
-   {:content (str "!bound(" (encode v) ")" )})
+  {:content (str "!bound(" (encode v) ")" )})
 
 (defn same-term [& vars]
   {:content (str "sameTerm("(string/join ", " (map encode vars)) ")") })
