@@ -488,3 +488,7 @@
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name } LIMIT 20")))
 
+(deftest part-16
+  "Query Forms"
+  (is (=
+        "")))

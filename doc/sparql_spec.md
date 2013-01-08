@@ -1084,3 +1084,143 @@ LIMIT 20
 ```
 
 ## 16 Query Forms
+
+### 16.1 SELECT
+
+```sparql
+PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+SELECT ?nameX ?nameY ?nickY
+WHERE
+  { ?x foaf:knows ?y ;
+       foaf:name ?nameX .
+    ?y foaf:name ?nameY .
+    OPTIONAL { ?y foaf:nick ?nickY }
+  }
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX  dc:  <http://purl.org/dc/elements/1.1/>
+PREFIX  ns:  <http://example.org/ns#>
+SELECT  ?title (?p*(1-?discount) AS ?price)
+{ ?x ns:price ?p .
+  ?x dc:title ?title .
+  ?x ns:discount ?discount
+}
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX  dc:  <http://purl.org/dc/elements/1.1/>
+PREFIX  ns:  <http://example.org/ns#>
+SELECT  ?title (?p AS ?fullPrice) (?fullPrice*(1-?discount) AS ?customerPrice)
+{ ?x ns:price ?p .
+   ?x dc:title ?title .
+   ?x ns:discount ?discount
+}
+```
+
+```clojure
+(query ...)
+```
+
+### 16.2 CONSTRUCT
+
+```sparql
+PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+PREFIX vcard:   <http://www.w3.org/2001/vcard-rdf/3.0#>
+CONSTRUCT   { <http://example.org/person#Alice> vcard:FN ?name }
+WHERE       { ?x foaf:name ?name }
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+PREFIX vcard:   <http://www.w3.org/2001/vcard-rdf/3.0#>
+
+CONSTRUCT { ?x  vcard:N _:v .
+            _:v vcard:givenName ?gname .
+            _:v vcard:familyName ?fname }
+WHERE
+ {
+    { ?x foaf:firstname ?gname } UNION  { ?x foaf:givenname   ?gname } .
+    { ?x foaf:surname   ?fname } UNION  { ?x foaf:family_name ?fname } .
+ }
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+CONSTRUCT { ?s ?p ?o } WHERE { GRAPH <http://example.org/aGraph> { ?s ?p ?o } . }
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX  dc: <http://purl.org/dc/elements/1.1/>
+PREFIX app: <http://example.org/ns#>
+PREFIX xsd: <http://www.w3.org/2001/XMLSchema#>
+
+CONSTRUCT { ?s ?p ?o } WHERE
+ {
+   GRAPH ?g { ?s ?p ?o } .
+   ?g dc:publisher <http://www.w3.org/> .
+   ?g dc:date ?date .
+   FILTER ( app:customDate(?date) > "2005-02-28T00:00:00Z"^^xsd:dateTime ) .
+ }
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX site: <http://example.org/stats#>
+
+CONSTRUCT { [] foaf:name ?name }
+WHERE
+{ [] foaf:name ?name ;
+     site:hits ?hits .
+}
+ORDER BY desc(?hits)
+LIMIT 2
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+CONSTRUCT WHERE { ?x foaf:name ?name }
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+
+CONSTRUCT { ?x foaf:name ?name }
+WHERE
+{ ?x foaf:name ?name }
+```
+
+```clojure
+(query ...)
+```
