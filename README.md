@@ -47,9 +47,52 @@ You can also supply prefixes with the query, which will override the global `pre
            \; [:foaf "mbox"] (URI. "mailto:me@me.com") \.)))
 ```
 
-Matsu makes it easy to construct complex queries:
+Matsu makes it possible to create complex, nested queries:
 
-    EXAMPLE
+```clojure
+(query
+  (select :mbox :nick :ppd)
+  (from-named (URI. "http://example.org/foaf/aliceFoaf")
+              (URI. "http://example.org/foaf/bobFoaf"))
+  (where
+    (graph [:data "aliceFoaf"]
+           (group :alice [:foaf "mbox"] (URI. "mailto:alice@work.example")
+                  \; [:foaf "knows"] :whom \.
+                  :whom [:foaf "mbox"] :mbox
+                  \; [:rdfs "seeAlso"] :ppd \.
+                  :ppd \a [:foaf "PersonalProfileDocument"] \.)
+           \.)
+    (graph :ppd
+           (group :w [:foaf "mbox"] :mbox
+                  \; [:foaf "nick"] :nick))))
+```
+
+Yielding the following SPARQL string:
+
+```sparql
+PREFIX  data:  <http://example.org/foaf/>
+PREFIX  foaf:  <http://xmlns.com/foaf/0.1/>
+PREFIX  rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
+
+SELECT ?mbox ?nick ?ppd
+FROM NAMED <http://example.org/foaf/aliceFoaf>
+FROM NAMED <http://example.org/foaf/bobFoaf>
+WHERE
+{
+  GRAPH data:aliceFoaf
+  {
+    ?alice foaf:mbox <mailto:alice@work.example> ;
+           foaf:knows ?whom .
+    ?whom  foaf:mbox ?mbox ;
+           rdfs:seeAlso ?ppd .
+    ?ppd  a foaf:PersonalProfileDocument .
+  } .
+  GRAPH ?ppd
+  {
+      ?w foaf:mbox ?mbox ;
+         foaf:nick ?nick
+  }
+}
 
 You can bind queries to vars with `defquery` and use them as basis for other queries:
 
@@ -101,8 +144,9 @@ See the tests for more examples on query syntax.
 * Subqueries not supported yet
 * Property path syntax not supported yet
 * Specifying variables with `VALUES` in data block not possible yet
+* Federated queries (SERVICE keyword) to supported yet
 
-There might be other limitations, especially with complex, nested queries. But most, if not all of the limitations can be circumvented by interpolating raw strings into the query with the `raw` function.
+There might be other limitations, especially when dealing with SPARQL expressions. But most, if not all of the limitations can be circumvented by interpolating raw strings into the query with the `raw` function.
 
 ## Todos
 * Sparql update
