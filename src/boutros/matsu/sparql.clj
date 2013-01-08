@@ -12,6 +12,7 @@
   "query-map constructor"
   {:base nil
    :from nil
+   :from-named []
    :query-form {:form nil :content []}
    :where []
    ;:where {:keyword true :content [] }
@@ -116,7 +117,13 @@
 (defn- from-compile [q]
   {:pre [(map? q)]}
   (when-not (nil? (:from q))
-    (conj ["FROM"] (str \< (:from q) \>))))
+    (conj ["FROM"] (encode (:from q)))))
+
+(defn- from-named-compile [q]
+  {:pre [(map? q)]}
+  (when-let [graphs (seq (:from-named q))]
+    (conj []
+      (for [g graphs] ["FROM NAMED" (encode g)]))))
 
 (defn- where-compile [q]
   {:pre [(map? q)]}
@@ -160,6 +167,7 @@
     (->> (conj []
                (query-form-compile q)
                (from-compile q)
+               (from-named-compile q)
                (where-compile q)
                (limit-compile q)
                (group-by-compile q)
@@ -190,6 +198,11 @@
   {:pre [(map? q)]
    :post [(map? %)]}
   (assoc q :from graph))
+
+(defn from-named [q & graphs]
+  {:pre [(map? q)]
+   :post [(map? %)]}
+  (assoc q :from-named (vec graphs)))
 
 (defn select [q & vars]
   {:pre [(map? q)]
@@ -235,6 +248,10 @@
 (defn group [& vars]
   {:post [(map? %)]}
    {:content (str "{ " (string/join " " (vec (map encode vars))) " }" )})
+
+(defn graph [& vars]
+  {:post [(map? %)]}
+   {:content (str "GRAPH " (string/join " " (vec (map encode vars))))})
 
 (defn filter [& vars]
   {:post [(map? %)]}

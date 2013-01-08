@@ -8,7 +8,8 @@ The following namespaces are assumed to be registered:
 {:foaf    "<http://xmlns.com/foaf/0.1/>"
  :org     "<http://example.com/ns#>"
  :dc      "<http://purl.org/dc/elements/1.1/>"
- :ns      "<http://example.org/ns#>"}
+ :ns      "<http://example.org/ns#>"
+ :data    "<http://example.org/foaf/>"}
 ```
 
 ## 2 Making Simple Queries (Informative)
@@ -793,7 +794,10 @@ WHERE   { ?x foaf:name ?name }
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :name)
+  (from (URI. "http://example.org/foaf/aliceFoaf"))
+  (where :x [:foaf "name"] :name))
 ```
 
 ```sparql
@@ -812,10 +816,17 @@ WHERE
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :who :g :mbox)
+  (from (URI. "http://example.org/dft.ttl"))
+  (from-named (URI. "http://example.org/bob")
+              (URI. "http://example.org/alice"))
+  (where :g [:dc "publisher"] :who \.
+         (graph :g (group :x [:foaf "mbox"] :mbox))))
 ```
 
 ### 13.3 Querying the Dataset
+
 
 ```sparql
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
@@ -834,7 +845,13 @@ WHERE
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :src :bobNick)
+  (from-named (URI. "http://example.org/foaf/aliceFoaf")
+              (URI. "http://example.org/foaf/bobFoaf"))
+  (where (graph :src
+                (group :x [:foaf "mbox"] (URI. "mailto:bob@work.example") \.
+                       :x [:foaf "nick"] :bobNick))))
 ```
 
 ```sparql
@@ -853,7 +870,13 @@ WHERE
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :nick)
+  (from-named (URI. "http://example.org/foaf/aliceFoaf")
+              (URI. "http://example.org/foaf/bobFoaf"))
+  (where (graph [:data "bobFoaf"]
+                (group :x [:foaf "mbox"] (URI. "mailto:bob@work.example") \.
+                       :x [:foaf "nick"] :nick))))
 ```
 
 ```clojure
@@ -882,9 +905,22 @@ WHERE
 }
 ```
 
-
 ```sparql
-(query ...)
+(query
+  (select :mbox :nick :ppd)
+  (from-named (URI. "http://example.org/foaf/aliceFoaf")
+              (URI. "http://example.org/foaf/bobFoaf"))
+  (where
+    (graph [:data "aliceFoaf"]
+           (group :alice [:foaf "mbox"] (URI. "mailto:alice@work.example")
+                  \; [:foaf "knows"] :whom \.
+                  :whom [:foaf "mbox"] :mbox
+                  \; [:rdfs "seeAlso"] :ppd \.
+                  :ppd \a [:foaf "PersonalProfileDocument"] \.)
+           \.)
+    (graph :ppd
+           (group :w [:foaf "mbox"] :mbox
+                  \; [:foaf "nick"] :nick))))
 ```
 
 ```sparql
@@ -901,7 +937,14 @@ WHERE
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :name :mbox :date)
+  (where
+    :g [:dc "publisher"] :name
+    \; [:dc "date"] :date \.
+    (graph :g
+           (group :person [:foaf "name"] :name
+                  \; [:foaf "mbox"] :mbox))))
 ```
 
 ## 14 Basic Federated Query

@@ -25,7 +25,7 @@
   (select :s))
 
 (defquery q2
-  (from "http://dbpedia.org/resource"))
+  (from (URI. "http://dbpedia.org/resource")))
 
 (deftest saved-queries
   (testing "query based on saved queries"
