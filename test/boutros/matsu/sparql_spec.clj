@@ -490,5 +490,32 @@
 
 (deftest part-16
   "Query Forms"
+
   (is (=
-        "")))
+        (query
+          (select :nameX :nameY :nickY)
+          (where :x [:foaf "knows"] :y
+                 \; [:foaf "name"] :nameX \.
+                 :y [:foaf "name"] :nameY \.
+                 (optional :y [:foaf "nick"] :nickY)))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?nameX ?nameY ?nickY WHERE { ?x foaf:knows ?y ; foaf:name ?nameX . ?y foaf:name ?nameY . OPTIONAL { ?y foaf:nick ?nickY } }"))
+
+  (is (=
+        (query
+          (select :title [(raw "?p*(1-?discount)") :price])
+          (where :x [:ns "price"] :p \.
+                 :x [:dc "title"] :title \.
+                 :x [:ns "discount"] :discount))
+
+        "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ( ?p*(1-?discount) AS ?price ) WHERE { ?x ns:price ?p . ?x dc:title ?title . ?x ns:discount ?discount }"))
+
+  (is (=
+        (query
+          (select :title [(raw "?p AS ?fullPrice) (?fullPrice*(1-?discount)") :customerPrice])
+          (where :x [:ns "price"] :p \.
+                 :x [:dc "title"] :title \.
+                 :x [:ns "discount"] :discount))
+
+        "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ( ?p AS ?fullPrice) (?fullPrice*(1-?discount) AS ?customerPrice ) WHERE { ?x ns:price ?p . ?x dc:title ?title . ?x ns:discount ?discount }"))
+  )

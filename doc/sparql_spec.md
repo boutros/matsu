@@ -1099,7 +1099,12 @@ WHERE
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :nameX :nameY :nickY)
+  (where :x [:foaf "knows"] :y
+         \; [:foaf "name"] :nameX \.
+         :y [:foaf "name"] :nameY \.
+         (optional :y [:foaf "nick"] :nickY)))
 ```
 
 ```sparql
@@ -1113,7 +1118,11 @@ SELECT  ?title (?p*(1-?discount) AS ?price)
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :title [(raw "?p*(1-?discount)") :price])
+  (where :x [:ns "price"] :p \.
+         :x [:dc "title"] :title \.
+         :x [:ns "discount"] :discount))
 ```
 
 ```sparql
@@ -1127,7 +1136,11 @@ SELECT  ?title (?p AS ?fullPrice) (?fullPrice*(1-?discount) AS ?customerPrice)
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :title [(raw "?p AS ?fullPrice) (?fullPrice*(1-?discount)") :customerPrice])
+  (where :x [:ns "price"] :p \.
+         :x [:dc "title"] :title \.
+         :x [:ns "discount"] :discount))
 ```
 
 ### 16.2 CONSTRUCT
