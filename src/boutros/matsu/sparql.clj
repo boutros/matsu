@@ -16,11 +16,11 @@
    :query-form {:form nil :content []}
    :where []
    ;:where {:keyword true :content [] }
-   :order-by nil
+   :order-by []
    :group-by []
    :having []
-   :limit nil
-   :offset nil})
+   :offset nil
+   :limit nil})
 
 (def PREFIXES (atom {}))
 
@@ -135,6 +135,16 @@
   (when-let [n (:limit q)]
     (conj [] "LIMIT" n)))
 
+(defn- offset-compile [q]
+  {:pre [(map? q)]}
+  (when-let [n (:offset q)]
+    (conj [] "OFFSET" n)))
+
+(defn- order-by-compile [q]
+  {:pre [(map? q)]}
+  (when-let [xs (seq (:order-by q))]
+    (conj ["ORDER BY"] (vec (map encode xs)))))
+
 (defn- group-by-compile [q]
   {:pre [(map? q)]}
   (when-let [xs (seq (:group-by q))]
@@ -169,7 +179,9 @@
                (from-compile q)
                (from-named-compile q)
                (where-compile q)
+               (order-by-compile q)
                (limit-compile q)
+               (offset-compile q)
                (group-by-compile q)
                (having-compile q))
          (flatten)
@@ -183,6 +195,8 @@
 ; -----------------------------------------------------------------------------
 
 ; These all takes a map of the query and returns a modified query-map:
+
+(declare desc)
 
 (defn base [q uri]
   {:pre [(map? q)]
@@ -214,6 +228,11 @@
    :post [(map? %)]}
   (assoc q :query-form {:form "SELECT DISTINCT" :content (vec vars)}))
 
+(defn select-reduced [q & vars]
+  {:pre [(map? q)]
+   :post [(map? %)]}
+  (assoc q :query-form {:form "SELECT REDUCED" :content (vec vars)}))
+
 (defn construct [q & vars]
   {:pre [(map? q)]
    :post [(map? %)]}
@@ -228,6 +247,19 @@
   {:pre [(map? q)]
   :post [(map? %)]}
   (assoc q :limit n))
+
+(defn offset [q & n]
+  {:pre [(map? q)]
+  :post [(map? %)]}
+  (assoc q :offset n))
+
+(defn order-by [q & expr]
+  {:pre [(map? q)]
+  :post [(map? %)]}
+  (assoc q :order-by (vec expr)))
+
+(defn order-by-desc [q v]
+  (order-by q (desc v)))
 
 (defn group-by [q & expr]
   {:pre [(map? q)]
@@ -285,6 +317,14 @@
   {:pre [(string? string)]
    :post [(map? %)]}
    {:content string })
+
+(defn desc [v]
+  {:post [(map? %)]}
+   {:content (str "DESC(" (encode v) ")" )})
+
+(defn asc [v]
+  {:post [(map? %)]}
+   {:content (str "ASC(" (encode v) ")" )})
 
 (defn sum [v]
   {:post [(map? %)]}

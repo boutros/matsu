@@ -952,3 +952,135 @@ WHERE
 Not supported yet.
 
 ## 15 Solution Sequences and Modifiers
+
+### 15.1 ORDER BY
+
+```sparql
+PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+
+SELECT ?name
+WHERE { ?x foaf:name ?name }
+ORDER BY ?name
+```
+
+```clojure
+(query
+  (select :name)
+  (where :x [:foaf "name"] :name)
+  (order-by :name))
+```
+
+```sparql
+PREFIX     :    <http://example.org/ns#>
+PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+
+SELECT ?name
+WHERE { ?x foaf:name ?name ; :empId ?emp }
+ORDER BY DESC(?emp)
+```
+
+```clojure
+(query
+  (base (URI. "http://example.org/ns#"))
+  (select :name)
+  (where :x [:foaf "name"] :name
+         \; [:empId] :emp)
+  (order-by (desc :emp)))     ; or (order-by-desc :emp)
+```
+
+```sparql
+PREFIX     :    <http://example.org/ns#>
+PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+
+SELECT ?name
+WHERE { ?x foaf:name ?name ; :empId ?emp }
+ORDER BY ?name DESC(?emp)
+```
+
+```clojure
+(query
+  (base (URI. "http://example.org/ns#"))
+  (select :name)
+  (where :x [:foaf "name"] :name
+         \; [:empId] :emp)
+  (order-by :name (desc :emp)))
+```
+
+### 15.2 Projection
+
+```sparql
+PREFIX foaf:       <http://xmlns.com/foaf/0.1/>
+SELECT ?name
+WHERE
+ { ?x foaf:name ?name }
+```
+
+```clojure
+(query
+  (select :name)
+  (where :x [:foaf "name"] :name))
+```
+
+### 15.3 Duplicate Solutions
+
+```sparql
+PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+SELECT DISTINCT ?name WHERE { ?x foaf:name ?name }
+```
+
+```clojure
+(query
+  (select-distinct :name)
+  (where :x [:foaf "name"] :name))
+```
+
+```sparql
+PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+SELECT REDUCED ?name WHERE { ?x foaf:name ?name }
+```
+
+```clojure
+(query
+  (select-reduced :name)
+  (where :x [:foaf "name"] :name))
+```
+
+### 15.4 OFFSET
+
+```sparql
+PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+
+SELECT  ?name
+WHERE   { ?x foaf:name ?name }
+ORDER BY ?name
+LIMIT   5
+OFFSET  10
+```
+
+```clojure
+(query
+  (select :name)
+  (where :x [:foaf "name"] :name)
+  (order-by :name)
+  (limit 5)
+  (offset 10))
+```
+
+### 15.5 LIMIT
+
+```sparql
+PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+
+SELECT ?name
+WHERE { ?x foaf:name ?name }
+LIMIT 20
+```
+
+```clojure
+(query
+  (select :name)
+  (where :x [:foaf "name"] :name)
+  (limit 20))
+```
+
+## 16 Query Forms

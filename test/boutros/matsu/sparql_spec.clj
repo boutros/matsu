@@ -419,3 +419,72 @@
                               \; [:foaf "mbox"] :mbox))))
 
             "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox ?date WHERE { ?g dc:publisher ?name ; dc:date ?date . GRAPH ?g { ?person foaf:name ?name ; foaf:mbox ?mbox } }")))
+
+    (deftest part-15
+      (is (=
+            (query
+              (select :name)
+              (where :x [:foaf "name"] :name)
+              (order-by :name))
+
+            "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name } ORDER BY ?name"))
+
+      (is (=
+            (query
+              (base (URI. "http://example.org/ns#"))
+              (select :name)
+              (where :x [:foaf "name"] :name
+                     \; [:empId] :emp)
+              (order-by (desc :emp))) ; or (order-by-desc :emp)
+
+            "BASE <http://example.org/ns#> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name ; <empId> ?emp } ORDER BY DESC(?emp)"))
+
+      (is (=
+            (query
+              (base (URI. "http://example.org/ns#"))
+              (select :name)
+              (where :x [:foaf "name"] :name
+                     \; [:empId] :emp)
+              (order-by :name (desc :emp)))
+
+            "BASE <http://example.org/ns#> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name ; <empId> ?emp } ORDER BY ?name DESC(?emp)"))
+
+      (is (=
+            (query
+              (select :name)
+              (where :x [:foaf "name"] :name))
+
+            "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name }"))
+
+      (is (=
+            (query
+              (select-distinct :name)
+              (where :x [:foaf "name"] :name))
+
+            "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT DISTINCT ?name WHERE { ?x foaf:name ?name }"))
+
+      (is (=
+            (query
+              (select-reduced :name)
+              (where :x [:foaf "name"] :name))
+
+            "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT REDUCED ?name WHERE { ?x foaf:name ?name }"))
+
+      (is (=
+            (query
+              (select :name)
+              (where :x [:foaf "name"] :name)
+              (order-by :name)
+              (limit 5)
+              (offset 10))
+
+            "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name } ORDER BY ?name LIMIT 5 OFFSET 10"))
+
+      (is (=
+            (query
+              (select :name)
+              (where :x [:foaf "name"] :name)
+              (limit 20))
+
+            "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name } LIMIT 20"))
+      )
