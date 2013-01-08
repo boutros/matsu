@@ -17,7 +17,10 @@
                       :dc11    "<http://purl.org/dc/elements/1.1/>"
                       :rdf     "<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"
                       :data    "<http://example.org/foaf/>"
-                      :vcard   "<http://www.w3.org/2001/vcard-rdf/3.0#>"})
+                      :vcard   "<http://www.w3.org/2001/vcard-rdf/3.0#>"
+                      :app     "<http://example.org/ns#>"
+                      :xsd     "<http://www.w3.org/2001/XMLSchema#>"
+                      :site    "<http://example.org/stats#>"})
 
 ; Tests
 
@@ -547,5 +550,32 @@
           (where (graph (URI. "http://example.org/aGraph") (group :s :p :o) \.)))
 
         "CONSTRUCT { ?s ?p ?o } WHERE { GRAPH <http://example.org/aGraph> { ?s ?p ?o } . }"))
+
+  (is (=
+        (query
+          (construct :s :p :o)
+          (where
+            (graph :g (group :s :p :o) \.)
+            :g [:dc "publisher"] (URI. "http://www.w3.org/") \.
+            :g [:dc "date"] :date \.
+            (filter [:app "customDate(?date)"] \> (raw "\"2005-02-28T00:00:00Z\"^^xsd:dateTime")) \.))
+
+        "PREFIX app: <http://example.org/ns#> PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> CONSTRUCT { ?s ?p ?o } WHERE { GRAPH ?g { ?s ?p ?o } . ?g dc:publisher <http://www.w3.org/> . ?g dc:date ?date . FILTER(app:customDate(?date) > \"2005-02-28T00:00:00Z\"^^xsd:dateTime) . }"))
+
+  (is (=
+        (query
+          (construct (raw "[]") [:foaf "name"] :name)
+          (where (raw "[]") [:foaf "name"] :name
+                 \; [:site "hits"] :hits \.)
+          (order-by-desc :hits)
+          (limit 2))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX site: <http://example.org/stats#> CONSTRUCT { [] foaf:name ?name } WHERE { [] foaf:name ?name ; site:hits ?hits . } ORDER BY DESC(?hits) LIMIT 2"))
+  (is (=
+        (query
+          (construct :x [:foaf "name"] :name)
+          (where :x [:foaf "name"] :name))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> CONSTRUCT { ?x foaf:name ?name } WHERE { ?x foaf:name ?name }"))
 
   )

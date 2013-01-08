@@ -146,11 +146,14 @@ See the tests for more examples on query syntax.
 * Property path syntax not supported yet
 * Specifying variables with `VALUES` in data block not possible yet
 * Federated queries (SERVICE) not supported yet
+* CONSTRUCT short form not supported yet (CONSTRUCT WHERE { ... })
 
 There might be other limitations, especially when dealing with SPARQL expressions. But most, if not all of the limitations can be circumvented by interpolating raw strings into the query with the `raw` function.
 
 ## Todos
-* Sparql update
+* Datetime encoding, java to ^^xsd:dateTime
+* SPARQL update
+* Maybe utilize a parser, like cgrand's parsley, for more powerful query manipulations.
 
 ## Interals
 

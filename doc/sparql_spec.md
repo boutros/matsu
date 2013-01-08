@@ -10,7 +10,9 @@ The following namespaces are assumed to be registered:
  :dc      "<http://purl.org/dc/elements/1.1/>"
  :ns      "<http://example.org/ns#>"
  :data    "<http://example.org/foaf/>"
- :vcard   "<http://www.w3.org/2001/vcard-rdf/3.0#>"}
+ :vcard   "<http://www.w3.org/2001/vcard-rdf/3.0#>
+ :app     "<http://example.org/ns#>"
+ :xsd     "<http://www.w3.org/2001/XMLSchema#>"}
 ```
 
 ## 2 Making Simple Queries (Informative)
@@ -1211,7 +1213,13 @@ CONSTRUCT { ?s ?p ?o } WHERE
 ```
 
 ```clojure
-(query ...)
+(query
+  (construct :s :p :o)
+  (where
+    (graph :g (group :s :p :o) \.)
+    :g [:dc "publisher"] (URI. "http://www.w3.org/") \.
+    :g [:dc "date"] :date \.
+    (filter [:app "customDate(?date)"] \> (raw "\"2005-02-28T00:00:00Z\"^^xsd:dateTime")) \.))
 ```
 
 ```sparql
@@ -1226,9 +1234,14 @@ WHERE
 ORDER BY desc(?hits)
 LIMIT 2
 ```
-
+Hm, not possible except wit `raw`. (I've never seen this being used 'in the wild'.)
 ```clojure
-(query ...)
+(query
+  (construct (raw "[]") [:foaf "name"] :name)
+  (where (raw "[]") [:foaf "name"] :name
+         \; [:site "hits"] :hits \.)
+  (order-by-desc :hits)
+  (limit 2))
 ```
 
 ```sparql
@@ -1237,7 +1250,7 @@ CONSTRUCT WHERE { ?x foaf:name ?name }
 ```
 
 ```clojure
-(query ...)
+(query ...) ; Not possible yet, use the form below
 ```
 
 ```sparql
@@ -1249,5 +1262,7 @@ WHERE
 ```
 
 ```clojure
-(query ...)
+(query
+  (construct :x [:foaf "name"] :name)
+  (where :x [:foaf "name"] :name))
 ```
