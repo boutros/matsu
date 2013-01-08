@@ -22,7 +22,8 @@
                       :xsd     "<http://www.w3.org/2001/XMLSchema#>"
                       :site    "<http://example.org/stats#>"
                       :ent     "<http://org.example.com/employees#>"
-                      :a      "<http://www.w3.org/2000/10/annotation-ns#>"})
+                      :a       "<http://www.w3.org/2000/10/annotation-ns#>"
+                      :t       "<http://example.org/types#>"})
 
 ; Tests
 
@@ -658,4 +659,40 @@
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:givenName ?name . OPTIONAL { ?x dc:date ?date } . FILTER(!bound(?date)) }"))
 
+  (is (=
+        (query
+          (select :name1 :name2)
+          (where :x [:foaf "name"] :name1
+                 \; [:foaf "mbox"] :mbox1 \.
+                 :y [:foaf "name"] :name2
+                 \; [:foaf "mbox"] :mbox2 \.
+                 (filter :mbox1 \= :mbox2 '&& :name1 '!= :name2)))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name1 ?name2 WHERE { ?x foaf:name ?name1 ; foaf:mbox ?mbox1 . ?y foaf:name ?name2 ; foaf:mbox ?mbox2 . FILTER(?mbox1 = ?mbox2 && ?name1 != ?name2) }"))
+
+  (is (=
+        (query
+          (select :name1 :name2)
+          (where :x [:foaf "name"] :name1
+                 \; [:foaf "mbox"] :mbox1 \.
+                 :y [:foaf "name"] :name2
+                 \; [:foaf "mbox"] :mbox2 \.
+                 (filter (same-term :mbox1, :mbox2) '&& (!same-term :name1 :name2))))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name1 ?name2 WHERE { ?x foaf:name ?name1 ; foaf:mbox ?mbox1 . ?y foaf:name ?name2 ; foaf:mbox ?mbox2 . FILTER(sameTerm(?mbox1, ?mbox2) && !sameTerm(?name1, ?name2)) }"))
+
+  (is (=
+        (query
+          (base (URI. "http://example.org/WMterms#"))
+          (select :aLabel1, :bLabel)
+          (where :a [:label] :aLabel \.
+                 :a [:weight] :aWeight \.
+                 :a [:displacement] :aDisp \.
+                 :b [:label] :bLabel \.
+                 :b [:weight] :bWeight \.
+                 :b [:displacement] :bDisp \.
+                 (filter (same-term :aWeight :bWeight) '&&
+                         (!same-term :aDisp :bDisp))))
+
+        "BASE <http://example.org/WMterms#> SELECT ?aLabel1 ?bLabel WHERE { ?a <label> ?aLabel . ?a <weight> ?aWeight . ?a <displacement> ?aDisp . ?b <label> ?bLabel . ?b <weight> ?bWeight . ?b <displacement> ?bDisp . FILTER(sameTerm(?aWeight, ?bWeight) && !sameTerm(?aDisp, ?bDisp)) }"))
     )

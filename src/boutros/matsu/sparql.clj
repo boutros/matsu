@@ -335,3 +335,9 @@
 
 (defn !bound [v]
    {:content (str "!bound(" (encode v) ")" )})
+
+(defn same-term [& vars]
+  {:content (str "sameTerm("(string/join ", " (map encode vars)) ")") })
+
+(defn !same-term [& vars]
+  {:content (str "!sameTerm("(string/join ", " (map encode vars)) ")") })

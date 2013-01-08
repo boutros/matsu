@@ -14,7 +14,8 @@ The following namespaces are assumed to be registered:
  :app     "<http://example.org/ns#>"
  :xsd     "<http://www.w3.org/2001/XMLSchema#>"
  :ent     "<http://org.example.com/employees#>"
- :a      "<http://www.w3.org/2000/10/annotation-ns#>"}
+ :a       "<http://www.w3.org/2000/10/annotation-ns#>"
+ :t       "<http://example.org/types#>"}
 ```
 
 ## 2 Making Simple Queries (Informative)
@@ -1418,10 +1419,15 @@ WHERE { ?x foaf:name  ?name1 ;
         FILTER (?mbox1 = ?mbox2 && ?name1 != ?name2)
       }
 ```
-
-
+Not pretty but, possible: (might get rid of the quoting with more macro trixtery)
 ```clojure
-(query ...)
+(query
+  (select :name1 :name2)
+  (where :x [:foaf "name"] :name1
+         \; [:foaf "mbox"] :mbox1 \.
+         :y [:foaf "name"] :name2
+         \; [:foaf "mbox"] :mbox2 \.
+         (filter :mbox1 \= :mbox2 '&& :name1 '!= :name2)))
 ```
 
 ```sparql
@@ -1437,7 +1443,7 @@ WHERE { ?annot  a:annotates  ?annotates .
 ```
 
 ```clojure
-(query ...)
+(query ...) ; TODO dateTime
 ```
 
 ```sparql
@@ -1452,12 +1458,17 @@ WHERE { ?x foaf:name  ?name1 ;
 ```
 
 ```clojure
-(query ...)
+  (query
+  (select :name1 :name2)
+  (where :x [:foaf "name"] :name1
+         \; [:foaf "mbox"] :mbox1 \.
+         :y [:foaf "name"] :name2
+         \; [:foaf "mbox"] :mbox2 \.
+         (filter (same-term :mbox1, :mbox2) '&& (!same-term :name1 :name2))))
 ```
 
 ```sparql
 PREFIX  :      <http://example.org/WMterms#>
-PREFIX  t:     <http://example.org/types#>
 
 SELECT ?aLabel1 ?bLabel
 WHERE { ?a  :label        ?aLabel .
@@ -1470,9 +1481,19 @@ WHERE { ?a  :label        ?aLabel .
 
         FILTER ( sameTerm(?aWeight, ?bWeight) && !sameTerm(?aDisp, ?bDisp)) }
 ```
-
+TODO find a way to handle `&&`
 ```clojure
-(query ...)
+(query
+  (base (URI. "http://example.org/WMterms#"))
+  (select :aLabel1, :bLabel)
+  (where :a [:label] :aLabel \.
+         :a [:weight] :aWeight \.
+         :a [:displacement] :aDisp \.
+         :b [:label] :bLabel \.
+         :b [:weight] :bWeight \.
+         :b [:displacement] :bDisp \.
+         (filter (same-term :aWeight :bWeight) '&&
+                 (!same-term :aDisp :bDisp))))
 ```
 
 ```sparql
