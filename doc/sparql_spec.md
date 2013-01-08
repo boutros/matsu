@@ -1377,7 +1377,6 @@ WHERE { ?annot  a:annotates  <http://www.w3.org/TR/rdf-sparql-query/> .
 ```sparql
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 PREFIX dc:   <http://purl.org/dc/elements/1.1/>
-PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#>
 SELECT ?givenName
  WHERE { ?x foaf:givenName  ?givenName .
          OPTIONAL { ?x dc:date ?date } .
@@ -1385,7 +1384,11 @@ SELECT ?givenName
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :givenName)
+  (where :x [:foaf "givenName"] :givenName \.
+         (optional :x [:dc "date"] :date) \.
+         (filter (bound :date))))
 ```
 
 ```sparql
@@ -1398,7 +1401,11 @@ SELECT ?name
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :name)
+  (where :x [:foaf "givenName"] ::name \.
+         (optional :x [:dc "date"] :date) \.
+         (filter (!bound :date))))
 ```
 
 ```sparql

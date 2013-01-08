@@ -328,8 +328,13 @@
 (defn concat [& vars]
   {:content (str "CONCAT("(string/join " " (map encode-with-comma (butlast vars)))
                  " " (encode (last vars))")") })
-
 (defn bind [v]
   {:pre [(vector? v)]}
   (let [[expr name] v]
     {:content (str "BIND(" (encode expr) " AS " (encode name) ")") }))
+
+(defn bound [v]
+   {:content (str "bound(" (encode v) ")" )})
+
+(defn !bound [v]
+   {:content (str "!bound(" (encode v) ")" )})

@@ -638,4 +638,24 @@
                  :annot [:dc "date"] :date \.
                  (filter :date \> (raw "\"2005-01-01T00:00:00Z\"^^xsd:dateTime"))))
 
-        "PREFIX a: <http://www.w3.org/2000/10/annotation-ns#> PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> SELECT ?annot WHERE { ?annot a:annotates <http://www.w3.org/TR/rdf-sparql-query/> . ?annot dc:date ?date . FILTER(?date > \"2005-01-01T00:00:00Z\"^^xsd:dateTime) }")))
+        "PREFIX a: <http://www.w3.org/2000/10/annotation-ns#> PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> SELECT ?annot WHERE { ?annot a:annotates <http://www.w3.org/TR/rdf-sparql-query/> . ?annot dc:date ?date . FILTER(?date > \"2005-01-01T00:00:00Z\"^^xsd:dateTime) }"))
+
+  (is (=
+        (query
+          (select :givenName)
+          (where :x [:foaf "givenName"] :givenName \.
+                 (optional :x [:dc "date"] :date) \.
+                 (filter (bound :date))))
+
+        "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?givenName WHERE { ?x foaf:givenName ?givenName . OPTIONAL { ?x dc:date ?date } . FILTER(bound(?date)) }"))
+
+  (is (=
+        (query
+          (select :name)
+          (where :x [:foaf "givenName"] ::name \.
+                 (optional :x [:dc "date"] :date) \.
+                 (filter (!bound :date))))
+
+        "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:givenName ?name . OPTIONAL { ?x dc:date ?date } . FILTER(!bound(?date)) }"))
+
+    )
