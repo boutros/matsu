@@ -90,9 +90,6 @@
     (map? x) (:content x)
     :else (throw (Exception. (format "Don't know how to encode %s into RDF literal!" x)))))
 
-(defn encode-with-comma [x]
-  (str (encode x) ","))
-
 ; -----------------------------------------------------------------------------
 ; Compiler functions
 ; -----------------------------------------------------------------------------
@@ -326,8 +323,8 @@
    {:content (str "AVG(" (encode v) ")" )})
 
 (defn concat [& vars]
-  {:content (str "CONCAT("(string/join " " (map encode-with-comma (butlast vars)))
-                 " " (encode (last vars))")") })
+  {:content (str "CONCAT("(string/join ", " (map encode vars)) ")") })
+
 (defn bind [v]
   {:pre [(vector? v)]}
   (let [[expr name] v]
