@@ -145,7 +145,7 @@ See the tests for more examples on query syntax.
 * Subqueries not supported yet
 * Property path syntax not supported yet
 * Specifying variables with `VALUES` in data block not possible yet
-* Federated queries (SERVICE keyword) to supported yet
+* Federated queries (SERVICE) not supported yet
 
 There might be other limitations, especially when dealing with SPARQL expressions. But most, if not all of the limitations can be circumvented by interpolating raw strings into the query with the `raw` function.
 
