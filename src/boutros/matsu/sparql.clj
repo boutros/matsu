@@ -274,35 +274,27 @@
 ; Functions which compile inline groups inside select/where clauses:
 
 (defn union [& groups]
-  {:post [(map? %)]}
   {:content (string/join " UNION " (vec (map encode groups))) })
 
 (defn group [& vars]
-  {:post [(map? %)]}
    {:content (str "{ " (string/join " " (vec (map encode vars))) " }" )})
 
 (defn graph [& vars]
-  {:post [(map? %)]}
    {:content (str "GRAPH " (string/join " " (vec (map encode vars))))})
 
 (defn filter [& vars]
-  {:post [(map? %)]}
    {:content (str "FILTER(" (string/join " " (vec (map encode vars))) ")" )})
 
 (defn filter-not-exists [& vars]
-  {:post [(map? %)]}
    {:content (str "FILTER NOT EXISTS { " (string/join " " (vec (map encode vars))) " }" )})
 
 (defn filter-exists [& vars]
-  {:post [(map? %)]}
    {:content (str "FILTER EXISTS { " (string/join " " (vec (map encode vars))) " }" )})
 
 (defn minus [& vars]
-  {:post [(map? %)]}
    {:content (str "MINUS { " (string/join " " (vec (map encode vars))) " }" )})
 
 (defn filter-regex [v regex & flags]
-  {:post [(map? %)]}
    {:content (str "FILTER regex(" (encode v)
                   ", "
                   (encode regex)
@@ -310,37 +302,29 @@
                   ")" )})
 
 (defn optional [& vars]
-  {:post [(map? %)]}
    {:content (str "OPTIONAL { " (string/join " " (vec (map encode vars))) " }" )})
 
 (defn raw [string]
-  {:pre [(string? string)]
-   :post [(map? %)]}
+  {:pre [(string? string)]}
    {:content string })
 
 (defn desc [v]
-  {:post [(map? %)]}
    {:content (str "DESC(" (encode v) ")" )})
 
 (defn asc [v]
-  {:post [(map? %)]}
    {:content (str "ASC(" (encode v) ")" )})
 
 (defn sum [v]
-  {:post [(map? %)]}
    {:content (str "SUM(" (encode v) ")" )})
 
 (defn avg [v]
-  {:post [(map? %)]}
    {:content (str "AVG(" (encode v) ")" )})
 
 (defn concat [& vars]
-  {:post [(map? %)]}
   {:content (str "CONCAT("(string/join " " (map encode-with-comma (butlast vars)))
                  " " (encode (last vars))")") })
 
 (defn bind [v]
-  {:pre [(vector? v)]
-   :post [(map? %)]}
+  {:pre [(vector? v)]}
   (let [[expr name] v]
     {:content (str "BIND(" (encode expr) " AS " (encode name) ")") }))
