@@ -13,7 +13,8 @@ The following namespaces are assumed to be registered:
  :vcard   "<http://www.w3.org/2001/vcard-rdf/3.0#>"
  :app     "<http://example.org/ns#>"
  :xsd     "<http://www.w3.org/2001/XMLSchema#>"
- :ent     "<http://org.example.com/employees#>"}
+ :ent     "<http://org.example.com/employees#>"
+ :a      "<http://www.w3.org/2000/10/annotation-ns#>"}
 ```
 
 ## 2 Making Simple Queries (Informative)
@@ -1351,3 +1352,285 @@ DESCRIBE ?x WHERE { ?x ent:employeeId "1234" }
 ```
 
 ## 17 Expressions and Testing Values
+
+```sparql
+PREFIX a:      <http://www.w3.org/2000/10/annotation-ns#>
+PREFIX dc:     <http://purl.org/dc/elements/1.1/>
+PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?annot
+WHERE { ?annot  a:annotates  <http://www.w3.org/TR/rdf-sparql-query/> .
+        ?annot  dc:date      ?date .
+        FILTER ( ?date > "2005-01-01T00:00:00Z"^^xsd:dateTime ) }
+```
+
+```clojure
+(query
+  (select :annot)
+  (where :annot [:a "annotates"] (URI. "http://www.w3.org/TR/rdf-sparql-query/") \.
+         :annot [:dc "date"] :date \.
+         (filter :date \> (raw "\"2005-01-01T00:00:00Z\"^^xsd:dateTime"))))
+```
+
+### 17.4 Function Definitions
+
+```sparql
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX dc:   <http://purl.org/dc/elements/1.1/>
+PREFIX xsd:   <http://www.w3.org/2001/XMLSchema#>
+SELECT ?givenName
+ WHERE { ?x foaf:givenName  ?givenName .
+         OPTIONAL { ?x dc:date ?date } .
+         FILTER ( bound(?date) ) }
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX dc:   <http://purl.org/dc/elements/1.1/>
+SELECT ?name
+ WHERE { ?x foaf:givenName  ?name .
+         OPTIONAL { ?x dc:date ?date } .
+         FILTER (!bound(?date)) }
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+SELECT ?name1 ?name2
+WHERE { ?x foaf:name  ?name1 ;
+        foaf:mbox  ?mbox1 .
+        ?y foaf:name  ?name2 ;
+        foaf:mbox  ?mbox2 .
+        FILTER (?mbox1 = ?mbox2 && ?name1 != ?name2)
+      }
+```
+
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX a:      <http://www.w3.org/2000/10/annotation-ns#>
+PREFIX dc:     <http://purl.org/dc/elements/1.1/>
+PREFIX xsd:    <http://www.w3.org/2001/XMLSchema#>
+
+SELECT ?annotates
+WHERE { ?annot  a:annotates  ?annotates .
+        ?annot  dc:date      ?date .
+        FILTER ( ?date = xsd:dateTime("2005-01-01T00:00:00Z") )
+      }
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+SELECT ?name1 ?name2
+WHERE { ?x foaf:name  ?name1 ;
+        foaf:mbox  ?mbox1 .
+         ?y foaf:name  ?name2 ;
+         foaf:mbox  ?mbox2 .
+         FILTER (sameTerm(?mbox1, ?mbox2) && !sameTerm(?name1, ?name2))
+      }
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX  :      <http://example.org/WMterms#>
+PREFIX  t:     <http://example.org/types#>
+
+SELECT ?aLabel1 ?bLabel
+WHERE { ?a  :label        ?aLabel .
+        ?a  :weight       ?aWeight .
+        ?a  :displacement ?aDisp .
+
+        ?b  :label        ?bLabel .
+        ?b  :weight       ?bWeight .
+        ?b  :displacement ?bDisp .
+
+        FILTER ( sameTerm(?aWeight, ?bWeight) && !sameTerm(?aDisp, ?bDisp)) }
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+SELECT ?name ?mbox
+ WHERE { ?x foaf:name  ?name ;
+            foaf:mbox  ?mbox .
+         FILTER isIRI(?mbox) }
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX a:      <http://www.w3.org/2000/10/annotation-ns#>
+PREFIX dc:     <http://purl.org/dc/elements/1.1/>
+PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
+
+SELECT ?given ?family
+WHERE { ?annot  a:annotates  <http://www.w3.org/TR/rdf-sparql-query/> .
+  ?annot  dc:creator   ?c .
+  OPTIONAL { ?c  foaf:given   ?given ; foaf:family  ?family } .
+  FILTER isBlank(?c)
+}
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+SELECT ?name ?mbox
+WHERE { ?x foaf:name  ?name ;
+        foaf:mbox  ?mbox .
+        FILTER isLiteral(?mbox) }
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+SELECT ?name ?mbox
+ WHERE { ?x foaf:name  ?name ;
+            foaf:mbox  ?mbox .
+         FILTER regex(str(?mbox), "@work\\.example$") }
+
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+SELECT ?name ?mbox
+ WHERE { ?x foaf:name  ?name ;
+            foaf:mbox  ?mbox .
+         FILTER ( lang(?name) = "es" ) }
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX xsd:  <http://www.w3.org/2001/XMLSchema#>
+PREFIX eg:   <http://biometrics.example/ns#>
+SELECT ?name ?shoeSize
+ WHERE { ?x foaf:name  ?name ; eg:shoeSize  ?shoeSize .
+         FILTER ( datatype(?shoeSize) = xsd:integer ) }
+```
+
+```clojure
+(query ...)
+```
+
+
+```sparql
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+SELECT ?title
+ WHERE { ?x dc:title  "That Seventies Show"@en ;
+            dc:title  ?title .
+         FILTER langMatches( lang(?title), "FR" ) }
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX dc: <http://purl.org/dc/elements/1.1/>
+SELECT ?title
+ WHERE { ?x dc:title  ?title .
+         FILTER langMatches( lang(?title), "*" ) }
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+SELECT ?name
+ WHERE { ?x foaf:name  ?name
+         FILTER regex(?name, "^ali", "i") }
+```
+
+```clojure
+(query ...)
+```
+
+### 17.6 Extensible Value Testing
+
+```sparql
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+PREFIX func: <http://example.org/functions#>
+SELECT ?name ?id
+WHERE { ?x foaf:name  ?name ;
+           func:empId   ?id .
+        FILTER (func:even(?id)) }
+```
+
+```clojure
+(query ...)
+```
+
+```sparql
+PREFIX aGeo: <http://example.org/geo#>
+
+SELECT ?neighbor
+WHERE { ?a aGeo:placeName "Grenoble" .
+        ?a aGeo:locationX ?axLoc .
+        ?a aGeo:locationY ?ayLoc .
+
+        ?b aGeo:placeName ?neighbor .
+        ?b aGeo:locationX ?bxLoc .
+        ?b aGeo:locationY ?byLoc .
+
+        FILTER ( aGeo:distance(?axLoc, ?ayLoc, ?bxLoc, ?byLoc) < 10 ) .
+      }
+```
+
+```clojure
+(query ...)
+```
+
+## 18 Definition of SPARQL
+
+```
+PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#>
+SELECT (SUM(?val) AS ?sum) (COUNT(?a) AS ?count)
+WHERE {
+  ?a rdf:value ?val .
+} GROUP BY ?a
+```
+
+```clojure
+(query ...)
+```
+
+## Thats all, folks!
+
+
