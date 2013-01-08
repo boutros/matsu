@@ -208,6 +208,11 @@
    :post [(map? %)]}
   (assoc q :query-form {:form "ASK" :content (vec vars)}))
 
+(defn describe [q & vars]
+  {:pre [(map? q)]
+   :post [(map? %)]}
+  (assoc q :query-form {:form "DESCRIBE" :content (vec vars)}))
+
 (defn from [q graph]
   {:pre [(map? q)]
    :post [(map? %)]}

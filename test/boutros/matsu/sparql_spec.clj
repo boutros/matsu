@@ -20,7 +20,8 @@
                       :vcard   "<http://www.w3.org/2001/vcard-rdf/3.0#>"
                       :app     "<http://example.org/ns#>"
                       :xsd     "<http://www.w3.org/2001/XMLSchema#>"
-                      :site    "<http://example.org/stats#>"})
+                      :site    "<http://example.org/stats#>"
+                      :ent     "<http://org.example.com/employees#>"})
 
 ; Tests
 
@@ -592,4 +593,37 @@
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> ASK { ?x foaf:name \"Alice\" ; foaf:mbox <mailto:alice@work.example> }"))
 
-  )
+  (is (=
+        (query
+          (describe (URI. "http://example.org/")))
+
+        "DESCRIBE <http://example.org/>"))
+
+  (is (=
+        (query
+          (describe :x)
+          (where :x [:foaf "mbox"] (URI. "mailto:alice@org")))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> DESCRIBE ?x WHERE { ?x foaf:mbox <mailto:alice@org> }"))
+
+  (is (=
+        (query
+          (describe :x)
+          (where :x [:foaf "name"] "Alice"))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> DESCRIBE ?x WHERE { ?x foaf:name \"Alice\" }"))
+
+  (is (=
+        (query
+          (describe :x :y (URI. "http://example.org/"))
+          (where :x [:foaf "knows"] :y))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> DESCRIBE ?x ?y <http://example.org/> WHERE { ?x foaf:knows ?y }"))
+
+  (is (=
+        (query
+          (describe :x)
+          (where :x [:ent "employeeId"] "1234"))
+
+        "PREFIX ent: <http://org.example.com/employees#> DESCRIBE ?x WHERE { ?x ent:employeeId \"1234\" }")))
+

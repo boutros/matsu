@@ -12,7 +12,8 @@ The following namespaces are assumed to be registered:
  :data    "<http://example.org/foaf/>"
  :vcard   "<http://www.w3.org/2001/vcard-rdf/3.0#>
  :app     "<http://example.org/ns#>"
- :xsd     "<http://www.w3.org/2001/XMLSchema#>"}
+ :xsd     "<http://www.w3.org/2001/XMLSchema#>"
+ :ent     "<http://org.example.com/employees#>"}
 ```
 
 ## 2 Making Simple Queries (Informative)
@@ -1286,5 +1287,67 @@ ASK  { ?x foaf:name  "Alice" ;
 ```
 
 ```clojure
-(query ...)
+(query
+  (ask :x [:foaf "name"] "Alice"
+       \; [:foaf "mbox"] (URI. "mailto:alice@work.example")))
 ```
+
+### 16.4 DESCRIBE (Informative)
+
+```sparql
+DESCRIBE <http://example.org/>
+```
+
+```clojure
+(query
+  (describe (URI. "http://example.org/")))
+```
+
+```sparql
+PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
+DESCRIBE ?x
+WHERE    { ?x foaf:mbox <mailto:alice@org> }
+```
+
+```clojure
+(query
+  (describe :x)
+  (where :x [:foaf "mbox"] (URI. "mailto:alice@org")))
+```
+
+```sparql
+PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
+DESCRIBE ?x
+WHERE    { ?x foaf:name "Alice" }
+```
+
+```clojure
+(query
+  (describe :x)
+  (where :x [:foaf "name"] "Alice"))
+```
+
+```sparql
+PREFIX foaf:   <http://xmlns.com/foaf/0.1/>
+DESCRIBE ?x ?y <http://example.org/>
+WHERE    {?x foaf:knows ?y}
+```
+
+```clojure
+(query
+  (describe :x :y (URI. "http://example.org/"))
+  (where :x [:foaf "knows"] :y))
+```
+
+```sparql
+PREFIX ent:  <http://org.example.com/employees#>
+DESCRIBE ?x WHERE { ?x ent:employeeId "1234" }
+```
+
+```clojure
+(query
+  (describe :x)
+  (where :x [:ent "employeeId"] "1234"))
+```
+
+## 17 Expressions and Testing Values
