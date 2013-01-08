@@ -93,6 +93,7 @@ WHERE
          foaf:nick ?nick
   }
 }
+```
 
 You can bind queries to vars with `defquery` and use them as basis for other queries:
 
