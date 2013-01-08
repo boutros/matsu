@@ -571,11 +571,25 @@
           (limit 2))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX site: <http://example.org/stats#> CONSTRUCT { [] foaf:name ?name } WHERE { [] foaf:name ?name ; site:hits ?hits . } ORDER BY DESC(?hits) LIMIT 2"))
+
   (is (=
         (query
           (construct :x [:foaf "name"] :name)
           (where :x [:foaf "name"] :name))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> CONSTRUCT { ?x foaf:name ?name } WHERE { ?x foaf:name ?name }"))
+
+  (is (=
+        (query
+          (ask :x [:foaf "name"] "Alice"))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> ASK { ?x foaf:name \"Alice\" }"))
+
+  (is (=
+        (query
+          (ask :x [:foaf "name"] "Alice"
+               \; [:foaf "mbox"] (URI. "mailto:alice@work.example")))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> ASK { ?x foaf:name \"Alice\" ; foaf:mbox <mailto:alice@work.example> }"))
 
   )

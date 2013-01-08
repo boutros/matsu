@@ -1266,3 +1266,25 @@ WHERE
   (construct :x [:foaf "name"] :name)
   (where :x [:foaf "name"] :name))
 ```
+
+### 16.3 ASK
+
+```sparql
+PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+ASK  { ?x foaf:name  "Alice" }
+```
+
+```clojure
+(query
+  (ask :x [:foaf "name"] "Alice"))
+```
+
+```sparql
+PREFIX foaf:    <http://xmlns.com/foaf/0.1/>
+ASK  { ?x foaf:name  "Alice" ;
+          foaf:mbox  <mailto:alice@work.example> }
+```
+
+```clojure
+(query ...)
+```
