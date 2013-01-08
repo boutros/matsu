@@ -985,7 +985,7 @@ ORDER BY DESC(?emp)
   (select :name)
   (where :x [:foaf "name"] :name
          \; [:empId] :emp)
-  (order-by (desc :emp)))     ; or (order-by-desc :emp)
+  (order-by (desc :emp))) ; or (order-by-desc :emp)
 ```
 
 ```sparql

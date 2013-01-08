@@ -55,7 +55,7 @@ You can bind queries to vars with `defquery` and use them as basis for other que
 
     EXAMPLE
 
-The aim of Matsu is to cover the full SPARQL 1.1 specification. But no doubt there will be edge cases where Matsu falls short. In such cases you can always insert a raw string into your query with `raw`:
+While the aim of matsu is to cover the full SPARQL 1.1 specification, there will no doubt be cases where it falls short. In such cases you can always insert a raw string into your query with `raw`:
 
 ```clojure
 (query
@@ -90,9 +90,9 @@ Remember that quotation marks must be escaped. Characters as well as quoted symb
 
 See the tests for more examples on query syntax.
 
-+ SPARQL 1.1 spec translation in /doc/sparql_spec.md
++ SPARQL 1.1 spec translation in [/doc/sparql_spec.md](https://github.com/boutros/matsu/blob/master/doc/sparql_spec.md)
 
-+ Complete working example querying dbpedia in docs/example.clj
++ See doc/example.clj for a omplete working example querying the remote dbedia SPARQL endpoint
 
 ## Limitations
 * The `WHERE` keyword is not optional, like it is in SPARQL
@@ -103,6 +103,9 @@ See the tests for more examples on query syntax.
 * Specifying variables with `VALUES` in data block not possible yet
 
 There might be other limitations, especially with complex, nested queries. But most, if not all of the limitations can be circumvented by interpolating raw strings into the query with the `raw` function.
+
+## Todos
+* Sparql update
 
 ## Interals
 
