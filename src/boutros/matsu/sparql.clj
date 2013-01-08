@@ -16,8 +16,8 @@
    :where []
    ;:where {:keyword true :content [] }
    :order-by nil
-   :group-by nil
-   :having nil
+   :group-by []
+   :having []
    :limit nil
    :offset nil})
 
@@ -130,14 +130,13 @@
 
 (defn- group-by-compile [q]
   {:pre [(map? q)]}
-  (when-let [v (:group-by q)]
-    (conj [] "GROUP BY" (encode v))))
+  (when-let [xs (seq (:group-by q))]
+    (conj ["GROUP BY"] (vec (map encode xs)))))
 
 (defn- having-compile [q]
   {:pre [(map? q)]}
   (when-let [xs (seq (:having q))]
-    (conj [] "HAVING(" (vec (map encode xs)) ")" )))
-
+    (conj ["HAVING("] (vec (map encode xs)) ")" )))
 
 (defn- infer-prefixes [s]
   {:pre [(string? s)]
@@ -217,10 +216,10 @@
   :post [(map? %)]}
   (assoc q :limit n))
 
-(defn group-by [q v]
+(defn group-by [q & expr]
   {:pre [(map? q)]
   :post [(map? %)]}
-  (assoc q :group-by v))
+  (assoc q :group-by (vec expr)))
 
 (defn having [q & expr]
   {:pre [(map? q)]

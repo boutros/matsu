@@ -714,7 +714,12 @@ HAVING(AVG(?size) > 10)
 ```
 
 ```clojure
-(query ...)
+(query
+  (base (URI. "http://data.example/"))
+  (select [(avg :size) :asize])
+  (where :x [:size] :size)
+  (group-by :x)
+  (having (avg :size) \> 10))
 ```
 
 ### 11.4 Aggregate Projection Restrictions
@@ -727,9 +732,13 @@ WHERE {
   ?x :q ?z .
 } GROUP BY ?x (STR(?z))
 ```
-
+Not quite there yet (must rethink the query data structure to better deal with expressions):
 ```clojure
-(query ...)
+(query
+  (base (URI. "http://example.com/data/#"))
+  (select :x [(raw "MIN(?y) * 2") :min])
+  (where :x [:p] :y \. :x [:q] :z \.)
+  (group-by :x (raw "(STR(?z))")))
 ```
 
 ### 11.5 Aggregate Example (with errors)
@@ -744,7 +753,32 @@ GROUP BY ?g
 ```
 
 ```clojure
-(query ...)
+(query
+  (base (URI. "http://example.com/data/#"))
+  (select :g [(raw "AVG(?p) AS ?avg) ( (MIN(?p) + MAX(?p)) / 2") :c])
+  (where :g [:p] :p \.)
+  (group-by :g))
 ```
 
 ## 12 Subqueries
+
+```sparql
+PREFIX : <http://people.example/>
+PREFIX : <http://people.example/>
+SELECT ?y ?minName
+WHERE {
+  :alice :knows ?y .
+  {
+    SELECT ?y (MIN(?name) AS ?minName)
+    WHERE {
+      ?y :name ?name .
+    } GROUP BY ?y
+  }
+}
+```
+Not supported yet, use `raw`.
+```clojure
+(query ...)
+```
+
+## 13 RDF Dataset
