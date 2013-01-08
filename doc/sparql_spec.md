@@ -879,7 +879,7 @@ WHERE
                        :x [:foaf "nick"] :nick))))
 ```
 
-```clojure
+```sparql
 PREFIX  data:  <http://example.org/foaf/>
 PREFIX  foaf:  <http://xmlns.com/foaf/0.1/>
 PREFIX  rdfs:  <http://www.w3.org/2000/01/rdf-schema#>
@@ -905,7 +905,7 @@ WHERE
 }
 ```
 
-```sparql
+```clojure
 (query
   (select :mbox :nick :ppd)
   (from-named (URI. "http://example.org/foaf/aliceFoaf")
