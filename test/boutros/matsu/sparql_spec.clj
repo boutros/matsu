@@ -295,8 +295,7 @@
                  (group :x [:dc "title"] :title \.)
                  (filter :price \< 20)))
 
-        "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ?price WHERE { { ?x ns:price ?p . ?x ns:discount ?discount BIND(?p*(1-?discount) AS ?price) } { ?x dc:title ?title . } FILTER(?price < 20) }"))
-  )
+        "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ?price WHERE { { ?x ns:price ?p . ?x ns:discount ?discount BIND(?p*(1-?discount) AS ?price) } { ?x dc:title ?title . } FILTER(?price < 20) }")))
 
 (deftest part-11
   (is (=
@@ -311,180 +310,181 @@
 
         "BASE <http://books.example/> SELECT ( SUM(?lprice) AS ?totalPrice ) WHERE { ?org <affiliates> ?auth . ?auth <writesBook> ?book . ?book <price> ?lprice . } GROUP BY ?org HAVING( SUM(?lprice) > 10 )"))
 
-    (is (=
-          (query
-            (select [(avg :y) :avg])
-            (where :a [:x] :x
-                   \; [:y] :y \.)
-            (group-by :x))
+  (is (=
+        (query
+          (select [(avg :y) :avg])
+          (where :a [:x] :x
+                 \; [:y] :y \.)
+                 (group-by :x))
 
           "SELECT ( AVG(?y) AS ?avg ) WHERE { ?a <x> ?x ; <y> ?y . } GROUP BY ?x"))
 
+  (is (=
+        (query
+          (base (URI. "http://data.example/"))
+          (select [(avg :size) :asize])
+          (where :x [:size] :size)
+          (group-by :x)
+          (having (avg :size) \> 10))
+
+        "BASE <http://data.example/> SELECT ( AVG(?size) AS ?asize ) WHERE { ?x <size> ?size } GROUP BY ?x HAVING( AVG(?size) > 10 )"))
+
+  (is (=
+        (query
+          (base (URI. "http://example.com/data/#"))
+          (select :x [(raw "MIN(?y) * 2") :min])
+          (where :x [:p] :y \. :x [:q] :z \.)
+          (group-by :x (raw "(STR(?z))")))
+
+        "BASE <http://example.com/data/#> SELECT ?x ( MIN(?y) * 2 AS ?min ) WHERE { ?x <p> ?y . ?x <q> ?z . } GROUP BY ?x (STR(?z))"))
+
+  (is (=
+        (query
+          (base (URI. "http://example.com/data/#"))
+          (select :g [(raw "AVG(?p) AS ?avg) ( (MIN(?p) + MAX(?p)) / 2") :c])
+          (where :g [:p] :p \.)
+          (group-by :g))
+
+        "BASE <http://example.com/data/#> SELECT ?g ( AVG(?p) AS ?avg) ( (MIN(?p) + MAX(?p)) / 2 AS ?c ) WHERE { ?g <p> ?p . } GROUP BY ?g")))
+
+(deftest part-13
+  (is (=
+        (query
+          (select :name)
+          (from (URI. "http://example.org/foaf/aliceFoaf"))
+          (where :x [:foaf "name"] :name))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name FROM <http://example.org/foaf/aliceFoaf> WHERE { ?x foaf:name ?name }"))
+
+  (is (=
+        (query
+          (select :who :g :mbox)
+          (from (URI. "http://example.org/dft.ttl"))
+          (from-named (URI. "http://example.org/bob")
+                      (URI. "http://example.org/alice"))
+          (where :g [:dc "publisher"] :who \.
+                 (graph :g (group :x [:foaf "mbox"] :mbox))))
+
+        "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?who ?g ?mbox FROM <http://example.org/dft.ttl> FROM NAMED <http://example.org/bob> FROM NAMED <http://example.org/alice> WHERE { ?g dc:publisher ?who . GRAPH ?g { ?x foaf:mbox ?mbox } }"))
+
+  (is (=
+        (query
+          (select :src :bobNick)
+          (from-named (URI. "http://example.org/foaf/aliceFoaf")
+                      (URI. "http://example.org/foaf/bobFoaf"))
+          (where (graph :src
+                        (group :x [:foaf "mbox"] (URI. "mailto:bob@work.example") \.
+                               :x [:foaf "nick"] :bobNick))))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?src ?bobNick FROM NAMED <http://example.org/foaf/aliceFoaf> FROM NAMED <http://example.org/foaf/bobFoaf> WHERE { GRAPH ?src { ?x foaf:mbox <mailto:bob@work.example> . ?x foaf:nick ?bobNick } }"))
+
     (is (=
           (query
-            (base (URI. "http://data.example/"))
-            (select [(avg :size) :asize])
-            (where :x [:size] :size)
-            (group-by :x)
-            (having (avg :size) \> 10))
+            (select :nick)
+            (from-named (URI. "http://example.org/foaf/aliceFoaf")
+                        (URI. "http://example.org/foaf/bobFoaf"))
+            (where (graph [:data "bobFoaf"]
+                          (group :x [:foaf "mbox"] (URI. "mailto:bob@work.example") \.
+                                 :x [:foaf "nick"] :nick))))
 
-          "BASE <http://data.example/> SELECT ( AVG(?size) AS ?asize ) WHERE { ?x <size> ?size } GROUP BY ?x HAVING( AVG(?size) > 10 )"))
-
-    (is (=
-          (query
-            (base (URI. "http://example.com/data/#"))
-            (select :x [(raw "MIN(?y) * 2") :min])
-            (where :x [:p] :y \. :x [:q] :z \.)
-            (group-by :x (raw "(STR(?z))")))
-
-          "BASE <http://example.com/data/#> SELECT ?x ( MIN(?y) * 2 AS ?min ) WHERE { ?x <p> ?y . ?x <q> ?z . } GROUP BY ?x (STR(?z))"))
+          "PREFIX data: <http://example.org/foaf/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?nick FROM NAMED <http://example.org/foaf/aliceFoaf> FROM NAMED <http://example.org/foaf/bobFoaf> WHERE { GRAPH data:bobFoaf { ?x foaf:mbox <mailto:bob@work.example> . ?x foaf:nick ?nick } }"))
 
     (is (=
           (query
-            (base (URI. "http://example.com/data/#"))
-            (select :g [(raw "AVG(?p) AS ?avg) ( (MIN(?p) + MAX(?p)) / 2") :c])
-            (where :g [:p] :p \.)
-            (group-by :g))
+            (select :mbox :nick :ppd)
+            (from-named (URI. "http://example.org/foaf/aliceFoaf")
+                        (URI. "http://example.org/foaf/bobFoaf"))
+            (where
+              (graph [:data "aliceFoaf"]
+                     (group :alice [:foaf "mbox"] (URI. "mailto:alice@work.example")
+                            \; [:foaf "knows"] :whom \.
+                            :whom [:foaf "mbox"] :mbox
+                            \; [:rdfs "seeAlso"] :ppd \.
+                            :ppd \a [:foaf "PersonalProfileDocument"] \.)
+                     \.)
+              (graph :ppd
+                     (group :w [:foaf "mbox"] :mbox
+                            \; [:foaf "nick"] :nick))))
 
-          "BASE <http://example.com/data/#> SELECT ?g ( AVG(?p) AS ?avg) ( (MIN(?p) + MAX(?p)) / 2 AS ?c ) WHERE { ?g <p> ?p . } GROUP BY ?g")))
+          "PREFIX data: <http://example.org/foaf/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?mbox ?nick ?ppd FROM NAMED <http://example.org/foaf/aliceFoaf> FROM NAMED <http://example.org/foaf/bobFoaf> WHERE { GRAPH data:aliceFoaf { ?alice foaf:mbox <mailto:alice@work.example> ; foaf:knows ?whom . ?whom foaf:mbox ?mbox ; rdfs:seeAlso ?ppd . ?ppd a foaf:PersonalProfileDocument . } . GRAPH ?ppd { ?w foaf:mbox ?mbox ; foaf:nick ?nick } }"))
 
-    (deftest part-13
-      (is (=
-            (query
-              (select :name)
-              (from (URI. "http://example.org/foaf/aliceFoaf"))
-              (where :x [:foaf "name"] :name))
+    (is (=
+          (query
+            (select :name :mbox :date)
+            (where
+              :g [:dc "publisher"] :name
+              \; [:dc "date"] :date \.
+              (graph :g
+                     (group :person [:foaf "name"] :name
+                            \; [:foaf "mbox"] :mbox))))
 
-            "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name FROM <http://example.org/foaf/aliceFoaf> WHERE { ?x foaf:name ?name }"))
+          "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox ?date WHERE { ?g dc:publisher ?name ; dc:date ?date . GRAPH ?g { ?person foaf:name ?name ; foaf:mbox ?mbox } }")))
 
-      (is (=
-            (query
-              (select :who :g :mbox)
-              (from (URI. "http://example.org/dft.ttl"))
-              (from-named (URI. "http://example.org/bob")
-                          (URI. "http://example.org/alice"))
-              (where :g [:dc "publisher"] :who \.
-                     (graph :g (group :x [:foaf "mbox"] :mbox))))
+(deftest part-15
+  (is (=
+        (query
+          (select :name)
+          (where :x [:foaf "name"] :name)
+          (order-by :name))
 
-            "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?who ?g ?mbox FROM <http://example.org/dft.ttl> FROM NAMED <http://example.org/bob> FROM NAMED <http://example.org/alice> WHERE { ?g dc:publisher ?who . GRAPH ?g { ?x foaf:mbox ?mbox } }"))
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name } ORDER BY ?name"))
 
-      (is (=
-            (query
-              (select :src :bobNick)
-              (from-named (URI. "http://example.org/foaf/aliceFoaf")
-                          (URI. "http://example.org/foaf/bobFoaf"))
-              (where (graph :src
-                            (group :x [:foaf "mbox"] (URI. "mailto:bob@work.example") \.
-                                   :x [:foaf "nick"] :bobNick))))
+  (is (=
+        (query
+          (base (URI. "http://example.org/ns#"))
+          (select :name)
+          (where :x [:foaf "name"] :name
+                 \; [:empId] :emp)
+          (order-by (desc :emp))) ; or (order-by-desc :emp)
 
-            "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?src ?bobNick FROM NAMED <http://example.org/foaf/aliceFoaf> FROM NAMED <http://example.org/foaf/bobFoaf> WHERE { GRAPH ?src { ?x foaf:mbox <mailto:bob@work.example> . ?x foaf:nick ?bobNick } }"))
+        "BASE <http://example.org/ns#> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name ; <empId> ?emp } ORDER BY DESC(?emp)"))
 
-      (is (=
-            (query
-              (select :nick)
-              (from-named (URI. "http://example.org/foaf/aliceFoaf")
-                          (URI. "http://example.org/foaf/bobFoaf"))
-              (where (graph [:data "bobFoaf"]
-                            (group :x [:foaf "mbox"] (URI. "mailto:bob@work.example") \.
-                                   :x [:foaf "nick"] :nick))))
+  (is (=
+        (query
+          (base (URI. "http://example.org/ns#"))
+          (select :name)
+          (where :x [:foaf "name"] :name
+                 \; [:empId] :emp)
+          (order-by :name (desc :emp)))
 
-            "PREFIX data: <http://example.org/foaf/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?nick FROM NAMED <http://example.org/foaf/aliceFoaf> FROM NAMED <http://example.org/foaf/bobFoaf> WHERE { GRAPH data:bobFoaf { ?x foaf:mbox <mailto:bob@work.example> . ?x foaf:nick ?nick } }"))
+        "BASE <http://example.org/ns#> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name ; <empId> ?emp } ORDER BY ?name DESC(?emp)"))
 
-      (is (=
-            (query
-              (select :mbox :nick :ppd)
-              (from-named (URI. "http://example.org/foaf/aliceFoaf")
-                          (URI. "http://example.org/foaf/bobFoaf"))
-              (where
-                (graph [:data "aliceFoaf"]
-                       (group :alice [:foaf "mbox"] (URI. "mailto:alice@work.example")
-                              \; [:foaf "knows"] :whom \.
-                              :whom [:foaf "mbox"] :mbox
-                              \; [:rdfs "seeAlso"] :ppd \.
-                              :ppd \a [:foaf "PersonalProfileDocument"] \.)
-                       \.)
-                (graph :ppd
-                       (group :w [:foaf "mbox"] :mbox
-                              \; [:foaf "nick"] :nick))))
+  (is (=
+        (query
+          (select :name)
+          (where :x [:foaf "name"] :name))
 
-            "PREFIX data: <http://example.org/foaf/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?mbox ?nick ?ppd FROM NAMED <http://example.org/foaf/aliceFoaf> FROM NAMED <http://example.org/foaf/bobFoaf> WHERE { GRAPH data:aliceFoaf { ?alice foaf:mbox <mailto:alice@work.example> ; foaf:knows ?whom . ?whom foaf:mbox ?mbox ; rdfs:seeAlso ?ppd . ?ppd a foaf:PersonalProfileDocument . } . GRAPH ?ppd { ?w foaf:mbox ?mbox ; foaf:nick ?nick } }"))
-      (is (=
-            (query
-              (select :name :mbox :date)
-              (where
-                :g [:dc "publisher"] :name
-                \; [:dc "date"] :date \.
-                (graph :g
-                       (group :person [:foaf "name"] :name
-                              \; [:foaf "mbox"] :mbox))))
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name }"))
 
-            "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox ?date WHERE { ?g dc:publisher ?name ; dc:date ?date . GRAPH ?g { ?person foaf:name ?name ; foaf:mbox ?mbox } }")))
+  (is (=
+        (query
+          (select-distinct :name)
+          (where :x [:foaf "name"] :name))
 
-    (deftest part-15
-      (is (=
-            (query
-              (select :name)
-              (where :x [:foaf "name"] :name)
-              (order-by :name))
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT DISTINCT ?name WHERE { ?x foaf:name ?name }"))
 
-            "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name } ORDER BY ?name"))
+  (is (=
+        (query
+          (select-reduced :name)
+          (where :x [:foaf "name"] :name))
 
-      (is (=
-            (query
-              (base (URI. "http://example.org/ns#"))
-              (select :name)
-              (where :x [:foaf "name"] :name
-                     \; [:empId] :emp)
-              (order-by (desc :emp))) ; or (order-by-desc :emp)
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT REDUCED ?name WHERE { ?x foaf:name ?name }"))
 
-            "BASE <http://example.org/ns#> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name ; <empId> ?emp } ORDER BY DESC(?emp)"))
+  (is (=
+        (query
+          (select :name)
+          (where :x [:foaf "name"] :name)
+          (order-by :name)
+          (limit 5)
+          (offset 10))
 
-      (is (=
-            (query
-              (base (URI. "http://example.org/ns#"))
-              (select :name)
-              (where :x [:foaf "name"] :name
-                     \; [:empId] :emp)
-              (order-by :name (desc :emp)))
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name } ORDER BY ?name LIMIT 5 OFFSET 10"))
 
-            "BASE <http://example.org/ns#> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name ; <empId> ?emp } ORDER BY ?name DESC(?emp)"))
+  (is (=
+        (query
+          (select :name)
+          (where :x [:foaf "name"] :name)
+          (limit 20))
 
-      (is (=
-            (query
-              (select :name)
-              (where :x [:foaf "name"] :name))
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name } LIMIT 20")))
 
-            "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name }"))
-
-      (is (=
-            (query
-              (select-distinct :name)
-              (where :x [:foaf "name"] :name))
-
-            "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT DISTINCT ?name WHERE { ?x foaf:name ?name }"))
-
-      (is (=
-            (query
-              (select-reduced :name)
-              (where :x [:foaf "name"] :name))
-
-            "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT REDUCED ?name WHERE { ?x foaf:name ?name }"))
-
-      (is (=
-            (query
-              (select :name)
-              (where :x [:foaf "name"] :name)
-              (order-by :name)
-              (limit 5)
-              (offset 10))
-
-            "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name } ORDER BY ?name LIMIT 5 OFFSET 10"))
-
-      (is (=
-            (query
-              (select :name)
-              (where :x [:foaf "name"] :name)
-              (limit 20))
-
-            "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name } LIMIT 20"))
-      )
