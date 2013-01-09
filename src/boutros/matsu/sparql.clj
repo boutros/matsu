@@ -94,7 +94,8 @@
                     (not b) (str \< (name a) \>)
                     (string? a) (str \" a "\"@" (name b))
                     (and (map? a)
-                         (keyword? b)) (conj ["("] (conj (sub-compiler a)                                                  " AS "
+                         (keyword? b)) (into ["("] (conj (sub-compiler a)
+                                                         " AS "
                                                          (encode b)
                                                          ")" ))
                     :else (str (name a) \: b)))
@@ -138,11 +139,6 @@
 (defn- from-compile [q]
   (when-not (nil? (:from q))
     (conj ["FROM"] (encode (:from q)))))
-
-(defn- group-subcompile [v]
-  {:pre [(vector? v)]
-   :post [(vector? %)]}
-  (conj ["{"] (map encode v) "}"))
 
 (defn- from-named-compile [q]
   (when-let [graphs (seq (:from-named q))]
@@ -265,6 +261,8 @@
 (defn order-by-desc [q v]
   (order-by q (desc v)))
 
+;; Aggregation
+
 (defn group-by [q & expr]
   (assoc q :group-by (vec expr)))
 
@@ -321,6 +319,7 @@
                  (encode regex)
                  (when flags (str ", " (encode (first flags))))
                  ")" )})
+
 
 ;;;;;;
 (defn raw [string]
