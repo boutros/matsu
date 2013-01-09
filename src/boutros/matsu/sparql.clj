@@ -101,7 +101,8 @@
                     :else (str (name a) \: b)))
     (map? x) (if (:tag x)
                (sub-compiler x)
-               (:content x))
+               "sprudlevann!")
+               ;(:content x))
     :else (throw (Exception. (format "Don't know how to encode %s into RDF literal!" x)))))
 
 ; -----------------------------------------------------------------------------
@@ -113,13 +114,7 @@
 
 (defn- compiler [q what]
   (when-let [m (what q)]
-    (conj []
-          (:tag m)
-          (first (:bounds m))
-          (interpose
-                 (:separator m)
-                 (map encode (:content m)))
-          (last (:bounds m)))))
+    (sub-compiler m)))
 
 (defn- sub-compiler [m]
   (conj []
@@ -203,8 +198,6 @@
 ;; ----------------------------------------------------------------------------
 ;; SPARQL query DSL functions
 ;; ----------------------------------------------------------------------------
-
-; These all takes a map of the query and returns a modified query-map:
 
 ;; Query forms
 
@@ -314,17 +307,26 @@
   {:tag "MINUS " :content (vec more) :bounds ["{ " " }"] :separator " "})
 
 (defn filter-regex [v regex & flags]
-  {:content (str "FILTER regex(" (encode v)
-                 ", "
-                 (encode regex)
-                 (when flags (str ", " (encode (first flags))))
-                 ")" )})
+  (if flags
+    {:tag "FILTER regex" :bounds ["(" ")"] :separator ", "
+    :content [v regex (first flags)]}
+    {:tag "FILTER regex" :bounds ["(" ")"] :separator ", "
+    :content [v regex]}))
+
+  ; {:content (str "FILTER regex(" (encode v)
+  ;                ", "
+  ;                (encode regex)
+  ;                (when flags (str ", " (encode (first flags))))
+  ;                ")" )})
 
 
-;;;;;;
+
+;; Matsu syntax helpers
+
 (defn raw [string]
-  {:tag nil :separator "" :bounds "" :content string })
+  {:tag "" :separator "" :bounds "" :content string })
 
+;;
 (defn desc [v]
   {:content (str "DESC(" (encode v) ")" )})
 
