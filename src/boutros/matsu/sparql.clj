@@ -9,20 +9,26 @@
 ; -----------------------------------------------------------------------------
 
 (defn empty-query []
-  "query-map constructor"
+  "Query-map constructor
+
+  Each key is populated with the following map:
+
+    {:tag nil :content [] :bounds ["" ""] :separator " "}
+
+  The :content field can contain other such maps, so the datastructure
+  can be arbiritarily deeply nested. "
   {:base nil
    :from nil
    :from-named []
-   :query-form {:form nil :content []}
-   :where []
-   ;:where {:keyword true :content [] }
+   :query-form  nil
+   :where nil
    :order-by []
    :group-by []
    :having []
    :offset nil
    :limit nil})
 
-(def PREFIXES (atom {}))
+(def prefixes (atom {}))
 
 ; -----------------------------------------------------------------------------
 ; Namespace functions
@@ -30,11 +36,11 @@
 
 (defn register-namespaces [m]
   {:pre [(map? m)]}
-  (swap! PREFIXES merge m))
+  (swap! prefixes merge m))
 
 (defn- ns-or-error [k]
   {:pre [(keyword? k)]}
-  (if-let [v (k @PREFIXES)]
+  (if-let [v (k @prefixes)]
     v
    (throw (IllegalArgumentException. (str "Cannot resolve namespace: " k)))))
 
@@ -101,15 +107,21 @@
    :post [(vector? %)]}
   (conj ["{"] (map encode v) "}"))
 
-(defn- query-form-compile [q]
-  {:pre [(map? q)]}
-  (when-let [form (get-in q [:query-form :form])]
+(defn- compiler [q what]
+  (when-let [x (what q)]
     (conj []
-      (case form
-        "ASK" (conj ["ASK"] (group-subcompile (get-in q [:query-form :content])))
-        "CONSTRUCT" (conj ["CONSTRUCT" "{"] (vec (map encode (get-in q [:query-form :content]))) "}")
-        (conj [] (get-in q [:query-form :form])
-                (vec (map encode (get-in q [:query-form :content]))))))))
+          (:tag x)
+          (first (:bounds x))
+          (interpose
+                 (:separator x)
+                 (map encode (:content x)))
+          (last (:bounds x)))))
+
+(defn- query-form-compile [q]
+  (compiler q :query-form))
+
+(defn- where-compile [q]
+  (compiler q :where))
 
 (defn- from-compile [q]
   (when-not (nil? (:from q))
@@ -120,9 +132,6 @@
     (conj []
       (for [g graphs] ["FROM NAMED" (encode g)]))))
 
-(defn- where-compile [q]
-  (when-let [xs (seq (:where q))]
-    (conj ["WHERE" "{"] (vec (map encode xs)) "}")))
 
 (defn- limit-compile [q]
   (when-let [n (:limit q)]
@@ -173,17 +182,33 @@
                (having-compile q))
          (flatten)
          (remove nil?)
-         (string/join " ")
+         (string/join "")
+         (string/trim)
          (infer-prefixes)
          (add-base base))))
 
-; -----------------------------------------------------------------------------
-; SPARQL query DSL functions
-; -----------------------------------------------------------------------------
+;; ----------------------------------------------------------------------------
+;; SPARQL query DSL functions
+;; ----------------------------------------------------------------------------
 
 ; These all takes a map of the query and returns a modified query-map:
 
-(declare desc)
+
+;; Query forms
+
+(defn select [q & more]
+  (assoc q :query-form {:tag "SELECT" :content (vec more)
+                        :bounds [" "] :separator " "}))
+
+(defn construct [q & more]
+  (assoc q :query-form {:tag "CONSTRUCT" :content (vec more)
+                        :bounds [" { " " } "] :separator " "}))
+
+;; Where
+
+(defn where [q & more]
+  (assoc q :where {:tag "WHERE" :content (vec more)
+                   :bounds [" { " " } "] :separator " "}))
 
 (defn base [q uri]
   (assoc q :base uri))
@@ -200,8 +225,7 @@
 (defn from-named [q & graphs]
   (assoc q :from-named (vec graphs)))
 
-(defn select [q & vars]
-  (assoc q :query-form {:form "SELECT" :content (vec vars)}))
+
 
 (defn select-distinct [q & vars]
   (assoc q :query-form {:form "SELECT DISTINCT" :content (vec vars)}))
@@ -209,11 +233,9 @@
 (defn select-reduced [q & vars]
   (assoc q :query-form {:form "SELECT REDUCED" :content (vec vars)}))
 
-(defn construct [q & vars]
-  (assoc q :query-form {:form "CONSTRUCT" :content (vec vars)}))
 
-(defn where [q & vars]
-  (update-in q [:where] into vars))
+
+
 
 (defn limit [q & n]
   (assoc q :limit n))
@@ -224,6 +246,7 @@
 (defn order-by [q & expr]
   (assoc q :order-by (vec expr)))
 
+(declare desc)
 (defn order-by-desc [q v]
   (order-by q (desc v)))
 
@@ -267,8 +290,7 @@
   {:content (str "OPTIONAL { " (string/join " " (vec (map encode vars))) " }" )})
 
 (defn raw [string]
-  {:pre [(string? string)]}
-  {:content string })
+  {:tag nil :separator "" :bounds "" :content string })
 
 (defn desc [v]
   {:content (str "DESC(" (encode v) ")" )})
