@@ -210,11 +210,14 @@
 
 ; These all takes a map of the query and returns a modified query-map:
 
-
 ;; Query forms
 
 (defn select [q & more]
   (assoc q :query-form {:tag "SELECT" :content (vec more)
+                        :bounds [" "] :separator " "}))
+
+(defn select-distinct [q & more]
+  (assoc q :query-form {:tag "SELECT DISTINCT" :content (vec more)
                         :bounds [" "] :separator " "}))
 
 (defn construct [q & more]
@@ -243,8 +246,7 @@
   (assoc q :from-named (vec graphs)))
 
 
-(defn select-distinct [q & vars]
-  (assoc q :query-form {:form "SELECT DISTINCT" :content (vec vars)}))
+
 
 (defn select-reduced [q & vars]
   (assoc q :query-form {:form "SELECT REDUCED" :content (vec vars)}))
@@ -269,7 +271,7 @@
 (defn having [q & expr]
   (assoc q :having (vec expr)))
 
-;;; Functions which compile inline groups inside select/where clauses:
+;;; Functions which return a map to be nested in the query-map
 
 ;; Assingment
 
@@ -284,26 +286,34 @@
   {:tag "CONCAT" :content (vec more) :bounds ["(" ")"] :separator ", "})
 
 
-(defn union [& groups]
-  {:content (string/join " UNION " (vec (map encode groups))) })
+;; Graph pattern matching
 
-(defn group [& vars]
-  {:content (str "{ " (string/join " " (vec (map encode vars))) " }" )})
+(defn group [& more]
+  {:tag "" :content (vec more) :bounds ["{ " " }"] :separator " "})
+
+(defn optional [& more]
+  {:tag "OPTIONAL " :content (vec more) :bounds ["{ " " }"] :separator " "})
+
+(defn union [& more]
+  {:tag "" :content (interpose 'UNION (vec more)) :bounds [""] :separator " "})
 
 (defn graph [& vars]
   {:content (str "GRAPH " (string/join " " (vec (map encode vars))))})
 
-(defn filter [& vars]
-  {:content (str "FILTER(" (string/join " " (vec (map encode vars))) ")" )})
 
-(defn filter-not-exists [& vars]
-  {:content (str "FILTER NOT EXISTS { " (string/join " " (vec (map encode vars))) " }" )})
+;; Negation
 
-(defn filter-exists [& vars]
-  {:content (str "FILTER EXISTS { " (string/join " " (vec (map encode vars))) " }" )})
+(defn filter [& more]
+  {:tag "FILTER" :content (vec more) :bounds ["(" ")"] :separator " "})
 
-(defn minus [& vars]
-  {:content (str "MINUS { " (string/join " " (vec (map encode vars))) " }" )})
+(defn filter-not-exists [& more]
+  {:tag "FILTER NOT EXISTS " :content (vec more) :bounds ["{ " " }"] :separator " "})
+
+(defn filter-exists [& more]
+  {:tag "FILTER EXISTS " :content (vec more) :bounds ["{ " " }"] :separator " "})
+
+(defn minus [& more]
+  {:tag "MINUS " :content (vec more) :bounds ["{ " " }"] :separator " "})
 
 (defn filter-regex [v regex & flags]
   {:content (str "FILTER regex(" (encode v)
@@ -312,9 +322,7 @@
                  (when flags (str ", " (encode (first flags))))
                  ")" )})
 
-(defn optional [& vars]
-  {:content (str "OPTIONAL { " (string/join " " (vec (map encode vars))) " }" )})
-
+;;;;;;
 (defn raw [string]
   {:tag nil :separator "" :bounds "" :content string })
 
