@@ -653,7 +653,7 @@
   (is (=
         (query
           (select :name)
-          (where :x [:foaf "givenName"] ::name \.
+          (where :x [:foaf "givenName"] :name \.
                  (optional :x [:dc "date"] :date) \.
                  (filter (!bound :date))))
 
