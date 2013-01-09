@@ -89,16 +89,17 @@
     (string? x) (str \" x \" )
     (= java.net.URI (type x)) (str "<" x ">")
     ;(= java.util.Date (type x)) (str \" x \" "^^xsd:dateTime")
-    (vector? x) (cond
-                  (not (next x)) (str \< (name (first x)) \>)
-                  (string? (first x)) (str \" (first x) "\"@" (name (second x)))
-                  (and (map? (first x))
-                       (keyword? (second x))) (conj ["("] (conj (sub-compiler (first x))                                                        " AS "
-                                                                   (encode (second x))
-                                                                   ")"))
-                  :else (str (name (first x)) \: (second x)))
+    (vector? x) (let [[a b] x]
+                  (cond
+                    (not b) (str \< (name a) \>)
+                    (string? a) (str \" a "\"@" (name b))
+                    (and (map? a)
+                         (keyword? b)) (conj ["("] (conj (sub-compiler a)                                                  " AS "
+                                                         (encode b)
+                                                         ")" ))
+                    :else (str (name a) \: b)))
     (map? x) (if (:tag x)
-               "help what happens now"
+               (sub-compiler x)
                (:content x))
     :else (throw (Exception. (format "Don't know how to encode %s into RDF literal!" x)))))
 
@@ -321,16 +322,18 @@
   {:content (str "AVG(" (encode v) ")" )})
 
 
-;; SPARQL functions on strings
+;; Functions on strings
 
 (defn concat [& more]
   {:tag "CONCAT" :content (vec more) :bounds ["(" ")"] :separator ", "})
 
 
+;; Assingment
+
 (defn bind [v]
-  {:pre [(vector? v)]}
   (let [[expr name] v]
-    {:content (str "BIND(" (encode expr) " AS " (encode name) ")") }))
+    {:tag "BIND" :content [expr 'AS  name]  :bounds ["(" ")"] :separator " "}))
+
 
 (defn bound [v]
   {:content (str "bound(" (encode v) ")" )})
