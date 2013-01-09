@@ -243,15 +243,11 @@
   (assoc q :from-named (vec graphs)))
 
 
-
 (defn select-distinct [q & vars]
   (assoc q :query-form {:form "SELECT DISTINCT" :content (vec vars)}))
 
 (defn select-reduced [q & vars]
   (assoc q :query-form {:form "SELECT REDUCED" :content (vec vars)}))
-
-
-
 
 
 (defn limit [q & n]
@@ -273,7 +269,20 @@
 (defn having [q & expr]
   (assoc q :having (vec expr)))
 
-; Functions which compile inline groups inside select/where clauses:
+;;; Functions which compile inline groups inside select/where clauses:
+
+;; Assingment
+
+(defn bind [v]
+  (let [[expr name] v]
+    {:tag "BIND" :content [expr 'AS  name]  :bounds ["(" ")"] :separator " "}))
+
+
+;; Functions on strings
+
+(defn concat [& more]
+  {:tag "CONCAT" :content (vec more) :bounds ["(" ")"] :separator ", "})
+
 
 (defn union [& groups]
   {:content (string/join " UNION " (vec (map encode groups))) })
@@ -320,19 +329,6 @@
 
 (defn avg [v]
   {:content (str "AVG(" (encode v) ")" )})
-
-
-;; Functions on strings
-
-(defn concat [& more]
-  {:tag "CONCAT" :content (vec more) :bounds ["(" ")"] :separator ", "})
-
-
-;; Assingment
-
-(defn bind [v]
-  (let [[expr name] v]
-    {:tag "BIND" :content [expr 'AS  name]  :bounds ["(" ")"] :separator " "}))
 
 
 (defn bound [v]
