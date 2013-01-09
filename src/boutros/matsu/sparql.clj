@@ -70,6 +70,7 @@
 ; -----------------------------------------------------------------------------
 ; Util functions
 ; -----------------------------------------------------------------------------
+(declare sub-compiler)
 
 (defn encode [x]
   "Encodes keywords to ?-prefixed variables and other values to RDF literals
@@ -91,9 +92,14 @@
     (vector? x) (cond
                   (not (next x)) (str \< (name (first x)) \>)
                   (string? (first x)) (str \" (first x) "\"@" (name (second x)))
-                  (and (map? (first x)) (keyword? (second x))) (str "( " (:content (first x)) " AS " (encode (second x)) " )")
+                  (and (map? (first x))
+                       (keyword? (second x))) (conj ["("] (conj (sub-compiler (first x))                                                        " AS "
+                                                                   (encode (second x))
+                                                                   ")"))
                   :else (str (name (first x)) \: (second x)))
-    (map? x) (:content x)
+    (map? x) (if (:tag x)
+               "help what happens now"
+               (:content x))
     :else (throw (Exception. (format "Don't know how to encode %s into RDF literal!" x)))))
 
 ; -----------------------------------------------------------------------------
@@ -102,20 +108,25 @@
 ; Transforms the various query parts into a vectors of strings, or nil if the
 ; particular function is not used in the query
 
-(defn- group-subcompile [v]
-  {:pre [(vector? v)]
-   :post [(vector? %)]}
-  (conj ["{"] (map encode v) "}"))
 
 (defn- compiler [q what]
-  (when-let [x (what q)]
+  (when-let [m (what q)]
     (conj []
-          (:tag x)
-          (first (:bounds x))
+          (:tag m)
+          (first (:bounds m))
           (interpose
-                 (:separator x)
-                 (map encode (:content x)))
-          (last (:bounds x)))))
+                 (:separator m)
+                 (map encode (:content m)))
+          (last (:bounds m)))))
+
+(defn- sub-compiler [m]
+  (conj []
+        (:tag m)
+        (first (:bounds m))
+        (interpose
+          (:separator m)
+          (map encode (:content m)))
+        (last (:bounds m))))
 
 (defn- query-form-compile [q]
   (compiler q :query-form))
@@ -126,6 +137,11 @@
 (defn- from-compile [q]
   (when-not (nil? (:from q))
     (conj ["FROM"] (encode (:from q)))))
+
+(defn- group-subcompile [v]
+  {:pre [(vector? v)]
+   :post [(vector? %)]}
+  (conj ["{"] (map encode v) "}"))
 
 (defn- from-named-compile [q]
   (when-let [graphs (seq (:from-named q))]
@@ -304,8 +320,12 @@
 (defn avg [v]
   {:content (str "AVG(" (encode v) ")" )})
 
-(defn concat [& vars]
-  {:content (str "CONCAT("(string/join ", " (map encode vars)) ")") })
+
+;; SPARQL functions on strings
+
+(defn concat [& more]
+  {:tag "CONCAT" :content (vec more) :bounds ["(" ")"] :separator ", "})
+
 
 (defn bind [v]
   {:pre [(vector? v)]}
