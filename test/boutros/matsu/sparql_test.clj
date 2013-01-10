@@ -24,10 +24,10 @@
   (is (=
         (query
           (with-prefixes {:foaf "<mylocalfoaf>"})
-          (select :s)
-          (where :s [:foaf "name"] :o))
+          (select :person)
+          (where :person [:foaf "name"] "Petter"))
 
-        "PREFIX foaf: <mylocalfoaf> SELECT ?s WHERE { ?s foaf:name ?o }")))
+        "PREFIX foaf: <mylocalfoaf> SELECT ?person WHERE { ?person foaf:name \"Petter\" }")))
 
 ; Macros
 

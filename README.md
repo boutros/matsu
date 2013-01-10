@@ -37,18 +37,17 @@ Althught without newlines or indentation. A pretty-printer might be added in the
 
 The prefixes are automatically infered provided that they exists in the global `PREFIXES` map. An exception will be thrown if the prefix cannot be resolved.
 
-You can also supply prefixes with the query, which will override the global `prefixes`:
+You can also supply query-local prefixes which will override the global `prefixes`:
 
 ```clojure
 (query
   (with-prefixes {:foaf "<mylocalfoaf>"})
-  (select :s)
-  (where :s [:foaf "name"] :o))
-
+  (select :person)
+  (where :person [:foaf "name"] "Petter"))
 ```
 ```sparql
 PREFIX foaf: <mylocalfoaf>
-SELECT ?s WHERE { ?s foaf:name ?o }
+SELECT ?person WHERE { ?s foaf:name "Petter" }
 ```
 
 Matsu makes it possible to create complex, nested queries:
