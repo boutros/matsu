@@ -142,7 +142,6 @@ See the tests for more examples on query syntax.
 + See doc/example.clj for a omplete working example querying the remote dbedia SPARQL endpoint
 
 ## Limitations
-* The `WHERE` keyword is not optional, like it is in SPARQL
 * Single colon keyword prefix is not possible, use the equivalent `BASE`-form instead
 * Dollar-prefixed variables not supported
 

@@ -233,7 +233,7 @@
 (defn where-
   "Where clause without the optional WHERE keyword"
   [q & more]
-  (assoc q :where {:tag "" :content (vec more) :bounds [" { " " } "] :sep " "}))
+  (assoc q :where {:tag "" :content (vec more) :bounds ["{ " " } "] :sep " "}))
 
 (defn group
   "Delimits a graph pattern within curly braces. (Not a SPARQL keyword.)"

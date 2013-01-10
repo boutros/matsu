@@ -254,10 +254,10 @@
   (is (=
         (query
           (select \*)
-          (where :s :p :o
+          (where- :s :p :o
                  (filter-not-exists :x :y :z)))
 
-        "SELECT * WHERE { ?s ?p ?o FILTER NOT EXISTS { ?x ?y ?z } }"))
+        "SELECT * { ?s ?p ?o FILTER NOT EXISTS { ?x ?y ?z } }"))
 
   (is (=
         (query

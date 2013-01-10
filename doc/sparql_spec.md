@@ -474,11 +474,11 @@ SELECT *
   FILTER NOT EXISTS { ?x ?y ?z }
 }
 ```
-Currently not possible without the `WHERE` keyword (which is optional in SPARQL):
+Use the `where-` function if you want to omit the `WHERE` keyword (which is optional in SPARQL):
 ```clojure
 (query
   (select \*)
-  (where :s :p :o
+  (where- :s :p :o
          (filter-not-exists :x :y :z)))
 ```
 
