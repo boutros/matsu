@@ -258,8 +258,7 @@
 ;; Specifying datasets
 
 (defn from [q graph]
-  (assoc q :from {:tag "FROM" :content [graph]
-                  :bounds [" " " "] :sep " "}))
+  (assoc q :from {:tag "FROM" :content [graph] :bounds [" " " "] :sep " "}))
 
 (defn from-named [q & graphs]
   (assoc q :from-named {:tag "" :bounds ["" " "] :sep " "
@@ -279,8 +278,8 @@
 (defn asc [v] {:tag "ASC" :bounds ["(" ")"] :sep " " :content [v]})
 
 (defn order-by [q & expr]
-  (assoc q :order-by {:tag "ORDER BY" :bounds [" "] :sep " "
-                      :content (vec expr)}))
+  (assoc q :order-by
+    {:tag "ORDER BY" :bounds [" "] :sep " " :content (vec expr)}))
 
 (defn order-by-desc [q v]
   (order-by q (desc v)))
@@ -319,11 +318,9 @@
 
 ;; Functional forms
 
-(defn bound [v]
-  {:tag "bound" :content [v] :bounds ["(" ")"] :sep " "})
+(defn bound [v] {:tag "bound" :content [v] :bounds ["(" ")"] :sep " "})
 
-(defn !bound [v]
-  {:tag "!bound" :content [v] :bounds ["(" ")"] :sep " "})
+(defn !bound [v] {:tag "!bound" :content [v] :bounds ["(" ")"] :sep " "})
 
 
 ;; Functions on strings
