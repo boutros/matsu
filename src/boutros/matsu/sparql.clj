@@ -1,7 +1,6 @@
 (ns boutros.matsu.sparql
   (:refer-clojure :exclude [filter concat group-by max min])
-  (:require [clojure.set :as set]
-            [clojure.string :as string])
+  (:require [clojure.string :as string])
   (:import (java.net URI)))
 
 ; -----------------------------------------------------------------------------
@@ -114,10 +113,8 @@
                     (not b) (str \< (name a) \>)
                     (string? a) (str \" a "\"@" (name b))
                     (and (map? a)
-                         (keyword? b)) (into ["("] (conj (sub-compiler a)
-                                                         " AS "
-                                                         (encode b)
-                                                         ")" ))
+                         (keyword? b)) (into ["("]
+                                             (conj (sub-compiler a) " AS " (encode b) ")" ))
                     :else (str (name a) \: b)))
     (map? x) (sub-compiler x)
     :else (throw (Exception.
@@ -156,7 +153,7 @@
     s))
 
 (defn- add-base
-  "Prefixes the query string with 'BASE <baseuri>'"
+  "Prefixes the query string with 'BASE <uri>'"
   [uri s]
   (if (nil? uri)
     s
@@ -175,11 +172,10 @@
                            :limit :offset :group-by :having]]
                 (compiler q part)))
          (flatten)
-         (remove nil?)
-         (string/join "")
-         (string/trim)
+         (string/join)
          (infer-prefixes local-prefixes)
-         (add-base base))))
+         (add-base base)
+         (string/trim))))
 
 
 ;; ----------------------------------------------------------------------------
@@ -299,7 +295,7 @@
   (order-by q (desc v)))
 
 ;; Aggregation
-;; COUNT, GROUP_CONCAT, and SAMPLE
+
 (defn group-by [q & expr]
   (assoc q :group-by {:tag "GROUP BY" :bounds [" "] :sep " "
                       :content (vec expr)}))
@@ -318,7 +314,7 @@
 
 ;(defn sample [v])
 ;(defn count)
-;(defn group_concat)
+;(defn group-concat)
 
 
 ;; Assingment
@@ -346,6 +342,9 @@
   (if flags
     {:tag "FILTER regex" :bounds ["(" ")"] :sep ", " :content [v regex (first flags)]}
     {:tag "FILTER regex" :bounds ["(" ")"] :sep ", " :content [v regex]}))
+
+;(defn lang-matches [& more]
+;  {:tag "langMatches" :content (vec more) :bounds ["(" ")"] :sep ", "})
 
 ;;STRLEN, SUBSTR, UCASE, LCASE, STRSTARS, STRENDS, CONTAINS, STRBEFORE, STRAFTER, ENCODE_FOR_URI
 ;;langMatches, REGEX, REPLACE
