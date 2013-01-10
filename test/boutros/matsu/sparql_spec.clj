@@ -1,5 +1,5 @@
 (ns boutros.matsu.sparql-spec
-  (:refer-clojure :exclude [filter concat group-by])
+  (:refer-clojure :exclude [filter concat group-by max min])
   (:use clojure.test
         boutros.matsu.sparql)
   (:import (java.net URI)))
@@ -28,7 +28,8 @@
 ; Tests
 
 (deftest part-2
-  "2 Making Simple Queries (Informative)"
+  "Making Simple Queries (Informative)"
+
   (is (=
         (query
           (select :title)
@@ -87,7 +88,7 @@
           (where :P [:foaf "givenName"] :G
                  \; [:foaf "surname"] :S))
 
-        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ( CONCAT(?G, \" \", ?S) AS ?name ) WHERE { ?P foaf:givenName ?G ; foaf:surname ?S }"))
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT (CONCAT(?G, \" \", ?S) AS ?name) WHERE { ?P foaf:givenName ?G ; foaf:surname ?S }"))
 
   (is (=
         (query
@@ -97,6 +98,7 @@
                  (bind [(concat :G " " :S) :name])))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?P foaf:givenName ?G ; foaf:surname ?S BIND(CONCAT(?G, \" \", ?S) AS ?name) }"))
+
   (is (=
         (query
           (construct :x [:foaf "name"] :name)
@@ -105,6 +107,8 @@
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX org: <http://example.com/ns#> CONSTRUCT { ?x foaf:name ?name } WHERE { ?x org:employeeName ?name }")))
 
 (deftest part-3
+  "3 RDF Term Constraints (Informative)"
+
   (is (=
         (query
           (select :title)
@@ -131,6 +135,8 @@
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ?price WHERE { ?x ns:price ?price . FILTER(?price < 30.5) ?x dc:title ?title . }")))
 
 (deftest part-4
+  "SPARQL Syntax"
+
   (is (=
         (query
           (select :title)
@@ -138,7 +144,7 @@
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { <http://example.org/book/book1> dc:title ?title }"))
 
-    (is (=
+  (is (=
         (query
           (base (URI. "http://example.org/book/"))
           (select :title)
@@ -147,6 +153,8 @@
         "BASE <http://example.org/book/> PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { <book1> dc:title ?title }")))
 
 (deftest part-5
+  "Graph Patterns"
+
   (is (=
         (query
           (select :name :mbox)
@@ -155,16 +163,17 @@
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE { ?x foaf:name ?name . ?x foaf:mbox ?mbox . }"))
 
-    (is (=
+  (is (=
         (query
           (select :name :mbox)
           (where (group :x [:foaf "name"] :name \.)
                  (group :x [:foaf "mbox"] :mbox \.)))
 
-        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE { { ?x foaf:name ?name . } { ?x foaf:mbox ?mbox . } }"))
-    )
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE { { ?x foaf:name ?name . } { ?x foaf:mbox ?mbox . } }")))
 
 (deftest part-6
+  "Including Optional Values"
+
   (is (=
         (query
           (select :name :mbox)
@@ -173,31 +182,33 @@
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE { ?x foaf:name ?name . OPTIONAL { ?x foaf:mbox ?mbox } }"))
 
-    (is (=
-          (query
-            (select :title :price)
-            (where :x [:dc "title"] :title \.
-                   (optional :x [:ns "price"] :price \. (filter :price \< 30))))
+  (is (=
+        (query
+          (select :title :price)
+          (where :x [:dc "title"] :title \.
+                 (optional :x [:ns "price"] :price \. (filter :price \< 30))))
 
-          "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ?price WHERE { ?x dc:title ?title . OPTIONAL { ?x ns:price ?price . FILTER(?price < 30) } }" ))
+        "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ?price WHERE { ?x dc:title ?title . OPTIONAL { ?x ns:price ?price . FILTER(?price < 30) } }" ))
 
-    (is (=
-          (query
-            (select :name :mbox :hpage)
-            (where :x [:foaf "name"] :name \.
-                   (optional :x [:foaf "mbox"] :mbox) \.
-                   (optional :x [:foaf "homepage"] :hpage)))
+  (is (=
+        (query
+          (select :name :mbox :hpage)
+          (where :x [:foaf "name"] :name \.
+                 (optional :x [:foaf "mbox"] :mbox) \.
+                 (optional :x [:foaf "homepage"] :hpage)))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox ?hpage WHERE { ?x foaf:name ?name . OPTIONAL { ?x foaf:mbox ?mbox } . OPTIONAL { ?x foaf:homepage ?hpage } }")))
 
 (deftest part-7
-  (is (=
-        (query
-          (select :title)
-          (where (union (group :book [:dc10 "title"] :title)
-                        (group :book [:dc11 "title"] :title))))
+  "Matching Alternatives"
 
-        "PREFIX dc10: <http://purl.org/dc/elements/1.0/> PREFIX dc11: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { { ?book dc10:title ?title } UNION { ?book dc11:title ?title } }"))
+  (is (=
+      (query
+        (select :title)
+        (where (union (group :book [:dc10 "title"] :title)
+                      (group :book [:dc11 "title"] :title))))
+
+      "PREFIX dc10: <http://purl.org/dc/elements/1.0/> PREFIX dc11: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { { ?book dc10:title ?title } UNION { ?book dc11:title ?title } }"))
 
   (is (=
         (query
@@ -215,6 +226,8 @@
         "PREFIX dc10: <http://purl.org/dc/elements/1.0/> PREFIX dc11: <http://purl.org/dc/elements/1.1/> SELECT ?title ?author WHERE { { ?book dc10:title ?title . ?book dc10:creator ?author } UNION { ?book dc11:title ?title . ?book dc11:creator ?author } }")))
 
 (deftest part-8
+  "Negation"
+
   (is (=
         (query
           (select :person)
@@ -293,6 +306,8 @@
         "BASE <http://example.com/> SELECT * WHERE { ?x <p> ?n MINUS { ?x <q> ?m . FILTER(?n = ?m) } }")))
 
 (deftest part-10
+  "Assignment"
+
   (is (=
         (query
           (select :title :price)
@@ -305,6 +320,8 @@
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ?price WHERE { { ?x ns:price ?p . ?x ns:discount ?discount BIND(?p*(1-?discount) AS ?price) } { ?x dc:title ?title . } FILTER(?price < 20) }")))
 
 (deftest part-11
+  "Aggregates"
+
   (is (=
         (query
           (base (URI. "http://books.example/"))
@@ -315,7 +332,7 @@
           (group-by :org)
           (having (sum :lprice) \> 10))
 
-        "BASE <http://books.example/> SELECT ( SUM(?lprice) AS ?totalPrice ) WHERE { ?org <affiliates> ?auth . ?auth <writesBook> ?book . ?book <price> ?lprice . } GROUP BY ?org HAVING( SUM(?lprice) > 10 )"))
+        "BASE <http://books.example/> SELECT (SUM(?lprice) AS ?totalPrice) WHERE { ?org <affiliates> ?auth . ?auth <writesBook> ?book . ?book <price> ?lprice . } GROUP BY ?org HAVING(SUM(?lprice) > 10)"))
 
   (is (=
         (query
@@ -324,7 +341,7 @@
                  \; [:y] :y \.)
                  (group-by :x))
 
-          "SELECT ( AVG(?y) AS ?avg ) WHERE { ?a <x> ?x ; <y> ?y . } GROUP BY ?x"))
+          "SELECT (AVG(?y) AS ?avg) WHERE { ?a <x> ?x ; <y> ?y . } GROUP BY ?x"))
 
   (is (=
         (query
@@ -334,7 +351,7 @@
           (group-by :x)
           (having (avg :size) \> 10))
 
-        "BASE <http://data.example/> SELECT ( AVG(?size) AS ?asize ) WHERE { ?x <size> ?size } GROUP BY ?x HAVING( AVG(?size) > 10 )"))
+        "BASE <http://data.example/> SELECT (AVG(?size) AS ?asize) WHERE { ?x <size> ?size } GROUP BY ?x HAVING(AVG(?size) > 10)"))
 
   (is (=
         (query
@@ -343,7 +360,7 @@
           (where :x [:p] :y \. :x [:q] :z \.)
           (group-by :x (raw "(STR(?z))")))
 
-        "BASE <http://example.com/data/#> SELECT ?x ( MIN(?y) * 2 AS ?min ) WHERE { ?x <p> ?y . ?x <q> ?z . } GROUP BY ?x (STR(?z))"))
+        "BASE <http://example.com/data/#> SELECT ?x (MIN(?y) * 2 AS ?min) WHERE { ?x <p> ?y . ?x <q> ?z . } GROUP BY ?x (STR(?z))"))
 
   (is (=
         (query
@@ -352,9 +369,11 @@
           (where :g [:p] :p \.)
           (group-by :g))
 
-        "BASE <http://example.com/data/#> SELECT ?g ( AVG(?p) AS ?avg) ( (MIN(?p) + MAX(?p)) / 2 AS ?c ) WHERE { ?g <p> ?p . } GROUP BY ?g")))
+        "BASE <http://example.com/data/#> SELECT ?g (AVG(?p) AS ?avg) ( (MIN(?p) + MAX(?p)) / 2 AS ?c) WHERE { ?g <p> ?p . } GROUP BY ?g")))
 
 (deftest part-13
+  "RDF Datasets"
+
   (is (=
         (query
           (select :name)
@@ -385,49 +404,51 @@
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?src ?bobNick FROM NAMED <http://example.org/foaf/aliceFoaf> FROM NAMED <http://example.org/foaf/bobFoaf> WHERE { GRAPH ?src { ?x foaf:mbox <mailto:bob@work.example> . ?x foaf:nick ?bobNick } }"))
 
-    (is (=
-          (query
-            (select :nick)
-            (from-named (URI. "http://example.org/foaf/aliceFoaf")
-                        (URI. "http://example.org/foaf/bobFoaf"))
-            (where (graph [:data "bobFoaf"]
-                          (group :x [:foaf "mbox"] (URI. "mailto:bob@work.example") \.
-                                 :x [:foaf "nick"] :nick))))
+  (is (=
+        (query
+          (select :nick)
+          (from-named (URI. "http://example.org/foaf/aliceFoaf")
+                      (URI. "http://example.org/foaf/bobFoaf"))
+          (where (graph [:data "bobFoaf"]
+                        (group :x [:foaf "mbox"] (URI. "mailto:bob@work.example") \.
+                               :x [:foaf "nick"] :nick))))
 
-          "PREFIX data: <http://example.org/foaf/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?nick FROM NAMED <http://example.org/foaf/aliceFoaf> FROM NAMED <http://example.org/foaf/bobFoaf> WHERE { GRAPH data:bobFoaf { ?x foaf:mbox <mailto:bob@work.example> . ?x foaf:nick ?nick } }"))
+        "PREFIX data: <http://example.org/foaf/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?nick FROM NAMED <http://example.org/foaf/aliceFoaf> FROM NAMED <http://example.org/foaf/bobFoaf> WHERE { GRAPH data:bobFoaf { ?x foaf:mbox <mailto:bob@work.example> . ?x foaf:nick ?nick } }"))
 
-    (is (=
-          (query
-            (select :mbox :nick :ppd)
-            (from-named (URI. "http://example.org/foaf/aliceFoaf")
-                        (URI. "http://example.org/foaf/bobFoaf"))
-            (where
-              (graph [:data "aliceFoaf"]
-                     (group :alice [:foaf "mbox"] (URI. "mailto:alice@work.example")
-                            \; [:foaf "knows"] :whom \.
-                            :whom [:foaf "mbox"] :mbox
-                            \; [:rdfs "seeAlso"] :ppd \.
-                            :ppd \a [:foaf "PersonalProfileDocument"] \.)
-                     \.)
-              (graph :ppd
-                     (group :w [:foaf "mbox"] :mbox
-                            \; [:foaf "nick"] :nick))))
+  (is (=
+        (query
+          (select :mbox :nick :ppd)
+          (from-named (URI. "http://example.org/foaf/aliceFoaf")
+                      (URI. "http://example.org/foaf/bobFoaf"))
+          (where
+            (graph [:data "aliceFoaf"]
+                   (group :alice [:foaf "mbox"] (URI. "mailto:alice@work.example")
+                          \; [:foaf "knows"] :whom \.
+                          :whom [:foaf "mbox"] :mbox
+                          \; [:rdfs "seeAlso"] :ppd \.
+                          :ppd \a [:foaf "PersonalProfileDocument"] \.)
+                   \.)
+            (graph :ppd
+                   (group :w [:foaf "mbox"] :mbox
+                          \; [:foaf "nick"] :nick))))
 
-          "PREFIX data: <http://example.org/foaf/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?mbox ?nick ?ppd FROM NAMED <http://example.org/foaf/aliceFoaf> FROM NAMED <http://example.org/foaf/bobFoaf> WHERE { GRAPH data:aliceFoaf { ?alice foaf:mbox <mailto:alice@work.example> ; foaf:knows ?whom . ?whom foaf:mbox ?mbox ; rdfs:seeAlso ?ppd . ?ppd a foaf:PersonalProfileDocument . } . GRAPH ?ppd { ?w foaf:mbox ?mbox ; foaf:nick ?nick } }"))
+        "PREFIX data: <http://example.org/foaf/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?mbox ?nick ?ppd FROM NAMED <http://example.org/foaf/aliceFoaf> FROM NAMED <http://example.org/foaf/bobFoaf> WHERE { GRAPH data:aliceFoaf { ?alice foaf:mbox <mailto:alice@work.example> ; foaf:knows ?whom . ?whom foaf:mbox ?mbox ; rdfs:seeAlso ?ppd . ?ppd a foaf:PersonalProfileDocument . } . GRAPH ?ppd { ?w foaf:mbox ?mbox ; foaf:nick ?nick } }"))
 
-    (is (=
-          (query
-            (select :name :mbox :date)
-            (where
-              :g [:dc "publisher"] :name
-              \; [:dc "date"] :date \.
-              (graph :g
-                     (group :person [:foaf "name"] :name
-                            \; [:foaf "mbox"] :mbox))))
+  (is (=
+        (query
+          (select :name :mbox :date)
+          (where
+            :g [:dc "publisher"] :name
+            \; [:dc "date"] :date \.
+            (graph :g
+                   (group :person [:foaf "name"] :name
+                          \; [:foaf "mbox"] :mbox))))
 
-          "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox ?date WHERE { ?g dc:publisher ?name ; dc:date ?date . GRAPH ?g { ?person foaf:name ?name ; foaf:mbox ?mbox } }")))
+        "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox ?date WHERE { ?g dc:publisher ?name ; dc:date ?date . GRAPH ?g { ?person foaf:name ?name ; foaf:mbox ?mbox } }")))
 
 (deftest part-15
+  "Solution Sequences and Modifiers"
+
   (is (=
         (query
           (select :name)
@@ -495,6 +516,7 @@
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name } LIMIT 20")))
 
+
 (deftest part-16
   "Query Forms"
 
@@ -515,7 +537,7 @@
                  :x [:dc "title"] :title \.
                  :x [:ns "discount"] :discount))
 
-        "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ( ?p*(1-?discount) AS ?price ) WHERE { ?x ns:price ?p . ?x dc:title ?title . ?x ns:discount ?discount }"))
+        "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title (?p*(1-?discount) AS ?price) WHERE { ?x ns:price ?p . ?x dc:title ?title . ?x ns:discount ?discount }"))
 
   (is (=
         (query
@@ -524,7 +546,7 @@
                  :x [:dc "title"] :title \.
                  :x [:ns "discount"] :discount))
 
-        "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ( ?p AS ?fullPrice) (?fullPrice*(1-?discount) AS ?customerPrice ) WHERE { ?x ns:price ?p . ?x dc:title ?title . ?x ns:discount ?discount }"))
+        "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title (?p AS ?fullPrice) (?fullPrice*(1-?discount) AS ?customerPrice) WHERE { ?x ns:price ?p . ?x dc:title ?title . ?x ns:discount ?discount }"))
 
   (is (=
         (query

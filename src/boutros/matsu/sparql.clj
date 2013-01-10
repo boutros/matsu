@@ -1,5 +1,5 @@
 (ns boutros.matsu.sparql
-  (:refer-clojure :exclude [filter concat group-by])
+  (:refer-clojure :exclude [filter concat group-by max min])
   (:require [clojure.set :as set]
             [clojure.string :as string])
   (:import (java.net URI)))
@@ -13,13 +13,13 @@
 
   Each key is populated with the following map:
 
-    {:tag nil :content [] :bounds ["" ""] :separator " "}
+    {:tag nil :content [] :bounds ["" ""] :sep " "}
 
   The :content field can contain other such maps, so the datastructure
   can be arbiritarily deeply nested. "
   {:base nil
    :from nil
-   :from-named []
+   :from-named nil
    :query-form  nil
    :where nil
    :order-by []
@@ -29,6 +29,9 @@
    :limit nil})
 
 (def prefixes (atom {}))
+
+;; Used for specifying query-local namespaces with the function with-prefixes
+(def local-prefixes {})
 
 ; -----------------------------------------------------------------------------
 ; Namespace functions
@@ -70,6 +73,7 @@
 ; -----------------------------------------------------------------------------
 ; Util functions
 ; -----------------------------------------------------------------------------
+
 (declare sub-compiler)
 
 (defn encode [x]
@@ -99,18 +103,15 @@
                                                          (encode b)
                                                          ")" ))
                     :else (str (name a) \: b)))
-    (map? x) (if (:tag x)
-               (sub-compiler x)
-               "sprudlevann!")
-               ;(:content x))
-    :else (throw (Exception. (format "Don't know how to encode %s into RDF literal!" x)))))
+    (map? x) (if (:tag x) (sub-compiler x) "sprudlevann!")
+    :else (throw (Exception.
+                   (format "Don't know how to encode %s in an SPARQL context" x)))))
 
 ; -----------------------------------------------------------------------------
 ; Compiler functions
 ; -----------------------------------------------------------------------------
 ; Transforms the various query parts into a vectors of strings, or nil if the
 ; particular function is not used in the query
-
 
 (defn- compiler [q what]
   (when-let [m (what q)]
@@ -121,7 +122,7 @@
         (:tag m)
         (first (:bounds m))
         (interpose
-          (:separator m)
+          (:sep m)
           (map encode (:content m)))
         (last (:bounds m))))
 
@@ -132,34 +133,28 @@
   (compiler q :where))
 
 (defn- from-compile [q]
-  (when-not (nil? (:from q))
-    (conj ["FROM"] (encode (:from q)))))
+  (compiler q :from))
 
 (defn- from-named-compile [q]
-  (when-let [graphs (seq (:from-named q))]
-    (conj []
-      (for [g graphs] ["FROM NAMED" (encode g)]))))
-
-
-(defn- limit-compile [q]
-  (when-let [n (:limit q)]
-    (conj [] "LIMIT" n)))
-
-(defn- offset-compile [q]
-  (when-let [n (:offset q)]
-    (conj [] "OFFSET" n)))
-
-(defn- order-by-compile [q]
-  (when-let [xs (seq (:order-by q))]
-    (conj ["ORDER BY"] (vec (map encode xs)))))
+  (compiler q :from-named))
 
 (defn- group-by-compile [q]
-  (when-let [xs (seq (:group-by q))]
-    (conj ["GROUP BY"] (vec (map encode xs)))))
+  (compiler q :group-by))
 
 (defn- having-compile [q]
-  (when-let [xs (seq (:having q))]
-    (conj ["HAVING("] (vec (map encode xs)) ")" )))
+  (compiler q :having))
+
+(defn- limit-compile [q]
+  (compiler q :limit))
+
+(defn- offset-compile [q]
+  (compiler q :offset))
+
+(defn- order-by-compile [q]
+  (compiler q :order-by))
+
+
+;; Add namespaces to query
 
 (defn- infer-prefixes [s]
   (str
@@ -171,6 +166,9 @@
   (if (nil? uri)
     s
     (str  "BASE " (encode uri) " " s)))
+
+
+;; Main compiler function
 
 (defn compile-query [q]
   {:pre [(map? q)]
@@ -199,155 +197,185 @@
 ;; SPARQL query DSL functions
 ;; ----------------------------------------------------------------------------
 
-;; Query forms
+;; Matsu syntax helpers
 
-(defn select [q & more]
-  (assoc q :query-form {:tag "SELECT" :content (vec more)
-                        :bounds [" "] :separator " "}))
+(defn raw [string]
+  {:tag "" :sep "" :bounds "" :content string })
 
-(defn select-distinct [q & more]
-  (assoc q :query-form {:tag "SELECT DISTINCT" :content (vec more)
-                        :bounds [" "] :separator " "}))
+;(defn with-prefixes)
 
-(defn construct [q & more]
-  (assoc q :query-form {:tag "CONSTRUCT" :content (vec more)
-                        :bounds [" { " " } "] :separator " "}))
-
-;; Where
-
-(defn where [q & more]
-  (assoc q :where {:tag "WHERE" :content (vec more)
-                   :bounds [" { " " } "] :separator " "}))
+;; Namespaces
 
 (defn base [q uri]
   (assoc q :base uri))
 
-(defn ask [q & vars]
-  (assoc q :query-form {:form "ASK" :content (vec vars)}))
 
-(defn describe [q & vars]
-  (assoc q :query-form {:form "DESCRIBE" :content (vec vars)}))
+;; Query forms
 
-(defn from [q graph]
-  (assoc q :from graph))
+(defn select [q & more]
+  (assoc q :query-form {:tag "SELECT" :content (vec more)
+                        :bounds [" "] :sep " "}))
 
-(defn from-named [q & graphs]
-  (assoc q :from-named (vec graphs)))
+(defn select-distinct [q & more]
+  (assoc q :query-form {:tag "SELECT DISTINCT" :content (vec more)
+                        :bounds [" "] :sep " "}))
 
+(defn select-reduced [q & more]
+  (assoc q :query-form {:tag "SELECT REDUCED" :content (vec more)
+                        :bounds [" "] :sep " "}))
 
+(defn construct [q & more]
+  (assoc q :query-form {:tag "CONSTRUCT" :content (vec more)
+                        :bounds [" { " " } "] :sep " "}))
 
+(defn ask [q & more]
+  (assoc q :query-form {:tag "ASK" :content (vec more)
+                      :bounds [" { " " } "] :sep " "}))
 
-(defn select-reduced [q & vars]
-  (assoc q :query-form {:form "SELECT REDUCED" :content (vec vars)}))
-
-
-(defn limit [q & n]
-  (assoc q :limit n))
-
-(defn offset [q & n]
-  (assoc q :offset n))
-
-(defn order-by [q & expr]
-  (assoc q :order-by (vec expr)))
-
-(declare desc)
-(defn order-by-desc [q v]
-  (order-by q (desc v)))
-
-;; Aggregation
-
-(defn group-by [q & expr]
-  (assoc q :group-by (vec expr)))
-
-(defn having [q & expr]
-  (assoc q :having (vec expr)))
-
-;;; Functions which return a map to be nested in the query-map
-
-;; Assingment
-
-(defn bind [v]
-  (let [[expr name] v]
-    {:tag "BIND" :content [expr 'AS  name]  :bounds ["(" ")"] :separator " "}))
-
-
-;; Functions on strings
-
-(defn concat [& more]
-  {:tag "CONCAT" :content (vec more) :bounds ["(" ")"] :separator ", "})
+(defn describe [q & more]
+  (assoc q :query-form {:tag "DESCRIBE" :content (vec more)
+                        :bounds [" "] :sep " "}))
 
 
 ;; Graph pattern matching
 
+(defn where [q & more]
+  (assoc q :where {:tag "WHERE" :content (vec more)
+                   :bounds [" { " " } "] :sep " "}))
+
+(defn where- [q & more]
+  "where clause without the optional WHERE keyword"
+  (assoc q :where {:tag "" :content (vec more)
+                   :bounds [" { " " } "] :sep " "}))
+
 (defn group [& more]
-  {:tag "" :content (vec more) :bounds ["{ " " }"] :separator " "})
+  "group delimits a graph pattern within braces: { }"
+  {:tag "" :content (vec more) :bounds ["{ " " }"] :sep " "})
 
 (defn optional [& more]
-  {:tag "OPTIONAL " :content (vec more) :bounds ["{ " " }"] :separator " "})
+  {:tag "OPTIONAL " :content (vec more) :bounds ["{ " " }"] :sep " "})
 
 (defn union [& more]
-  {:tag "" :content (interpose 'UNION (vec more)) :bounds [""] :separator " "})
+  {:tag "" :content (interpose 'UNION (vec more)) :bounds [""] :sep " "})
 
-(defn graph [& vars]
-  {:content (str "GRAPH " (string/join " " (vec (map encode vars))))})
+(defn graph [& more]
+  {:tag "GRAPH " :content (vec more) :bounds [""] :sep " "})
 
 
 ;; Negation
 
 (defn filter [& more]
-  {:tag "FILTER" :content (vec more) :bounds ["(" ")"] :separator " "})
+  {:tag "FILTER" :content (vec more) :bounds ["(" ")"] :sep " "})
 
 (defn filter-not-exists [& more]
-  {:tag "FILTER NOT EXISTS " :content (vec more) :bounds ["{ " " }"] :separator " "})
+  {:tag "FILTER NOT EXISTS " :content (vec more) :bounds ["{ " " }"] :sep " "})
 
 (defn filter-exists [& more]
-  {:tag "FILTER EXISTS " :content (vec more) :bounds ["{ " " }"] :separator " "})
+  {:tag "FILTER EXISTS " :content (vec more) :bounds ["{ " " }"] :sep " "})
 
 (defn minus [& more]
-  {:tag "MINUS " :content (vec more) :bounds ["{ " " }"] :separator " "})
+  {:tag "MINUS " :content (vec more) :bounds ["{ " " }"] :sep " "})
+
+
+;; Specifying datasets
+
+(defn from [q graph]
+  (assoc q :from {:tag "FROM" :content [graph]
+                  :bounds [" " " "] :sep " "}))
+
+(defn from-named [q & graphs]
+  (assoc q :from-named {:tag "" :bounds ["" " "] :sep " "
+                        :content (interleave (repeat (raw "FROM NAMED")) (vec graphs))}))
+
+
+;; Solution sequences
+
+(defn limit [q n]
+  (assoc q :limit {:tag "LIMIT" :bounds [" "] :sep " " :content [n]}))
+
+(defn offset [q n]
+  (assoc q :offset {:tag "OFFSET" :bounds [" "] :sep " " :content [n]}))
+
+(defn desc [v] {:tag "DESC" :bounds ["(" ")"] :sep " " :content [v]})
+
+(defn asc [v] {:tag "ASC" :bounds ["(" ")"] :sep " " :content [v]})
+
+(defn order-by [q & expr]
+  (assoc q :order-by {:tag "ORDER BY" :bounds [" "] :sep " "
+                      :content (vec expr)}))
+
+(defn order-by-desc [q v]
+  (order-by q (desc v)))
+
+;; Aggregation
+;; COUNT, GROUP_CONCAT, and SAMPLE
+(defn group-by [q & expr]
+  (assoc q :group-by {:tag "GROUP BY" :bounds [" "] :sep " "
+                      :content (vec expr)}))
+
+(defn having [q & expr]
+  (assoc q :having {:tag "HAVING" :bounds ["(" ")"] :sep " "
+                    :content (vec expr)}))
+
+(defn sum [v] {:tag "SUM" :bounds ["(" ")"] :sep " " :content [v]})
+
+(defn avg [v] {:tag "AVG" :bounds ["(" ")"] :sep " " :content [v]})
+
+(defn min [v] {:tag "MIN" :bounds ["(" ")"] :sep " " :content [v]})
+
+(defn max [v] {:tag "MAX" :bounds ["(" ")"] :sep " " :content [v]})
+
+;(defn sample [v])
+;(defn count)
+;(defn group_concat)
+
+
+;; Assingment
+
+(defn bind [v]
+  (let [[expr name] v]
+    {:tag "BIND" :content [expr 'AS  name]  :bounds ["(" ")"] :sep " "}))
+
+;(defn values)
+
+
+
+;; Functional forms
+
+(defn bound [v]
+  {:tag "bound" :content [v] :bounds ["(" ")"] :sep " "})
+
+(defn !bound [v]
+  {:tag "!bound" :content [v] :bounds ["(" ")"] :sep " "})
+
+
+;; Functions on strings
+
+(defn concat [& more]
+  {:tag "CONCAT" :content (vec more) :bounds ["(" ")"] :sep ", "})
 
 (defn filter-regex [v regex & flags]
   (if flags
-    {:tag "FILTER regex" :bounds ["(" ")"] :separator ", "
+    {:tag "FILTER regex" :bounds ["(" ")"] :sep ", "
     :content [v regex (first flags)]}
-    {:tag "FILTER regex" :bounds ["(" ")"] :separator ", "
+    {:tag "FILTER regex" :bounds ["(" ")"] :sep ", "
     :content [v regex]}))
 
-  ; {:content (str "FILTER regex(" (encode v)
-  ;                ", "
-  ;                (encode regex)
-  ;                (when flags (str ", " (encode (first flags))))
-  ;                ")" )})
+;;STRLEN, SUBSTR, UCASE, LCASE, STRSTARS, STRENDS, CONTAINS, STRBEFORE, STRAFTER, ENCODE_FOR_URI
+;;langMatches, REGEX, REPLACE
 
 
+;; Functions on RDF terms
+;; isIRI, isBlank, isLiteral, isNumeric, str, lang, datatype, IRI, BNODE, STRDT
+;; STRLANG, UUID, STRUUID
+(defn same-term [& more]
+  {:tag "sameTerm" :content (vec more) :bounds ["(" ")"] :sep ", "})
 
-;; Matsu syntax helpers
+(defn !same-term [& more]
+  {:tag "!sameTerm" :content (vec more) :bounds ["(" ")"] :sep ", "})
 
-(defn raw [string]
-  {:tag "" :separator "" :bounds "" :content string })
+;; Functions on Numerics
 
-;;
-(defn desc [v]
-  {:content (str "DESC(" (encode v) ")" )})
+;; Functions on Dates and Times
 
-(defn asc [v]
-  {:content (str "ASC(" (encode v) ")" )})
-
-(defn sum [v]
-  {:content (str "SUM(" (encode v) ")" )})
-
-(defn avg [v]
-  {:content (str "AVG(" (encode v) ")" )})
-
-
-(defn bound [v]
-  {:content (str "bound(" (encode v) ")" )})
-
-(defn !bound [v]
-  {:content (str "!bound(" (encode v) ")" )})
-
-(defn same-term [& vars]
-  {:content (str "sameTerm("(string/join ", " (map encode vars)) ")") })
-
-(defn !same-term [& vars]
-  {:content (str "!sameTerm("(string/join ", " (map encode vars)) ")") })
+;; Hash functions
