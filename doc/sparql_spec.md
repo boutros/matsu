@@ -4,18 +4,18 @@ An attempt to translate all the example queries from the [SPARQL 1.1 specificati
 
 The following namespaces are assumed to be registered:
 ```clojure
-@PREFIXES
-{:foaf    "<http://xmlns.com/foaf/0.1/>"
- :org     "<http://example.com/ns#>"
- :dc      "<http://purl.org/dc/elements/1.1/>"
- :ns      "<http://example.org/ns#>"
- :data    "<http://example.org/foaf/>"
- :vcard   "<http://www.w3.org/2001/vcard-rdf/3.0#>"
- :app     "<http://example.org/ns#>"
- :xsd     "<http://www.w3.org/2001/XMLSchema#>"
- :ent     "<http://org.example.com/employees#>"
- :a       "<http://www.w3.org/2000/10/annotation-ns#>"
- :t       "<http://example.org/types#>"}
+@prefixes
+=> {:foaf    "<http://xmlns.com/foaf/0.1/>"
+    :org     "<http://example.com/ns#>"
+    :dc      "<http://purl.org/dc/elements/1.1/>"
+    :ns      "<http://example.org/ns#>"
+    :data    "<http://example.org/foaf/>"
+    :vcard   "<http://www.w3.org/2001/vcard-rdf/3.0#>"
+    :app     "<http://example.org/ns#>"
+    :xsd     "<http://www.w3.org/2001/XMLSchema#>"
+    :ent     "<http://org.example.com/employees#>"
+    :a       "<http://www.w3.org/2000/10/annotation-ns#>"
+    :t       "<http://example.org/types#>"}
 ```
 
 ## 2 Making Simple Queries (Informative)
