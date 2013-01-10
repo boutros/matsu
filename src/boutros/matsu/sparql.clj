@@ -71,7 +71,7 @@
             `(-> ~q ~@body (compile-query))))
 
 ; -----------------------------------------------------------------------------
-; Util functions
+; Encoder
 ; -----------------------------------------------------------------------------
 
 (declare sub-compiler)
@@ -110,7 +110,7 @@
                                                          (encode b)
                                                          ")" ))
                     :else (str (name a) \: b)))
-    (map? x) (if (:tag x) (sub-compiler x) "sprudlevann!")
+    (map? x) (sub-compiler x)
     :else (throw (Exception.
                    (format "Don't know how to encode %s in an SPARQL context" x)))))
 
@@ -133,7 +133,8 @@
           (map encode (:content m)))
         (last (:bounds m))))
 
-;; Add namespaces to query
+
+;; Add namespaces to query string
 
 (defn- infer-prefixes [m s]
   (str
@@ -332,10 +333,8 @@
 
 (defn filter-regex [v regex & flags]
   (if flags
-    {:tag "FILTER regex" :bounds ["(" ")"] :sep ", "
-    :content [v regex (first flags)]}
-    {:tag "FILTER regex" :bounds ["(" ")"] :sep ", "
-    :content [v regex]}))
+    {:tag "FILTER regex" :bounds ["(" ")"] :sep ", " :content [v regex (first flags)]}
+    {:tag "FILTER regex" :bounds ["(" ")"] :sep ", " :content [v regex]}))
 
 ;;STRLEN, SUBSTR, UCASE, LCASE, STRSTARS, STRENDS, CONTAINS, STRBEFORE, STRAFTER, ENCODE_FOR_URI
 ;;langMatches, REGEX, REPLACE
