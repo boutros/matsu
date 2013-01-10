@@ -113,8 +113,8 @@
 ; Transforms the various query parts into a vectors of strings, or nil if the
 ; particular function is not used in the query
 
-(defn- compiler [q what]
-  (when-let [m (what q)]
+(defn- compiler [q part]
+  (when-let [m (part q)]
     (sub-compiler m)))
 
 (defn- sub-compiler [m]
@@ -125,34 +125,6 @@
           (:sep m)
           (map encode (:content m)))
         (last (:bounds m))))
-
-(defn- query-form-compile [q]
-  (compiler q :query-form))
-
-(defn- where-compile [q]
-  (compiler q :where))
-
-(defn- from-compile [q]
-  (compiler q :from))
-
-(defn- from-named-compile [q]
-  (compiler q :from-named))
-
-(defn- group-by-compile [q]
-  (compiler q :group-by))
-
-(defn- having-compile [q]
-  (compiler q :having))
-
-(defn- limit-compile [q]
-  (compiler q :limit))
-
-(defn- offset-compile [q]
-  (compiler q :offset))
-
-(defn- order-by-compile [q]
-  (compiler q :order-by))
-
 
 ;; Add namespaces to query
 
@@ -177,15 +149,9 @@
   returns a vaild SPARQL 1.1 query string"
   (let [base (get q :base)]
     (->> (conj []
-               (query-form-compile q)
-               (from-compile q)
-               (from-named-compile q)
-               (where-compile q)
-               (order-by-compile q)
-               (limit-compile q)
-               (offset-compile q)
-               (group-by-compile q)
-               (having-compile q))
+               (for [part [:query-form :from :from-named :where :order-by
+                           :limit :offset :group-by :having]]
+                (compiler q part)))
          (flatten)
          (remove nil?)
          (string/join "")
