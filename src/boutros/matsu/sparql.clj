@@ -16,7 +16,7 @@
     {:tag nil :content [] :bounds ["" ""] :sep " "}
 
   The :content field can contain other such maps, so the datastructure
-  can be arbiritarily deeply nested. "
+  can be arbiritarily deeply nested."
   {:local-prefixes {}
    :base nil
    :from nil
@@ -36,11 +36,11 @@
 ; -----------------------------------------------------------------------------
 
 (defn register-namespaces [m]
-  {:pre [(map? m)]}
   (swap! prefixes merge m))
 
-(defn- ns-or-error [k m]
-  {:pre [(keyword? k)]}
+(defn- ns-or-error
+  "Resolves prefixes. Throws an error if the namespace cannot be resolved."
+  [k m]
   (if-let [v (k m)]
     v
     (if-let [v (k @prefixes)]
@@ -51,24 +51,28 @@
 ; Main macros
 ; -----------------------------------------------------------------------------
 
-(defmacro defquery [name & body]
-          "Defines a query-map and binds it to a var"
-          `(let [q# (-> (~empty-query) ~@body)]
-            (def ~name q#)))
+(defmacro defquery
+  "Defines a query-map and binds it to a var"
+  [name & body]
+  `(let [q# (-> (~empty-query) ~@body)]
+    (def ~name q#)))
 
-(defmacro query [q & body]
-          "Let you craft a SPARQL-query by composing functions, like this:
-            (query
-              (select :s)
-              (where :s :p :p))
-          And returns a valid SPARQL 1.1 string:
-            'SELECT ?s WHERE { ?s ?p ?o }'
+(defmacro query
+  "Let you craft a SPARQL-query by composing functions
 
-          The macro can also be called with a query-map as its first argument,
-          alowing you to modify saved queries."
-          (if (list? q)
-            `(-> (empty-query) ~q ~@body (compile-query))
-            `(-> ~q ~@body (compile-query))))
+    ex:  (query
+           (select :s)
+           (where :s :p :p))
+
+  Which will return a valid SPARQL 1.1 string:
+    'SELECT ?s WHERE { ?s ?p ?o }'
+
+  The macro can also be called with a query-map as its first argument,
+  allowing you to work on saved queries."
+  [q & body]
+  (if (list? q)
+    `(-> (empty-query) ~q ~@body (compile-query))
+    `(-> ~q ~@body (compile-query))))
 
 ; -----------------------------------------------------------------------------
 ; Encoder
@@ -76,7 +80,7 @@
 
 (declare sub-compiler)
 
-(defn encode [x]
+(defn encode
   "Encodes keywords to ?-prefixed variables and other values to RDF literals
   when applicable.
 
@@ -89,6 +93,7 @@
 
   Maps are expaned and compiled according to its contents, tag, bounds and
   separator"
+  [x]
   (cond
     (char? x) x
     (symbol? x) x
@@ -134,15 +139,21 @@
         (last (:bounds m))))
 
 
-;; Add namespaces to query string
+;; Functions to add namespaces to query string
 
-(defn- infer-prefixes [m s]
+(defn- infer-prefixes
+  "Finds all occurences of the pattern 'prefix:name' in the query string.
+  Returns the query string with the namespaces prefixed."
+  [m s]
   (str
-    (apply str (apply sorted-set (for [[_ p] (re-seq #"(\b[a-zA-Z0-9]+):[a-zA-Z]" s) :when (not= p (name :mailto))]
-             (str "PREFIX " p ": " (ns-or-error (keyword p) m) " " ))))
+    (apply str (apply sorted-set
+                      (for [[_ p] (re-seq #"(\b[a-zA-Z0-9]+):[a-zA-Z]" s) :when (not= p (name :mailto))]
+                        (str "PREFIX " p ": " (ns-or-error (keyword p) m) " " ))))
     s))
 
-(defn- add-base [uri s]
+(defn- add-base
+  "Prefixes the query string with 'BASE <baseuri>'"
+  [uri s]
   (if (nil? uri)
     s
     (str  "BASE " (encode uri) " " s)))
@@ -150,11 +161,10 @@
 
 ;; Main compiler function
 
-(defn compile-query [q]
-  {:pre [(map? q)]
-   :post [(string? %)]}
+(defn compile-query
   "Takes a map representing SPARQL graph patterns, bindings and modifiers and
   returns a vaild SPARQL 1.1 query string"
+  [q]
   (let [base (:base q) local-prefixes (:local-prefixes q)]
     (->> (conj []
                (for [part [:query-form :from :from-named :where :order-by
@@ -166,6 +176,7 @@
          (string/trim)
          (infer-prefixes local-prefixes)
          (add-base base))))
+
 
 ;; ----------------------------------------------------------------------------
 ;; SPARQL query DSL
@@ -181,7 +192,7 @@
   (assoc q :local-prefixes m))
 
 
-;; Namespaces
+;; Namespaces-related
 
 (defn base [q uri]
   (assoc q :base uri))
@@ -217,17 +228,16 @@
 ;; Graph pattern matching
 
 (defn where [q & more]
-  (assoc q :where {:tag "WHERE" :content (vec more)
-                   :bounds [" { " " } "] :sep " "}))
+  (assoc q :where {:tag "WHERE" :content (vec more) :bounds [" { " " } "] :sep " "}))
 
-(defn where- [q & more]
-  "where clause without the optional WHERE keyword"
-  (assoc q :where {:tag "" :content (vec more)
-                   :bounds [" { " " } "] :sep " "}))
+(defn where-
+  "Where clause without the optional WHERE keyword"
+  [q & more]
+  (assoc q :where {:tag "" :content (vec more) :bounds [" { " " } "] :sep " "}))
 
-(defn group [& more]
-  "Delimits a graph pattern within braces: { }.
-  Not a SPARQL keyword."
+(defn group
+  "Delimits a graph pattern within curly braces. (Not a SPARQL keyword.)"
+  [& more]
   {:tag "" :content (vec more) :bounds ["{ " " }"] :sep " "})
 
 (defn optional [& more]
