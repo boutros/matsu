@@ -74,6 +74,10 @@
     `(-> (empty-query) ~q ~@body (compile-query))
     `(-> ~q ~@body (compile-query))))
 
+(defmacro query-with-prefixes
+  [m & body]
+  `(query (assoc (empty-query) :local-prefixes ~m) ~@body))
+
 ; -----------------------------------------------------------------------------
 ; Encoder
 ; -----------------------------------------------------------------------------

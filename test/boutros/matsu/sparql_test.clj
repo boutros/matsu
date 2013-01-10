@@ -22,8 +22,7 @@
 
 (deftest local-prefixes
   (is (=
-        (query
-          (with-prefixes {:foaf "<mylocalfoaf>"})
+        (query-with-prefixes {:foaf "<mylocalfoaf>"}
           (select :person)
           (where :person [:foaf "name"] "Petter"))
 

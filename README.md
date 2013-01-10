@@ -40,8 +40,7 @@ The prefixes are automatically infered provided that they exists in the global `
 You can also supply query-local prefixes which will override the global `prefixes`:
 
 ```clojure
-(query
-  (with-prefixes {:foaf "<mylocalfoaf>"})
+(query-with-prefixes {:foaf "<mylocalfoaf>"}
   (select :person)
   (where :person [:foaf "name"] "Petter"))
 ```
