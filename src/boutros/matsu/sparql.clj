@@ -17,21 +17,19 @@
 
   The :content field can contain other such maps, so the datastructure
   can be arbiritarily deeply nested. "
-  {:base nil
+  {:local-prefixes {}
+   :base nil
    :from nil
    :from-named nil
    :query-form  nil
    :where nil
-   :order-by []
-   :group-by []
-   :having []
+   :order-by nil
+   :group-by nil
+   :having nil
    :offset nil
    :limit nil})
 
 (def prefixes (atom {}))
-
-;; Used for specifying query-local namespaces with the function with-prefixes
-(def local-prefixes {})
 
 ; -----------------------------------------------------------------------------
 ; Namespace functions
@@ -41,14 +39,16 @@
   {:pre [(map? m)]}
   (swap! prefixes merge m))
 
-(defn- ns-or-error [k]
+(defn- ns-or-error [k m]
   {:pre [(keyword? k)]}
-  (if-let [v (k @prefixes)]
+  (if-let [v (k m)]
     v
-   (throw (IllegalArgumentException. (str "Cannot resolve namespace: " k)))))
+    (if-let [v (k @prefixes)]
+      v
+     (throw (IllegalArgumentException. (str "Cannot resolve namespace: " k))))))
 
 ; -----------------------------------------------------------------------------
-; Macros
+; Main macros
 ; -----------------------------------------------------------------------------
 
 (defmacro defquery [name & body]
@@ -78,10 +78,17 @@
 
 (defn encode [x]
   "Encodes keywords to ?-prefixed variables and other values to RDF literals
-  when applicable. Vectors are treated as namespace-qualified if first value is
-  a keyword, or as string with language tag if the second value is a keyword.
+  when applicable.
 
-  Maps are used for special cases, to avoid compilation inside where-clauses."
+  Vectors are interpreted differently according to their contents:
+
+    [keyword string] => prefixed name
+    [string keyword] => string with language tag
+    [keyword]        => <keyword> - to be used with BASE
+    [map keyword]    => (:content map) AS keyword
+
+  Maps are expaned and compiled according to its contents, tag, bounds and
+  separator"
   (cond
     (char? x) x
     (symbol? x) x
@@ -128,10 +135,10 @@
 
 ;; Add namespaces to query
 
-(defn- infer-prefixes [s]
+(defn- infer-prefixes [m s]
   (str
     (apply str (apply sorted-set (for [[_ p] (re-seq #"(\b[a-zA-Z0-9]+):[a-zA-Z]" s) :when (not= p (name :mailto))]
-             (str "PREFIX " p ": " (ns-or-error (keyword p)) " " ))))
+             (str "PREFIX " p ": " (ns-or-error (keyword p) m) " " ))))
     s))
 
 (defn- add-base [uri s]
@@ -147,7 +154,7 @@
    :post [(string? %)]}
   "Takes a map representing SPARQL graph patterns, bindings and modifiers and
   returns a vaild SPARQL 1.1 query string"
-  (let [base (get q :base)]
+  (let [base (:base q) local-prefixes (:local-prefixes q)]
     (->> (conj []
                (for [part [:query-form :from :from-named :where :order-by
                            :limit :offset :group-by :having]]
@@ -156,19 +163,22 @@
          (remove nil?)
          (string/join "")
          (string/trim)
-         (infer-prefixes)
+         (infer-prefixes local-prefixes)
          (add-base base))))
 
 ;; ----------------------------------------------------------------------------
-;; SPARQL query DSL functions
+;; SPARQL query DSL
 ;; ----------------------------------------------------------------------------
 
-;; Matsu syntax helpers
+
+;; Matsu (i.e non-SPARQL) syntax helpers
 
 (defn raw [string]
   {:tag "" :sep "" :bounds "" :content string })
 
-;(defn with-prefixes)
+(defn with-prefixes [q m]
+  (assoc q :local-prefixes m))
+
 
 ;; Namespaces
 
@@ -215,7 +225,8 @@
                    :bounds [" { " " } "] :sep " "}))
 
 (defn group [& more]
-  "group delimits a graph pattern within braces: { }"
+  "Delimits a graph pattern within braces: { }.
+  Not a SPARQL keyword."
   {:tag "" :content (vec more) :bounds ["{ " " }"] :sep " "})
 
 (defn optional [& more]
@@ -303,7 +314,6 @@
     {:tag "BIND" :content [expr 'AS  name]  :bounds ["(" ")"] :sep " "}))
 
 ;(defn values)
-
 
 
 ;; Functional forms

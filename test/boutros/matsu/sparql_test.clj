@@ -19,6 +19,16 @@
                (query
                  (select \*)
                  (where [:missing "dada"] :p :o)))))
+
+(deftest local-prefixes
+  (is (=
+        (query
+          (with-prefixes {:foaf "<mylocalfoaf>"})
+          (select :s)
+          (where :s [:foaf "name"] :o))
+
+        "PREFIX foaf: <mylocalfoaf> SELECT ?s WHERE { ?s foaf:name ?o }")))
+
 ; Macros
 
 (defquery q1

@@ -41,10 +41,14 @@ You can also supply prefixes with the query, which will override the global `pre
 
 ```clojure
 (query
-  (with-prefixes {:foaf "http://blblbl"}
-    (select :person)
-    (where :person \a [:foaf "Person"]
-           \; [:foaf "mbox"] (URI. "mailto:me@me.com") \.)))
+  (with-prefixes {:foaf "<mylocalfoaf>"})
+  (select :s)
+  (where :s [:foaf "name"] :o))
+
+```
+```sparql
+PREFIX foaf: <mylocalfoaf>
+SELECT ?s WHERE { ?s foaf:name ?o }
 ```
 
 Matsu makes it possible to create complex, nested queries:
