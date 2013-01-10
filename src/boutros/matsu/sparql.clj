@@ -41,7 +41,7 @@
 (defn- ns-or-error
   "Resolves prefixes. Throws an error if the namespace cannot be resolved."
   [k m]
-  (if-let [v (k m)]
+  (if-let [v (k m)] ; check for query-local prefixes first
     v
     (if-let [v (k @prefixes)]
       v
