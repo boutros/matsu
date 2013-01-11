@@ -170,7 +170,7 @@ WHERE   { ?x dc:title ?title
           FILTER regex(?title, "^SPARQL")
         }
 ```
-Use `filter-` when FILTER is to be followed by another function:
+Use `filter-` when you don't want to wrap the `FILTER` expression in parentheses (i.e when it is followed by another SPARQL function, like `regex`):
 ```clojure
 (query
   (select :title)
@@ -1526,7 +1526,13 @@ WHERE { ?annot  a:annotates  <http://www.w3.org/TR/rdf-sparql-query/> .
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :given :family)
+  (where :annot [:a "annotates"] (URI. "http://www.w3.org/TR/rdf-sparql-query/") \.
+         :annot [:dc "creator"] :c \.
+         (optional :c [:foaf "given"] :given
+                    \; [:foaf "family"] :family) \.
+         (filter- (is-blank :c))))
 ```
 
 ```sparql
@@ -1538,7 +1544,11 @@ WHERE { ?x foaf:name  ?name ;
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :name :mbox)
+  (where :x [:foaf "name"] :name
+         \; [:foaf "mbox"] :mbox \.
+         (filter- (is-literal :mbox))))
 ```
 
 ```sparql
@@ -1549,9 +1559,13 @@ SELECT ?name ?mbox
          FILTER regex(str(?mbox), "@work\\.example$") }
 
 ```
-
+I didn't want to do without `clojure.core/str`, so I named the `str` function `str2`:
 ```clojure
-(query ...)
+(query
+  (select :name :mbox)
+  (where :x [:foaf "name"] :name
+         \; [:foaf "mbox"] :mbox \.
+         (filter- (regex (str2 :mbox) "@work\\.example$"))))
 ```
 
 ```sparql
