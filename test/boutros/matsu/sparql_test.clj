@@ -1,5 +1,5 @@
 (ns boutros.matsu.sparql-test
-  (:refer-clojure :exclude [filter concat group-by max min])
+  (:refer-clojure :exclude [filter concat group-by max min count])
   (:use clojure.test
         boutros.matsu.sparql)
   (:import (java.net URI)))

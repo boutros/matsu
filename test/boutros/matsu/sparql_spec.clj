@@ -1,5 +1,5 @@
 (ns boutros.matsu.sparql-spec
-  (:refer-clojure :exclude [filter concat group-by max min])
+  (:refer-clojure :exclude [filter concat group-by max min count])
   (:use clojure.test
         boutros.matsu.sparql)
   (:import (java.net URI)))
@@ -800,4 +800,11 @@
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name FILTER regex(?name, \"^ali\", \"i\") }"))
 
+  (is (=
+        (query
+          (select [(sum :val) :sum] [(count :a) :count])
+          (where :a [:rdf "value"] :val \.)
+          (group-by :a))
+
+        "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> SELECT (SUM(?val) AS ?sum) (COUNT(?a) AS ?count) WHERE { ?a rdf:value ?val . } GROUP BY ?a"))
     )

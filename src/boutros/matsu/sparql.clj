@@ -1,5 +1,5 @@
 (ns boutros.matsu.sparql
-  (:refer-clojure :exclude [filter concat group-by max min])
+  (:refer-clojure :exclude [filter concat group-by max min count])
   (:require [clojure.string :as string])
   (:import (java.net URI)))
 
@@ -319,8 +319,10 @@
 
 (defn max [v] {:tag "MAX" :bounds ["(" ")"] :sep " " :content [v]})
 
-;(defn sample [v])
-;(defn count)
+(defn sum [v] {:tag "SUM" :bounds ["(" ")"] :sep " " :content [v]})
+
+(defn count [v] {:tag "COUNT" :bounds ["(" ")"] :sep " " :content [v]})
+
 ;(defn group-concat)
 
 
@@ -353,8 +355,8 @@
 (defn lang-matches [& more]
   {:tag "langMatches" :content (vec more) :bounds ["(" ")"] :sep ", "})
 
-;;STRLEN, SUBSTR, UCASE, LCASE, STRSTARS, STRENDS, CONTAINS, STRBEFORE, STRAFTER, ENCODE_FOR_URI
-;;langMatches, REGEX, REPLACE
+;; TODO: STRLEN, SUBSTR, UCASE, LCASE, STRSTARS, STRENDS, CONTAINS, STRBEFORE,
+;;       STRAFTER, ENCODE_FOR_URI, REPLACE
 
 
 ;; Functions on RDF terms
