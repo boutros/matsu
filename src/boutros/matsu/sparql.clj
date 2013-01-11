@@ -33,7 +33,7 @@
 
 (def replacement-map
   "Used to replace symbols with characters inside expressions"
-  {= \= > \> < \<})
+  {= \= > \> < \< * \*})
 
 ; -----------------------------------------------------------------------------
 ; Namespace functions
@@ -206,8 +206,8 @@
 ;; Query forms
 
 (defn select [q & more]
-  (assoc q :query-form {:tag "SELECT" :content (vec more)
-                        :bounds [" "] :sep " "}))
+  (assoc q :query-form {:tag "SELECT" :bounds [" "] :sep " "
+                        :content (postwalk-replace replacement-map (vec more))}))
 
 (defn select-distinct [q & more]
   (assoc q :query-form {:tag "SELECT DISTINCT" :content (vec more)

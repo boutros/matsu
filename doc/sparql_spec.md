@@ -479,7 +479,7 @@ SELECT *
 Use the `where-` function if you want to omit the `WHERE` keyword (which is optional in SPARQL):
 ```clojure
 (query
-  (select \*)
+  (select *)
   (where- :s :p :o
          (filter-not-exists :x :y :z)))
 ```
@@ -495,7 +495,7 @@ SELECT *
 
 ```clojure
 (query
-  (select \*)
+  (select *)
   (where :s :p :o
          (minus :x :y :z)))
 ```
@@ -512,7 +512,7 @@ Using `BASE` URI instead of `:`
 ```clojure
 (query
   (base (URI. "http://example/"))
-  (select \*)
+  (select *)
   (where :s :p :o
          (filter-not-exists [:a] [:b] [:c])))
 ```
@@ -529,7 +529,7 @@ SELECT *
 ```clojure
 (query
   (base (URI. "http://example/"))
-  (select \*)
+  (select *)
   (where :s :p :o
          (minus [:a] [:b] [:c])))
 ```
@@ -548,7 +548,7 @@ SELECT * WHERE {
 ```clojure
 (query
   (base (URI. "http://example.com/"))
-  (select \*)
+  (select *)
   (where :x [:p] :n
          (filter-not-exists :x [:q] :m \.
                             (filter :n = :m))))
@@ -568,7 +568,7 @@ SELECT * WHERE {
 ```clojure
 (query
   (base (URI. "http://example.com/"))
-  (select \*)
+  (select *)
   (where :x [:p] :n
          (minus :x [:q] :m \.
                 (filter :n = :m))))

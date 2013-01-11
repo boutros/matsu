@@ -254,7 +254,7 @@
 
   (is (=
         (query
-          (select \*)
+          (select *)
           (where- :s :p :o
                  (filter-not-exists :x :y :z)))
 
@@ -262,7 +262,7 @@
 
   (is (=
         (query
-          (select \*)
+          (select *)
           (where :s :p :o
                  (minus :x :y :z)))
 
@@ -271,7 +271,7 @@
   (is (=
         (query
           (base (URI. "http://example/"))
-          (select \*)
+          (select *)
           (where :s :p :o
                  (filter-not-exists [:a] [:b] [:c])))
 
@@ -280,7 +280,7 @@
   (is (=
         (query
           (base (URI. "http://example/"))
-          (select \*)
+          (select *)
           (where :s :p :o
                  (minus [:a] [:b] [:c])))
 
@@ -289,7 +289,7 @@
   (is (=
         (query
           (base (URI. "http://example.com/"))
-          (select \*)
+          (select *)
           (where :x [:p] :n
                  (filter-not-exists :x [:q] :m \.
                                     (filter :n = :m))))
@@ -299,7 +299,7 @@
   (is (=
         (query
           (base (URI. "http://example.com/"))
-          (select \*)
+          (select *)
           (where :x [:p] :n
                  (minus :x [:q] :m \.
                         (filter :n = :m))))
