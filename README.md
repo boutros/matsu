@@ -110,7 +110,7 @@ While the aim of matsu is to cover the full SPARQL 1.1 specification, there will
                 :x [:ns "discount"] :discount
                 (bind [(raw "?p*(1-?discount)") :price]))
          (group :x [:dc "title"] :title \.)
-         (filter :price \< 20)))
+         (filter :price < 20)))
 ```
 
 Yielding the following SPARQL string:
