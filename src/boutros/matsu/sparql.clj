@@ -13,7 +13,7 @@
 
   Each key (except :local-prefixes) is populated with the following map:
 
-    {:tag nil :content [:x :y] :bounds ["(" ")"] :sep ", "}
+    {:tag nil :content [:x :y] :bounds ["" ""] :sep " "}
 
   The :content field can contain other such maps, so the datastructure
   can be arbiritarily deeply nested."
@@ -132,7 +132,6 @@
 ; Compiler functions
 ; -----------------------------------------------------------------------------
 ; Transforms the various query parts into a vectors of strings
-
 (defn- compiler [q part]
   (when-let [m (part q)]
     (sub-compiler m)))
