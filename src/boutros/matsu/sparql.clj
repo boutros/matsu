@@ -255,6 +255,13 @@
 (defn filter [& more]
   {:tag "FILTER" :content (vec more) :bounds ["(" ")"] :sep " "})
 
+(defn filter-
+  "Function to be used when FILTER followed by another SPARQL function.
+
+  ex: (filter- (is-iri :p))"
+  [& more]
+  {:tag "FILTER" :content (vec more) :bounds [" " ""] :sep " "})
+
 (defn filter-not-exists [& more]
   {:tag "FILTER NOT EXISTS " :content (vec more) :bounds ["{ " " }"] :sep " "})
 
@@ -338,10 +345,10 @@
 (defn concat [& more]
   {:tag "CONCAT" :content (vec more) :bounds ["(" ")"] :sep ", "})
 
-(defn filter-regex [v regex & flags]
+(defn regex [v regex & flags]
   (if flags
-    {:tag "FILTER regex" :bounds ["(" ")"] :sep ", " :content [v regex (first flags)]}
-    {:tag "FILTER regex" :bounds ["(" ")"] :sep ", " :content [v regex]}))
+    {:tag "regex" :bounds ["(" ")"] :sep ", " :content [v regex (first flags)]}
+    {:tag "regex" :bounds ["(" ")"] :sep ", " :content [v regex]}))
 
 ;(defn lang-matches [& more]
 ;  {:tag "langMatches" :content (vec more) :bounds ["(" ")"] :sep ", "})

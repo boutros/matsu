@@ -113,7 +113,7 @@
         (query
           (select :title)
           (where :x [:dc "title"] :title
-                 (filter-regex :title "^SPARQL")))
+                 (filter- (regex :title "^SPARQL"))))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { ?x dc:title ?title FILTER regex(?title, \"^SPARQL\") }"))
 
@@ -121,7 +121,7 @@
         (query
           (select :title)
           (where :x [:dc "title"] :title
-                 (filter-regex :title "web" "i")))
+                 (filter- (regex :title "web" "i"))))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { ?x dc:title ?title FILTER regex(?title, \"web\", \"i\") }"))
 

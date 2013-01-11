@@ -170,12 +170,12 @@ WHERE   { ?x dc:title ?title
           FILTER regex(?title, "^SPARQL")
         }
 ```
-
+Use `filter-` when FILTER is to be followed by another function:
 ```clojure
 (query
   (select :title)
   (where :x [:dc "title"] :title
-         (filter-regex :title "^SPARQL")))
+         (filter- (regex :title "^SPARQL"))))
 ```
 
 ```sparql
@@ -191,7 +191,7 @@ WHERE   { ?x dc:title ?title
 (query
   (select :title)
   (where :x [:dc "title"] :title
-         (filter-regex :title "web" "i")))
+         (filter- (regex :title "web" "i"))))
 ```
 
 ### 3.2 Restricting Numeric Values
