@@ -147,7 +147,7 @@ See the tests for more examples on query syntax.
 There might be other limitations, especially when dealing with SPARQL expressions. But most, if not all of the limitations can be circumvented by interpolating raw strings into the query with the `raw` function.
 
 ## Todos
-* Syntacic sugar to avoid with quoting (macros)
+* Syntacic sugar (macros)
 * SPARQL update
 * Datetime encoding, java to ^^xsd:dateTime
 * Subqueries

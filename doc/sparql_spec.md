@@ -211,7 +211,7 @@ WHERE   { ?x ns:price ?price .
 (query
   (select :title :price)
     (where :x [:ns "price"] :price \.
-           (filter :price \< 30.5)
+           (filter :price < 30.5)
            :x [:dc "title"] :title \.))
 ```
 
@@ -332,7 +332,7 @@ WHERE   { ?x dc:title ?title .
 (query
   (select :title :price)
   (where :x [:dc "title"] :title \.
-         (optional :x [:ns "price"] :price \. (filter :price \< 30))))
+         (optional :x [:ns "price"] :price \. (filter :price < 30))))
 ```
 
 ### 6.3 Multiple Optional Graph Patterns
@@ -551,7 +551,7 @@ SELECT * WHERE {
   (select \*)
   (where :x [:p] :n
          (filter-not-exists :x [:q] :m \.
-                            (filter :n \= :m))))
+                            (filter :n = :m))))
 ```
 
 ```sparql
@@ -571,7 +571,7 @@ SELECT * WHERE {
   (select \*)
   (where :x [:p] :n
          (minus :x [:q] :m \.
-                (filter :n \= :m))))
+                (filter :n = :m))))
 ```
 
 ## 9 Property Paths
@@ -603,7 +603,7 @@ Not quite possible yet without resorting to `raw`:
                 :x [:ns "discount"] :discount
                 (bind [(raw "?p*(1-?discount)") :price]))
          (group :x [:dc "title"] :title \.)
-         (filter :price \< 20)))
+         (filter :price < 20)))
 ```
 
 ```sparql
@@ -688,7 +688,7 @@ HAVING (SUM(?lprice) > 10)
          :auth [:writesBook] :book \.
          :book [:price] :lprice \.)
   (group-by :org)
-  (having (sum :lprice) \> 10))
+  (having (sum :lprice) > 10))
 ```
 
 ### 11.2 GROUP BY
@@ -728,7 +728,7 @@ HAVING(AVG(?size) > 10)
   (select [(avg :size) :asize])
   (where :x [:size] :size)
   (group-by :x)
-  (having (avg :size) \> 10))
+  (having (avg :size) > 10))
 ```
 
 ### 11.4 Aggregate Projection Restrictions
@@ -1224,7 +1224,7 @@ CONSTRUCT { ?s ?p ?o } WHERE
     (graph :g (group :s :p :o) \.)
     :g [:dc "publisher"] (URI. "http://www.w3.org/") \.
     :g [:dc "date"] :date \.
-    (filter [:app "customDate(?date)"] \> (raw "\"2005-02-28T00:00:00Z\"^^xsd:dateTime")) \.))
+    (filter [:app "customDate(?date)"] > (raw "\"2005-02-28T00:00:00Z\"^^xsd:dateTime")) \.))
 ```
 
 ```sparql
@@ -1372,7 +1372,7 @@ WHERE { ?annot  a:annotates  <http://www.w3.org/TR/rdf-sparql-query/> .
   (select :annot)
   (where :annot [:a "annotates"] (URI. "http://www.w3.org/TR/rdf-sparql-query/") \.
          :annot [:dc "date"] :date \.
-         (filter :date \> (raw "\"2005-01-01T00:00:00Z\"^^xsd:dateTime"))))
+         (filter :date > (raw "\"2005-01-01T00:00:00Z\"^^xsd:dateTime"))))
 ```
 
 ### 17.4 Function Definitions
@@ -1429,7 +1429,7 @@ Not pretty but, possible: (might get rid of the quoting with more macro trixtery
          \; [:foaf "mbox"] :mbox1 \.
          :y [:foaf "name"] :name2
          \; [:foaf "mbox"] :mbox2 \.
-         (filter :mbox1 \= :mbox2 '&& :name1 '!= :name2)))
+         (filter :mbox1 = :mbox2 '&& :name1 '!= :name2)))
 ```
 
 ```sparql
@@ -1583,7 +1583,7 @@ SELECT ?name ?mbox
   (select :name :mbox)
   (where :x [:foaf "name"] :name
           \; [:foaf "mbox"] :mbox \.
-          (filter (lang :name) \= "es")))
+          (filter (lang :name) = "es")))
 ```
 
 ```sparql
@@ -1600,7 +1600,7 @@ SELECT ?name ?shoeSize
   (select :name :shoeSize)
   (where :x [:foaf "name"] :name
          \; [:eg "shoeSize"] :shoeSize \.
-         (filter (datatype :shoeSize) \= [:xsd "integer"])))
+         (filter (datatype :shoeSize) = [:xsd "integer"])))
 ```
 
 

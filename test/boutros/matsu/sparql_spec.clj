@@ -130,7 +130,7 @@
         (query
           (select :title :price)
           (where :x [:ns "price"] :price \.
-                 (filter :price \< 30.5)
+                 (filter :price < 30.5)
                  :x [:dc "title"] :title \.))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ?price WHERE { ?x ns:price ?price . FILTER(?price < 30.5) ?x dc:title ?title . }")))
@@ -187,7 +187,7 @@
         (query
           (select :title :price)
           (where :x [:dc "title"] :title \.
-                 (optional :x [:ns "price"] :price \. (filter :price \< 30))))
+                 (optional :x [:ns "price"] :price \. (filter :price < 30))))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ?price WHERE { ?x dc:title ?title . OPTIONAL { ?x ns:price ?price . FILTER(?price < 30) } }" ))
 
@@ -292,7 +292,7 @@
           (select \*)
           (where :x [:p] :n
                  (filter-not-exists :x [:q] :m \.
-                                    (filter :n \= :m))))
+                                    (filter :n = :m))))
 
         "BASE <http://example.com/> SELECT * WHERE { ?x <p> ?n FILTER NOT EXISTS { ?x <q> ?m . FILTER(?n = ?m) } }"))
 
@@ -302,7 +302,7 @@
           (select \*)
           (where :x [:p] :n
                  (minus :x [:q] :m \.
-                        (filter :n \= :m))))
+                        (filter :n = :m))))
 
         "BASE <http://example.com/> SELECT * WHERE { ?x <p> ?n MINUS { ?x <q> ?m . FILTER(?n = ?m) } }")))
 
@@ -316,7 +316,7 @@
                         :x [:ns "discount"] :discount
                         (bind [(raw "?p*(1-?discount)") :price]))
                  (group :x [:dc "title"] :title \.)
-                 (filter :price \< 20)))
+                 (filter :price < 20)))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ?price WHERE { { ?x ns:price ?p . ?x ns:discount ?discount BIND(?p*(1-?discount) AS ?price) } { ?x dc:title ?title . } FILTER(?price < 20) }")))
 
@@ -331,7 +331,7 @@
                  :auth [:writesBook] :book \.
                  :book [:price] :lprice \.)
           (group-by :org)
-          (having (sum :lprice) \> 10))
+          (having (sum :lprice) > 10))
 
         "BASE <http://books.example/> SELECT (SUM(?lprice) AS ?totalPrice) WHERE { ?org <affiliates> ?auth . ?auth <writesBook> ?book . ?book <price> ?lprice . } GROUP BY ?org HAVING(SUM(?lprice) > 10)"))
 
@@ -350,7 +350,7 @@
           (select [(avg :size) :asize])
           (where :x [:size] :size)
           (group-by :x)
-          (having (avg :size) \> 10))
+          (having (avg :size) > 10))
 
         "BASE <http://data.example/> SELECT (AVG(?size) AS ?asize) WHERE { ?x <size> ?size } GROUP BY ?x HAVING(AVG(?size) > 10)"))
 
@@ -584,7 +584,7 @@
             (graph :g (group :s :p :o) \.)
             :g [:dc "publisher"] (URI. "http://www.w3.org/") \.
             :g [:dc "date"] :date \.
-            (filter [:app "customDate(?date)"] \> (raw "\"2005-02-28T00:00:00Z\"^^xsd:dateTime")) \.))
+            (filter [:app "customDate(?date)"] > (raw "\"2005-02-28T00:00:00Z\"^^xsd:dateTime")) \.))
 
         "PREFIX app: <http://example.org/ns#> PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> CONSTRUCT { ?s ?p ?o } WHERE { GRAPH ?g { ?s ?p ?o } . ?g dc:publisher <http://www.w3.org/> . ?g dc:date ?date . FILTER(app:customDate(?date) > \"2005-02-28T00:00:00Z\"^^xsd:dateTime) . }"))
 
@@ -660,7 +660,7 @@
           (select :annot)
           (where :annot [:a "annotates"] (URI. "http://www.w3.org/TR/rdf-sparql-query/") \.
                  :annot [:dc "date"] :date \.
-                 (filter :date \> (raw "\"2005-01-01T00:00:00Z\"^^xsd:dateTime"))))
+                 (filter :date > (raw "\"2005-01-01T00:00:00Z\"^^xsd:dateTime"))))
 
         "PREFIX a: <http://www.w3.org/2000/10/annotation-ns#> PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> SELECT ?annot WHERE { ?annot a:annotates <http://www.w3.org/TR/rdf-sparql-query/> . ?annot dc:date ?date . FILTER(?date > \"2005-01-01T00:00:00Z\"^^xsd:dateTime) }"))
 
@@ -689,7 +689,7 @@
                  \; [:foaf "mbox"] :mbox1 \.
                  :y [:foaf "name"] :name2
                  \; [:foaf "mbox"] :mbox2 \.
-                 (filter :mbox1 \= :mbox2 '&& :name1 '!= :name2)))
+                 (filter :mbox1 = :mbox2 '&& :name1 '!= :name2)))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name1 ?name2 WHERE { ?x foaf:name ?name1 ; foaf:mbox ?mbox1 . ?y foaf:name ?name2 ; foaf:mbox ?mbox2 . FILTER(?mbox1 = ?mbox2 && ?name1 != ?name2) }"))
 
@@ -762,7 +762,7 @@
           (select :name :mbox)
           (where :x [:foaf "name"] :name
                   \; [:foaf "mbox"] :mbox \.
-                  (filter (lang :name) \= "es")))
+                  (filter (lang :name) = "es")))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE { ?x foaf:name ?name ; foaf:mbox ?mbox . FILTER(lang(?name) = \"es\") }"))
 
@@ -771,7 +771,7 @@
           (select :name :shoeSize)
           (where :x [:foaf "name"] :name
                  \; [:eg "shoeSize"] :shoeSize \.
-                 (filter (datatype :shoeSize) \= [:xsd "integer"])))
+                 (filter (datatype :shoeSize) = [:xsd "integer"])))
 
         "PREFIX eg: <http://biometrics.example/ns#> PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> SELECT ?name ?shoeSize WHERE { ?x foaf:name ?name ; eg:shoeSize ?shoeSize . FILTER(datatype(?shoeSize) = xsd:integer) }"))
 

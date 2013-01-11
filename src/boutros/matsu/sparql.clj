@@ -1,10 +1,11 @@
 (ns boutros.matsu.sparql
   (:refer-clojure :exclude [filter concat group-by max min count])
-  (:require [clojure.string :as string])
+  (:require [clojure.string :as string]
+            [clojure.walk :refer [postwalk-replace]])
   (:import (java.net URI)))
 
 ; -----------------------------------------------------------------------------
-; Datastructures
+; Datastructures and vars
 ; -----------------------------------------------------------------------------
 
 (defn empty-query []
@@ -29,6 +30,10 @@
    :limit nil})
 
 (def prefixes (atom {}))
+
+(def replacement-map
+  "Used to replace symbols with characters inside expressions"
+  {= \= > \> < \<})
 
 ; -----------------------------------------------------------------------------
 ; Namespace functions
@@ -253,14 +258,16 @@
 ;; Negation
 
 (defn filter [& more]
-  {:tag "FILTER" :content (vec more) :bounds ["(" ")"] :sep " "})
+  {:tag "FILTER" :content (postwalk-replace replacement-map (vec more))
+   :bounds ["(" ")"] :sep " "})
 
 (defn filter-
   "Function to be used when FILTER followed by another SPARQL function.
 
   ex: (filter- (is-iri :p))"
   [& more]
-  {:tag "FILTER" :content (vec more) :bounds [" " ""] :sep " "})
+  {:tag "FILTER" :content (postwalk-replace replacement-map (vec more))
+                                            :bounds [" " ""] :sep " "})
 
 (defn filter-not-exists [& more]
   {:tag "FILTER NOT EXISTS " :content (vec more) :bounds ["{ " " }"] :sep " "})
@@ -309,7 +316,7 @@
 
 (defn having [q & expr]
   (assoc q :having {:tag "HAVING" :bounds ["(" ")"] :sep " "
-                    :content (vec expr)}))
+                    :content (postwalk-replace replacement-map (vec expr))}))
 
 (defn sum [v] {:tag "SUM" :bounds ["(" ")"] :sep " " :content [v]})
 
