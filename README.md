@@ -4,7 +4,7 @@ A Clojure SPARQL query constructor
 
 ## Status
 
-Everything is ALPHA and subject to change. Do not use yet!
+Everything is ALPHA and subject to change. That said, I'm begining to become reasonably satisfied with the DSL syntax as it is now. What bugs me is that dots and semicolns have to be written as characters or quoted.
 
 ## Installation
 
@@ -35,7 +35,7 @@ WHERE
 
 Althught without newlines or indentation. A pretty-printer might be added in the future.
 
-The prefixes are automatically infered provided that they exists in the global `PREFIXES` map. An exception will be thrown if the prefix cannot be resolved.
+The prefixes are automatically infered provided that they exists in the global `prefixes` map. An exception will be thrown if the prefix cannot be resolved.
 
 You can also supply query-local prefixes which will override the global `prefixes`:
 
@@ -99,7 +99,18 @@ WHERE
 
 You can bind queries to vars with `defquery` and use them as basis for other queries:
 
-    EXAMPLE
+```clojure
+(defquery q1
+  (select *)
+  (where :s :p :o))
+
+(query q1
+   (limit 5))
+```
+
+```sparql
+SELECT * WHERE { ?s ?p ?o } LIMIT 5
+```
 
 While the aim of matsu is to cover the full SPARQL 1.1 specification, there will no doubt be cases where it falls short. In such cases you can always insert a raw string into your query with `raw`:
 
@@ -130,10 +141,6 @@ WHERE {
       }
 ```
 
-Remember that quotation marks must be escaped. Characters as well as quoted symbols will also render unchanged:
-
-    EXAMPLE
-
 See the tests for more examples on query syntax.
 
 + SPARQL 1.1 spec translation in [/doc/sparql_spec.md](https://github.com/boutros/matsu/blob/master/doc/sparql_spec.md)
@@ -156,19 +163,9 @@ There might be other limitations, especially when dealing with SPARQL expression
 * Federated queries (SERVICE)
 * CONSTRUCT short form (CONSTRUCT WHERE { ... })
 
-## Interals
-
-The query is represented by a map
-
-dsl functions, takes a map and returns a map
-
-compiler-functions - compiles into []
--> into string
-
-
 ## Contribute
 
-By all means!
+By all means! I'm open for discussing any ideas you might have.
 
 ## License
 
