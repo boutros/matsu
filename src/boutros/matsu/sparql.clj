@@ -358,7 +358,7 @@
 
 
 ;; Functions on RDF terms
-;;  isLiteral, isNumeric, str, lang, datatype, IRI, BNODE, STRDT
+;;  lang, datatype, IRI, BNODE, STRDT
 ;; STRLANG, UUID, STRUUID
 (defn same-term [& more]
   {:tag "sameTerm" :content (vec more) :bounds ["(" ")"] :sep ", "})
@@ -371,6 +371,19 @@
 
 (defn is-blank [term]
   {:tag "isBlank" :content [term] :bounds ["(" ")"] :sep ""})
+
+(defn is-literal [term]
+  {:tag "isLiteral" :content [term] :bounds ["(" ")"] :sep ""})
+
+(defn is-numeric [term]
+  {:tag "isNumeric" :content [term] :bounds ["(" ")"] :sep ""})
+
+(defn is-literal [term]
+  {:tag "isLiteral" :content [term] :bounds ["(" ")"] :sep ""})
+
+;; clojure.core/str is to usefull
+(defn str2 [term]
+  {:tag "str" :content [term] :bounds ["(" ")"] :sep ""})
 
 ;; Functions on Numerics
 
