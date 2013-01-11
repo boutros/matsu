@@ -15,7 +15,8 @@ The following namespaces are assumed to be registered:
     :xsd     "<http://www.w3.org/2001/XMLSchema#>"
     :ent     "<http://org.example.com/employees#>"
     :a       "<http://www.w3.org/2000/10/annotation-ns#>"
-    :t       "<http://example.org/types#>"}
+    :t       "<http://example.org/types#>"
+    :eg      "<http://biometrics.example/ns#>"}
 ```
 
 ## 2 Making Simple Queries (Informative)
@@ -1577,7 +1578,11 @@ SELECT ?name ?mbox
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :name :mbox)
+  (where :x [:foaf "name"] :name
+          \; [:foaf "mbox"] :mbox \.
+          (filter (lang :name) \= "es")))
 ```
 
 ```sparql
@@ -1590,7 +1595,11 @@ SELECT ?name ?shoeSize
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :name :shoeSize)
+  (where :x [:foaf "name"] :name
+         \; [:eg "shoeSize"] :shoeSize \.
+         (filter (datatype :shoeSize) \= [:xsd "integer"])))
 ```
 
 

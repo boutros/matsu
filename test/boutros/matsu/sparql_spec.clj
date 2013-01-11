@@ -23,7 +23,8 @@
                       :site    "<http://example.org/stats#>"
                       :ent     "<http://org.example.com/employees#>"
                       :a       "<http://www.w3.org/2000/10/annotation-ns#>"
-                      :t       "<http://example.org/types#>"})
+                      :t       "<http://example.org/types#>"
+                      :eg      "<http://biometrics.example/ns#>"})
 
 ; Tests
 
@@ -764,4 +765,13 @@
                   (filter (lang :name) \= "es")))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE { ?x foaf:name ?name ; foaf:mbox ?mbox . FILTER(lang(?name) = \"es\") }"))
+
+  (is (=
+        (query
+          (select :name :shoeSize)
+          (where :x [:foaf "name"] :name
+                 \; [:eg "shoeSize"] :shoeSize \.
+                 (filter (datatype :shoeSize) \= [:xsd "integer"])))
+
+        "PREFIX eg: <http://biometrics.example/ns#> PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> SELECT ?name ?shoeSize WHERE { ?x foaf:name ?name ; eg:shoeSize ?shoeSize . FILTER(datatype(?shoeSize) = xsd:integer) }"))
   )

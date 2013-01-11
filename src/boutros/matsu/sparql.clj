@@ -384,8 +384,12 @@
 (defn str2 [term]
   {:tag "str" :content [term] :bounds ["(" ")"] :sep ""})
 
-(defn lang [x]
-  {:tag "lang" :content [x] :bounds ["(" ")"] :sep ""})
+(defn lang [literal]
+  {:tag "lang" :content [literal] :bounds ["(" ")"] :sep ""})
+
+(defn datatype [literal]
+  {:tag "datatype" :content [literal] :bounds ["(" ")"] :sep ""})
+
 
 ;; TODO: datatype, IRI, BNODE, STRDT, STRLANG, UUID, STRUUID
 
