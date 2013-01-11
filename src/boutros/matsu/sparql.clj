@@ -11,9 +11,9 @@
 (defn empty-query []
   "Query-map constructor
 
-  Each key is populated with the following map:
+  Each key (except :local-prefixes) is populated with the following map:
 
-    {:tag nil :content [] :bounds ["" ""] :sep " "}
+    {:tag nil :content [:x :y] :bounds ["(" ")"] :sep ", "}
 
   The :content field can contain other such maps, so the datastructure
   can be arbiritarily deeply nested."
@@ -35,7 +35,7 @@
   "Used to replace symbols with characters inside expressions"
   {= \= > \> < \< * \*})
 
-; short for rdf:type
+;; a is much used abberviation for rdf:type
 (def a \a)
 
 ; -----------------------------------------------------------------------------
@@ -131,8 +131,7 @@
 ; -----------------------------------------------------------------------------
 ; Compiler functions
 ; -----------------------------------------------------------------------------
-; Transforms the various query parts into a vectors of strings, or nil if the
-; particular function is not used in the query
+; Transforms the various query parts into a vectors of strings
 
 (defn- compiler [q part]
   (when-let [m (part q)]
@@ -195,9 +194,6 @@
 
 (defn raw [string]
   {:tag "" :sep "" :bounds "" :content string })
-
-(defn with-prefixes [q m]
-  (assoc q :local-prefixes m))
 
 
 ;; Namespaces-related
