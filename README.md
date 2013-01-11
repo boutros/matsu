@@ -17,7 +17,7 @@ Matsu is a DSL for constructing SPARQL queries:
 ```clojure
 (query
   (select :person)
-  (where :person \a [:foaf "Person"]
+  (where :person a [:foaf "Person"]
          \; [:foaf "mbox"] (URI. "mailto:me@me.com") \.))
 ```
 
@@ -62,7 +62,7 @@ Matsu makes it possible to create complex, nested queries:
                   \; [:foaf "knows"] :whom \.
                   :whom [:foaf "mbox"] :mbox
                   \; [:rdfs "seeAlso"] :ppd \.
-                  :ppd \a [:foaf "PersonalProfileDocument"] \.)
+                  :ppd a [:foaf "PersonalProfileDocument"] \.)
            \.)
     (graph :ppd
            (group :w [:foaf "mbox"] :mbox

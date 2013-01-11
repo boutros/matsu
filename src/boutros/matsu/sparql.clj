@@ -35,6 +35,9 @@
   "Used to replace symbols with characters inside expressions"
   {= \= > \> < \< * \*})
 
+; short for rdf:type
+(def a \a)
+
 ; -----------------------------------------------------------------------------
 ; Namespace functions
 ; -----------------------------------------------------------------------------

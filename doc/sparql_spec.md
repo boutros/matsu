@@ -924,7 +924,7 @@ WHERE
                   \; [:foaf "knows"] :whom \.
                   :whom [:foaf "mbox"] :mbox
                   \; [:rdfs "seeAlso"] :ppd \.
-                  :ppd \a [:foaf "PersonalProfileDocument"] \.)
+                  :ppd a [:foaf "PersonalProfileDocument"] \.)
            \.)
     (graph :ppd
            (group :w [:foaf "mbox"] :mbox
