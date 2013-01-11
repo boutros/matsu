@@ -774,4 +774,30 @@
                  (filter (datatype :shoeSize) \= [:xsd "integer"])))
 
         "PREFIX eg: <http://biometrics.example/ns#> PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> SELECT ?name ?shoeSize WHERE { ?x foaf:name ?name ; eg:shoeSize ?shoeSize . FILTER(datatype(?shoeSize) = xsd:integer) }"))
-  )
+
+  (is (=
+      (query
+        (select :title)
+        (where :x [:dc "title"] ["That Seventies Show" :en]
+               \; [:dc "title"] :title \.
+               (filter- (lang-matches (lang :title) "FR"))))
+
+      "PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { ?x dc:title \"That Seventies Show\"@en ; dc:title ?title . FILTER langMatches(lang(?title), \"FR\") }"))
+
+  (is (=
+        (query
+          (select :title)
+          (where :x [:dc "title"] :title \.
+                 (filter- (lang-matches (lang :title) "*"))))
+
+        "PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { ?x dc:title ?title . FILTER langMatches(lang(?title), \"*\") }"))
+
+  (is (=
+        (query
+          (select :name)
+          (where :x [:foaf "name"] :name
+                 (filter- (regex :name "^ali" "i"))))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name FILTER regex(?name, \"^ali\", \"i\") }"))
+
+    )

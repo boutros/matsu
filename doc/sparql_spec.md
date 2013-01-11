@@ -1612,7 +1612,11 @@ SELECT ?title
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :title)
+  (where :x [:dc "title"] ["That Seventies Show" :en]
+         \; [:dc "title"] :title \.
+         (filter- (lang-matches (lang :title) "FR"))))
 ```
 
 ```sparql
@@ -1623,7 +1627,10 @@ SELECT ?title
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :title)
+  (where :x [:dc "title"] :title \.
+         (filter- (lang-matches (lang :title) "*"))))
 ```
 
 ```sparql
@@ -1634,7 +1641,10 @@ SELECT ?name
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :name)
+  (where :x [:foaf "name"] :name
+         (filter- (regex :name "^ali" "i"))))
 ```
 
 ### 17.6 Extensible Value Testing
