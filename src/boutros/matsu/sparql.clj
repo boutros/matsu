@@ -350,16 +350,15 @@
     {:tag "regex" :bounds ["(" ")"] :sep ", " :content [v regex (first flags)]}
     {:tag "regex" :bounds ["(" ")"] :sep ", " :content [v regex]}))
 
-;(defn lang-matches [& more]
-;  {:tag "langMatches" :content (vec more) :bounds ["(" ")"] :sep ", "})
+(defn lang-matches [& more]
+  {:tag "langMatches" :content (vec more) :bounds ["(" ")"] :sep ", "})
 
 ;;STRLEN, SUBSTR, UCASE, LCASE, STRSTARS, STRENDS, CONTAINS, STRBEFORE, STRAFTER, ENCODE_FOR_URI
 ;;langMatches, REGEX, REPLACE
 
 
 ;; Functions on RDF terms
-;;  lang, datatype, IRI, BNODE, STRDT
-;; STRLANG, UUID, STRUUID
+
 (defn same-term [& more]
   {:tag "sameTerm" :content (vec more) :bounds ["(" ")"] :sep ", "})
 
@@ -381,9 +380,14 @@
 (defn is-literal [term]
   {:tag "isLiteral" :content [term] :bounds ["(" ")"] :sep ""})
 
-;; clojure.core/str is to usefull
+;; clojure.core/str is to usefull to do without
 (defn str2 [term]
   {:tag "str" :content [term] :bounds ["(" ")"] :sep ""})
+
+(defn lang [x]
+  {:tag "lang" :content [x] :bounds ["(" ")"] :sep ""})
+
+;; TODO: datatype, IRI, BNODE, STRDT, STRLANG, UUID, STRUUID
 
 ;; Functions on Numerics
 

@@ -755,4 +755,13 @@
                  (filter- (regex (str2 :mbox) "@work\\.example$"))))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE { ?x foaf:name ?name ; foaf:mbox ?mbox . FILTER regex(str(?mbox), \"@work\\.example$\") }"))
-)
+
+  (is (=
+        (query
+          (select :name :mbox)
+          (where :x [:foaf "name"] :name
+                  \; [:foaf "mbox"] :mbox \.
+                  (filter (lang :name) \= "es")))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE { ?x foaf:name ?name ; foaf:mbox ?mbox . FILTER(lang(?name) = \"es\") }"))
+  )
