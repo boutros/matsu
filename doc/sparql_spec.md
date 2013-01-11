@@ -1505,7 +1505,11 @@ SELECT ?name ?mbox
 ```
 
 ```clojure
-(query ...)
+(query
+  (select :name :mbox)
+  (where :x [:foaf "name"] :name
+         \; [:foaf "mbox"] :mbox \.
+         (filter- (is-iri :mbox))))
 ```
 
 ```sparql

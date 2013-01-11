@@ -717,4 +717,14 @@
                          (!same-term :aDisp :bDisp))))
 
         "BASE <http://example.org/WMterms#> SELECT ?aLabel1 ?bLabel WHERE { ?a <label> ?aLabel . ?a <weight> ?aWeight . ?a <displacement> ?aDisp . ?b <label> ?bLabel . ?b <weight> ?bWeight . ?b <displacement> ?bDisp . FILTER(sameTerm(?aWeight, ?bWeight) && !sameTerm(?aDisp, ?bDisp)) }"))
-    )
+
+  (is (=
+        (query
+          (select :name :mbox)
+          (where :x [:foaf "name"] :name
+                 \; [:foaf "mbox"] :mbox \.
+                 (filter- (is-iri :mbox))))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE { ?x foaf:name ?name ; foaf:mbox ?mbox . FILTER isIRI(?mbox) }"))
+
+  )
