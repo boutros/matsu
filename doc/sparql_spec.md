@@ -16,7 +16,8 @@ The following namespaces are assumed to be registered:
     :ent     "<http://org.example.com/employees#>"
     :a       "<http://www.w3.org/2000/10/annotation-ns#>"
     :t       "<http://example.org/types#>"
-    :eg      "<http://biometrics.example/ns#>"}
+    :eg      "<http://biometrics.example/ns#>"
+    :rdf     "<http://www.w3.org/1999/02/22-rdf-syntax-ns#>"}
 ```
 
 ## 2 Making Simple Queries (Informative)
@@ -1659,7 +1660,7 @@ WHERE { ?x foaf:name  ?name ;
 ```
 
 ```clojure
-(query ...)
+(query ...) ; TBD
 ```
 
 ```sparql
@@ -1679,7 +1680,7 @@ WHERE { ?a aGeo:placeName "Grenoble" .
 ```
 
 ```clojure
-(query ...)
+(query ...) ; TBD
 ```
 
 ## 18 Definition of SPARQL
@@ -1693,7 +1694,10 @@ WHERE {
 ```
 
 ```clojure
-(query ...)
+(query
+  (select [(sum :val) :sum] [(count :a) :count])
+  (where :a [:rdf "value"] :val \.)
+  (group-by :a))
 ```
 
 ## Thats all, folks!
