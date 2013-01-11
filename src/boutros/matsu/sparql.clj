@@ -358,7 +358,7 @@
 
 
 ;; Functions on RDF terms
-;; isIRI, isBlank, isLiteral, isNumeric, str, lang, datatype, IRI, BNODE, STRDT
+;;  isLiteral, isNumeric, str, lang, datatype, IRI, BNODE, STRDT
 ;; STRLANG, UUID, STRUUID
 (defn same-term [& more]
   {:tag "sameTerm" :content (vec more) :bounds ["(" ")"] :sep ", "})
@@ -368,6 +368,9 @@
 
 (defn is-iri [term]
   {:tag "isIRI" :content [term] :bounds ["(" ")"] :sep ""})
+
+(defn is-blank [term]
+  {:tag "isBlank" :content [term] :bounds ["(" ")"] :sep ""})
 
 ;; Functions on Numerics
 
