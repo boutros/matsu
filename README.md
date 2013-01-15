@@ -97,6 +97,7 @@ WHERE
 }
 ```
 
+### Working with saved queries
 You can bind queries to vars with `defquery` and use them as basis for other queries:
 
 ```clojure
@@ -112,6 +113,7 @@ You can bind queries to vars with `defquery` and use them as basis for other que
 SELECT * WHERE { ?s ?p ?o } LIMIT 5
 ```
 
+### Interpolating raw strings in the query
 While the aim of matsu is to cover the full SPARQL 1.1 specification, there will no doubt be cases where it falls short. In such cases you can always insert a raw string into your query with `raw`:
 
 ```clojure
@@ -141,11 +143,11 @@ WHERE {
       }
 ```
 
-See the tests for more examples on query syntax.
+### More examples
 
-+ SPARQL 1.1 spec translation in [/doc/sparql_spec.md](https://github.com/boutros/matsu/blob/master/doc/sparql_spec.md)
++ See [/doc/example.clj](https://github.com/boutros/matsu/blob/master/doc/example.clj) for an example REPL session using matsu to query the DBpedia SPARQL endpoint.
 
-+ See doc/example.clj for a omplete working example querying the remote dbedia SPARQL endpoint
++ An attempt to translate all the example queries from the WC3 SPARQL 1.1. specification: [/doc/sparql_spec.md](https://github.com/boutros/matsu/blob/master/doc/sparql_spec.md)
 
 ## Limitations
 * Single colon keyword prefix is not possible, use the equivalent `BASE`-form instead
