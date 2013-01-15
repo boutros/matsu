@@ -162,14 +162,15 @@ WHERE {
 There might be other limitations, especially when dealing with SPARQL expressions. But most, if not all of the limitations can be circumvented by interpolating raw strings into the query with the `raw` function.
 
 ## Todos
-* Syntacic sugar (macros)
 * SPARQL update
-* Datetime encoding, java to ^^xsd:dateTime
+* Datetime encoding, java Date. to ^^xsd:dateTime
+* Typed literal syntax (maybe fn encode-typed?)
 * Subqueries
 * Property path syntax
 * Specifying variables with `VALUES` in data block
 * Federated queries (SERVICE)
 * CONSTRUCT short form (CONSTRUCT WHERE { ... })
+* Syntacic sugar (macros)
 
 ## Contribute
 
