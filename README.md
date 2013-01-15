@@ -7,8 +7,8 @@ A Clojure SPARQL query constructor
 Everything is ALPHA and subject to change. That said, I'm begining to become reasonably satisfied with the DSL syntax as it is now.
 
 ## Installation
-
-Soon available on clojars.
+There's a snapshot version on clojars. Add the following to your project.clj:
+    [matsu "0.1.0-SNAPSHOT"]
 
 ## Usage
 
