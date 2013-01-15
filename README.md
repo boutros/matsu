@@ -53,7 +53,7 @@ You can also supply query-local prefixes which will override the global `prefixe
 ```
 ```sparql
 PREFIX foaf: <mylocalfoaf>
-SELECT ?person WHERE { ?s foaf:name "Petter" }
+SELECT ?person WHERE { ?person foaf:name "Petter" }
 ```
 
 Matsu makes it possible to create complex, nested queries:
