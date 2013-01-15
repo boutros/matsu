@@ -4,7 +4,7 @@ A Clojure SPARQL query constructor
 
 ## Status
 
-Everything is ALPHA and subject to change. That said, I'm begining to become reasonably satisfied with the DSL syntax as it is now. What bugs me is that dots and semicolns have to be written as characters or quoted.
+Everything is ALPHA and subject to change. That said, I'm begining to become reasonably satisfied with the DSL syntax as it is now.
 
 ## Installation
 
@@ -35,7 +35,13 @@ WHERE
 
 Althught without newlines or indentation. A pretty-printer might be added in the future.
 
-The prefixes are automatically infered provided that they exists in the global `prefixes` map. An exception will be thrown if the prefix cannot be resolved.
+As you can see, dots and semicolons must be supplied as chars (or quoted). I haven't found a way around this. Maybe add an alternate syntax with the letters `d` for dots and `c` for semicolons?
+
+The prefixes are automatically infered provided that they exists in the global `prefixes` map. An exception will be thrown if the prefix cannot be resolved. You add prefixes using `register-namespaces`:
+```clojure
+(register-namespaces {:foaf    "<http://xmlns.com/foaf/0.1/>"
+                      :rdfs    "<http://www.w3.org/2000/01/rdf-schema#>"})
+```
 
 You can also supply query-local prefixes which will override the global `prefixes`:
 
@@ -58,15 +64,15 @@ Matsu makes it possible to create complex, nested queries:
               (URI. "http://example.org/foaf/bobFoaf"))
   (where
     (graph [:data "aliceFoaf"]
-           (group :alice [:foaf "mbox"] (URI. "mailto:alice@work.example")
-                  \; [:foaf "knows"] :whom \.
-                  :whom [:foaf "mbox"] :mbox
-                  \; [:rdfs "seeAlso"] :ppd \.
+           (group :alice [:foaf "mbox"] (URI. "mailto:alice@work.example") \;
+                         [:foaf "knows"] :whom \.
+                  :whom [:foaf "mbox"] :mbox \;
+                        [:rdfs "seeAlso"] :ppd \.
                   :ppd a [:foaf "PersonalProfileDocument"] \.)
            \.)
     (graph :ppd
-           (group :w [:foaf "mbox"] :mbox
-                  \; [:foaf "nick"] :nick))))
+           (group :w [:foaf "mbox"] :mbox \;
+                     [:foaf "nick"] :nick))))
 ```
 
 Yielding the following SPARQL string:
@@ -143,7 +149,7 @@ WHERE {
       }
 ```
 
-### More examples
+## More examples
 
 + See [/doc/example.clj](https://github.com/boutros/matsu/blob/master/doc/example.clj) for an example REPL session using matsu to query the DBpedia SPARQL endpoint.
 
