@@ -17,15 +17,14 @@
 
 
 ;; Convenience function to parse xml strings
-
 (defn zip-str [s]
   (zip/xml-zip (xml/parse (java.io.ByteArrayInputStream. (.getBytes s)))))
 
 
-;; DBpedia sparql endpoint and some common prefixes
-
+;; DBpedia sparql endpoint
 (def dbpedia "http://dbpedia.org/sparql")
 
+;; some common prefixes
 (register-namespaces {:prop "<http://dbpedia.org/property/>"
                       :dbpedia "<http://dbpedia.org/resource/>"
                       :foaf    "<http://xmlns.com/foaf/0.1/>"
@@ -38,6 +37,7 @@
        [:dbpedia "Nile"] [:prop "length"] :nile \.
        (filter :amazon > :nile)))
 
+;; send HTTP request
 (def req
   (client/get dbpedia
               {:query-params {"query" (query amazon-vs-nile)}}))
@@ -47,7 +47,6 @@
 
 
 ;; When was Jimi Hendrix born?
-
 (defquery hendrix
   (select-distinct :bday)
   (where [:dbpedia "Jimi_Hendrix"] [:prop "dateOfBirth"] :bday))
@@ -61,8 +60,8 @@
 ;=> "1942-11-27"
 
 ;; Don't like to parse XML? You can also ask for JSON if you prefer
-;; Let's find Elvis' birthday this time
 
+;; Let's find Elvis' birthday this time
 (defquery elvis
   (select :bday)
   (where [:dbpedia "Elvis_Presley"] [:prop "dateOfBirth"] :bday))
@@ -81,7 +80,6 @@
 
 ;; Find movies starring actors born in Tokyo,
 ;; limit to 10, ordered by longest running time:
-
 (defquery movies
   (select-distinct :title)
   (where :p [:prop "birthPlace"] [:dbpedia "Tokyo"] \.
@@ -114,7 +112,6 @@
 (def linkedmdb "http://linkedmdb.org/sparql")
 
 ;; Find actors who acted in both movies directed by Kubrick and by Spielberg
-
 (defquery actors
   (base (URI. "http://data.linkedmdb.org/resource/movie/"))
   (select-distinct :actorname)
@@ -135,6 +132,5 @@
 
 (for [actor (->> answer keywordize-keys :results :bindings)]
   (->> actor :actorname :value))
-
 ; => ("Wolf Kahler" "Slim Pickens" "Tom Cruise" "Arliss Howard"
 ;      "Slim Pickens" "Ben Johnson" "Scatman Crothers" "Philip Stone")
