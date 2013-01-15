@@ -66,8 +66,8 @@ Matsu makes it possible to create complex, nested queries:
     (graph [:data "aliceFoaf"]
            (group :alice [:foaf "mbox"] (URI. "mailto:alice@work.example") \;
                          [:foaf "knows"] :whom \.
-                  :whom [:foaf "mbox"] :mbox \;
-                        [:rdfs "seeAlso"] :ppd \.
+                  :whom  [:foaf "mbox"] :mbox \;
+                         [:rdfs "seeAlso"] :ppd \.
                   :ppd a [:foaf "PersonalProfileDocument"] \.)
            \.)
     (graph :ppd
