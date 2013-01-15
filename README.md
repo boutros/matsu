@@ -8,8 +8,9 @@ Everything is ALPHA and subject to change. That said, I'm begining to become rea
 
 ## Installation
 There's a snapshot version on clojars. Add the following to your project.clj:
-    [matsu "0.1.0-SNAPSHOT"]
-
+```
+[matsu "0.1.0-SNAPSHOT"]
+```
 ## Usage
 
 Matsu is a DSL for constructing SPARQL queries:
