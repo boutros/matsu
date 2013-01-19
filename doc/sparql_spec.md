@@ -1429,7 +1429,7 @@ Not pretty but, possible: (might get rid of the quoting with more macro trixtery
          \; [:foaf "mbox"] :mbox1 \.
          :y [:foaf "name"] :name2
          \; [:foaf "mbox"] :mbox2 \.
-         (filter :mbox1 = :mbox2 '&& :name1 '!= :name2)))
+         (filter :mbox1 = :mbox2 && :name1 != :name2)))
 ```
 
 ```sparql
@@ -1466,7 +1466,7 @@ WHERE { ?x foaf:name  ?name1 ;
          \; [:foaf "mbox"] :mbox1 \.
          :y [:foaf "name"] :name2
          \; [:foaf "mbox"] :mbox2 \.
-         (filter (same-term :mbox1, :mbox2) '&& (!same-term :name1 :name2))))
+         (filter (same-term :mbox1, :mbox2) && (!same-term :name1 :name2))))
 ```
 
 ```sparql
@@ -1494,7 +1494,7 @@ TODO find a way to handle `&&`
          :b [:label] :bLabel \.
          :b [:weight] :bWeight \.
          :b [:displacement] :bDisp \.
-         (filter (same-term :aWeight :bWeight) '&&
+         (filter (same-term :aWeight :bWeight) &&
                  (!same-term :aDisp :bDisp))))
 ```
 

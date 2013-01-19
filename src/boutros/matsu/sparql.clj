@@ -11,6 +11,14 @@
 
 (def a \a) ; abberviation for rdf:type
 
+;; vars to avoid quoting in the queries.
+;; TODO: think of other way to solve this
+
+(def && '&&)
+
+(def || '||)
+
+(def != '!=)
 
 ;; ----------------------------------------------------------------------------
 ;; Main macros
@@ -111,6 +119,7 @@
 ;; Negation
 
 (def no-bounds
+  "If filter is followed by one of these functions, don't use parentheses."
   #{"regex" "isIRI" "isLiteral" "isBlank" "langMatches"})
 
 (defn filter [& more]

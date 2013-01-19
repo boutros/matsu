@@ -691,7 +691,7 @@
                  \; [:foaf "mbox"] :mbox1 \.
                  :y [:foaf "name"] :name2
                  \; [:foaf "mbox"] :mbox2 \.
-                 (filter :mbox1 = :mbox2 '&& :name1 '!= :name2)))
+                 (filter :mbox1 = :mbox2 && :name1 != :name2)))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name1 ?name2 WHERE { ?x foaf:name ?name1 ; foaf:mbox ?mbox1 . ?y foaf:name ?name2 ; foaf:mbox ?mbox2 . FILTER(?mbox1 = ?mbox2 && ?name1 != ?name2) }"))
 
@@ -716,7 +716,7 @@
                  :b [:label] :bLabel \.
                  :b [:weight] :bWeight \.
                  :b [:displacement] :bDisp \.
-                 (filter (same-term :aWeight :bWeight) '&&
+                 (filter (same-term :aWeight :bWeight) &&
                          (!same-term :aDisp :bDisp))))
 
         "BASE <http://example.org/WMterms#> SELECT ?aLabel1 ?bLabel WHERE { ?a <label> ?aLabel . ?a <weight> ?aWeight . ?a <displacement> ?aDisp . ?b <label> ?bLabel . ?b <weight> ?bWeight . ?b <displacement> ?bDisp . FILTER(sameTerm(?aWeight, ?bWeight) && !sameTerm(?aDisp, ?bDisp)) }"))
