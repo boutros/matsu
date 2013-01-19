@@ -9,6 +9,7 @@
   (:refer-clojure :exclude [filter concat group-by max min count])
   (:require [clj-http.client :as client]
             [boutros.matsu.sparql :refer :all]
+            [boutros.matus.core :refer [register-namespaces]]
             [clojure.xml :as xml]
             [clojure.zip :as zip :refer [down right left node children]]
             [cheshire.core :refer [parse-string]]

@@ -1,5 +1,6 @@
 (ns boutros.matsu.sparql-spec
   (:refer-clojure :exclude [filter concat group-by max min count])
+  (:require [boutros.matsu.core :refer [register-namespaces]])
   (:use clojure.test
         boutros.matsu.sparql)
   (:import (java.net URI)))
@@ -106,6 +107,7 @@
           (where :x [:org "employeeName"] :name))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX org: <http://example.com/ns#> CONSTRUCT { ?x foaf:name ?name } WHERE { ?x org:employeeName ?name }")))
+
 
 (deftest part-3
   "3 RDF Term Constraints (Informative)"

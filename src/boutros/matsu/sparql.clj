@@ -1,62 +1,20 @@
 (ns boutros.matsu.sparql
+  "Matsu SPARQL query DSL functions"
   (:refer-clojure :exclude [filter concat group-by max min count])
-  (:require [clojure.string :as string]
-            [clojure.walk :refer [postwalk-replace]])
-  (:import (java.net URI)))
+  (:require [boutros.matsu.compiler :refer [compile-query]]
+            [boutros.matsu.core :refer [empty-query]]))
 
-; -----------------------------------------------------------------------------
-; Datastructures and vars
-; -----------------------------------------------------------------------------
 
-(defn empty-query []
-  "Query-map constructor
+;; ----------------------------------------------------------------------------
+;; Shortcuts
+;; ----------------------------------------------------------------------------
 
-  Each key (except :local-prefixes) is populated with the following map:
+(def a \a) ; abberviation for rdf:type
 
-    {:tag nil :content [:x :y] :bounds ["" ""] :sep " "}
 
-  The :content field can contain other such maps, so the datastructure
-  can be arbiritarily deeply nested."
-  {:local-prefixes {}
-   :base nil
-   :from nil
-   :from-named nil
-   :query-form  nil
-   :where nil
-   :order-by nil
-   :group-by nil
-   :having nil
-   :offset nil
-   :limit nil})
-
-(def prefixes (atom {}))
-
-(def replacement-map
-  "Used to replace symbols with characters inside expressions"
-  {= \= > \> < \< * \*})
-
-;; a is much used abberviation for rdf:type
-(def a \a)
-
-; -----------------------------------------------------------------------------
-; Namespace functions
-; -----------------------------------------------------------------------------
-
-(defn register-namespaces [m]
-  (swap! prefixes merge m))
-
-(defn- ns-or-error
-  "Resolves prefixes. Throws an error if the namespace cannot be resolved."
-  [k m]
-  (if-let [v (k m)] ; check for query-local prefixes first
-    v
-    (if-let [v (k @prefixes)]
-      v
-     (throw (IllegalArgumentException. (str "Cannot resolve namespace: " k))))))
-
-; -----------------------------------------------------------------------------
-; Main macros
-; -----------------------------------------------------------------------------
+;; ----------------------------------------------------------------------------
+;; Main macros
+;; ----------------------------------------------------------------------------
 
 (defmacro defquery
   "Defines a query-map and binds it to a var"
@@ -85,127 +43,26 @@
   [m & body]
   `(query (assoc (empty-query) :local-prefixes ~m) ~@body))
 
-; -----------------------------------------------------------------------------
-; Encoder
-; -----------------------------------------------------------------------------
-
-(declare sub-compiler)
-
-(defn encode
-  "Encodes keywords to ?-prefixed variables and other values to RDF literals
-  when applicable.
-
-  Vectors are interpreted differently according to their contents:
-
-    [keyword string] => prefixed name
-    [string keyword] => string with language tag
-    [keyword]        => <keyword> - to be used with BASE
-    [map keyword]    => (:content map) AS keyword
-
-  Maps are expaned and compiled according to its contents, tag, bounds and
-  separator"
-  [x]
-  (cond
-    (char? x) x
-    (symbol? x) x
-    (keyword? x) (str \? (name x))
-    (integer? x) x                    ;(str  \" x \" "^^xsd:integer")
-    (float? x) x                      ;(str  \" x \" "^^xsd:decimal")
-    (true? x) x                       ;"\"true\"^^xsd:boolean"
-    (false? x) x                      ;"\"false\"^^xsd:boolean"
-    (string? x) (str \" x \" )
-    (= java.net.URI (type x)) (str "<" x ">")
-    ;(= java.util.Date (type x)) (str \" x \" "^^xsd:dateTime")
-    (vector? x) (let [[a b] x]
-                  (cond
-                    (not b) (str \< (name a) \>)
-                    (string? a) (str \" a "\"@" (name b))
-                    (and (map? a)
-                         (keyword? b)) (into ["("]
-                                             (conj (sub-compiler a) " AS " (encode b) ")" ))
-                    :else (str (name a) \: b)))
-    (map? x) (sub-compiler x)
-    :else (throw (Exception.
-                   (format "Don't know how to encode %s in an SPARQL context" x)))))
-
-; -----------------------------------------------------------------------------
-; Compiler functions
-; -----------------------------------------------------------------------------
-; Transforms the various query parts into a vectors of strings
-(defn- compiler [q part]
-  (when-let [m (part q)]
-    (sub-compiler m)))
-
-(defn- sub-compiler [m]
-  (conj []
-        (:tag m)
-        (first (:bounds m))
-        (interpose
-          (:sep m)
-          (map encode (:content m)))
-        (last (:bounds m))))
-
-
-;; Functions to add namespaces to query string
-
-(defn- infer-prefixes
-  "Finds all occurences of the pattern 'prefix:name' in the query string.
-  Returns the query string with the namespaces prefixed."
-  [m s]
-  (str
-    (apply str (apply sorted-set
-                      (for [[_ p] (re-seq #"(\b[a-zA-Z0-9]+):[a-zA-Z]" s) :when (not= p (name :mailto))]
-                        (str "PREFIX " p ": " (ns-or-error (keyword p) m) " " ))))
-    s))
-
-(defn- add-base
-  "Prefixes the query string with 'BASE <uri>'"
-  [uri s]
-  (if (nil? uri)
-    s
-    (str  "BASE " (encode uri) " " s)))
-
-
-;; Main compiler function
-
-(defn compile-query
-  "Takes a map representing SPARQL graph patterns, bindings and modifiers and
-  returns a vaild SPARQL 1.1 query string"
-  [q]
-  (let [base (:base q) local-prefixes (:local-prefixes q)]
-    (->> (conj []
-               (for [part [:query-form :from :from-named :where :order-by
-                           :limit :offset :group-by :having]]
-                (compiler q part)))
-         (flatten)
-         (string/join)
-         (infer-prefixes local-prefixes)
-         (add-base base)
-         (string/trim))))
-
 
 ;; ----------------------------------------------------------------------------
 ;; SPARQL query DSL
 ;; ----------------------------------------------------------------------------
-
 
 ;; Matsu (i.e non-SPARQL) syntax helpers
 
 (defn raw [string]
   {:tag "" :sep "" :bounds "" :content string })
 
-
 ;; Namespaces-related
 
 (defn base [q uri]
   (assoc q :base uri))
 
-
 ;; Query forms
 
 (defn select [q & more]
   (assoc q :query-form {:tag "SELECT" :bounds [" "] :sep " "
-                        :content (postwalk-replace replacement-map (vec more))}))
+                        :content (vec more)}))
 
 (defn select-distinct [q & more]
   (assoc q :query-form {:tag "SELECT DISTINCT" :content (vec more)
@@ -226,7 +83,6 @@
 (defn describe [q & more]
   (assoc q :query-form {:tag "DESCRIBE" :content (vec more)
                         :bounds [" "] :sep " "}))
-
 
 ;; Graph pattern matching
 
@@ -252,20 +108,17 @@
 (defn graph [& more]
   {:tag "GRAPH " :content (vec more) :bounds [""] :sep " "})
 
-
 ;; Negation
 
 (defn filter [& more]
-  {:tag "FILTER" :content (postwalk-replace replacement-map (vec more))
-   :bounds ["(" ")"] :sep " "})
+  {:tag "FILTER" :content (vec more) :bounds ["(" ")"] :sep " "})
 
 (defn filter-
   "Function to be used when FILTER followed by another SPARQL function.
 
   ex: (filter- (is-iri :p))"
   [& more]
-  {:tag "FILTER" :content (postwalk-replace replacement-map (vec more))
-                                            :bounds [" " ""] :sep " "})
+  {:tag "FILTER" :content (vec more) :bounds [" " ""] :sep " "})
 
 (defn filter-not-exists [& more]
   {:tag "FILTER NOT EXISTS " :content (vec more) :bounds ["{ " " }"] :sep " "})
@@ -276,7 +129,6 @@
 (defn minus [& more]
   {:tag "MINUS " :content (vec more) :bounds ["{ " " }"] :sep " "})
 
-
 ;; Specifying datasets
 
 (defn from [q graph]
@@ -285,7 +137,6 @@
 (defn from-named [q & graphs]
   (assoc q :from-named {:tag "" :bounds ["" " "] :sep " "
                         :content (interleave (repeat (raw "FROM NAMED")) (vec graphs))}))
-
 
 ;; Solution sequences
 
@@ -314,7 +165,7 @@
 
 (defn having [q & expr]
   (assoc q :having {:tag "HAVING" :bounds ["(" ")"] :sep " "
-                    :content (postwalk-replace replacement-map (vec expr))}))
+                    :content (vec expr)}))
 
 (defn sum [v] {:tag "SUM" :bounds ["(" ")"] :sep " " :content [v]})
 
@@ -330,6 +181,7 @@
 
 ;(defn group-concat)
 
+;(defn sample)
 
 ;; Assingment
 
@@ -339,13 +191,11 @@
 
 ;(defn values)
 
-
 ;; Functional forms
 
 (defn bound [v] {:tag "bound" :content [v] :bounds ["(" ")"] :sep " "})
 
 (defn !bound [v] {:tag "!bound" :content [v] :bounds ["(" ")"] :sep " "})
-
 
 ;; Functions on strings
 
@@ -387,8 +237,7 @@
 (defn is-literal [term]
   {:tag "isLiteral" :content [term] :bounds ["(" ")"] :sep ""})
 
-;; clojure.core/str is to usefull to do without
-(defn str2 [term]
+(defn str2 [term] ; clojure.core/str is to usefull to do without
   {:tag "str" :content [term] :bounds ["(" ")"] :sep ""})
 
 (defn lang [literal]
@@ -396,7 +245,6 @@
 
 (defn datatype [literal]
   {:tag "datatype" :content [literal] :bounds ["(" ")"] :sep ""})
-
 
 ;; TODO: datatype, IRI, BNODE, STRDT, STRLANG, UUID, STRUUID
 
