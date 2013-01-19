@@ -110,15 +110,14 @@
 
 ;; Negation
 
+(def no-bounds
+  #{"regex" "isIRI" "isLiteral" "isBlank" "langMatches"})
+
 (defn filter [& more]
-  {:tag "FILTER" :content (vec more) :bounds ["(" ")"] :sep " "})
+  (if (and (map? (first more)) (contains? no-bounds (:tag (first more))))
+    {:tag "FILTER" :content (vec more) :bounds [" " ""] :sep " "}
+    {:tag "FILTER" :content (vec more) :bounds ["(" ")"] :sep " "}))
 
-(defn filter-
-  "Function to be used when FILTER followed by another SPARQL function.
-
-  ex: (filter- (is-iri :p))"
-  [& more]
-  {:tag "FILTER" :content (vec more) :bounds [" " ""] :sep " "})
 
 (defn filter-not-exists [& more]
   {:tag "FILTER NOT EXISTS " :content (vec more) :bounds ["{ " " }"] :sep " "})

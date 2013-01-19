@@ -87,7 +87,7 @@
          :movie [:prop "starring"] :p \;
                 [:rdfs "label"] :title \;
                 [:prop "runtime"] :runtime
-         (filter- (lang-matches (lang :title) "en")))
+         (filter (lang-matches (lang :title) "en")))
   (order-by-desc :runtime)
   (limit 10))
 

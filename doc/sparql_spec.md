@@ -172,12 +172,12 @@ WHERE   { ?x dc:title ?title
           FILTER regex(?title, "^SPARQL")
         }
 ```
-Use `filter-` when you don't want to wrap the `FILTER` expression in parentheses (i.e when it is followed by another SPARQL function, like `regex`):
+
 ```clojure
 (query
   (select :title)
   (where :x [:dc "title"] :title
-         (filter- (regex :title "^SPARQL"))))
+         (filter (regex :title "^SPARQL"))))
 ```
 
 ```sparql
@@ -193,7 +193,7 @@ WHERE   { ?x dc:title ?title
 (query
   (select :title)
   (where :x [:dc "title"] :title
-         (filter- (regex :title "web" "i"))))
+         (filter (regex :title "web" "i"))))
 ```
 
 ### 3.2 Restricting Numeric Values
@@ -1511,7 +1511,7 @@ SELECT ?name ?mbox
   (select :name :mbox)
   (where :x [:foaf "name"] :name
          \; [:foaf "mbox"] :mbox \.
-         (filter- (is-iri :mbox))))
+         (filter (is-iri :mbox))))
 ```
 
 ```sparql
@@ -1534,7 +1534,7 @@ WHERE { ?annot  a:annotates  <http://www.w3.org/TR/rdf-sparql-query/> .
          :annot [:dc "creator"] :c \.
          (optional :c [:foaf "given"] :given
                     \; [:foaf "family"] :family) \.
-         (filter- (is-blank :c))))
+         (filter (is-blank :c))))
 ```
 
 ```sparql
@@ -1550,7 +1550,7 @@ WHERE { ?x foaf:name  ?name ;
   (select :name :mbox)
   (where :x [:foaf "name"] :name
          \; [:foaf "mbox"] :mbox \.
-         (filter- (is-literal :mbox))))
+         (filter (is-literal :mbox))))
 ```
 
 ```sparql
@@ -1567,7 +1567,7 @@ I didn't want to do without `clojure.core/str`, so I named the `str` function `s
   (select :name :mbox)
   (where :x [:foaf "name"] :name
          \; [:foaf "mbox"] :mbox \.
-         (filter- (regex (str2 :mbox) "@work\\.example$"))))
+         (filter (regex (str2 :mbox) "@work\\.example$"))))
 ```
 
 ```sparql
@@ -1617,7 +1617,7 @@ SELECT ?title
   (select :title)
   (where :x [:dc "title"] ["That Seventies Show" :en]
          \; [:dc "title"] :title \.
-         (filter- (lang-matches (lang :title) "FR"))))
+         (filter (lang-matches (lang :title) "FR"))))
 ```
 
 ```sparql
@@ -1631,7 +1631,7 @@ SELECT ?title
 (query
   (select :title)
   (where :x [:dc "title"] :title \.
-         (filter- (lang-matches (lang :title) "*"))))
+         (filter (lang-matches (lang :title) "*"))))
 ```
 
 ```sparql
@@ -1645,7 +1645,7 @@ SELECT ?name
 (query
   (select :name)
   (where :x [:foaf "name"] :name
-         (filter- (regex :name "^ali" "i"))))
+         (filter (regex :name "^ali" "i"))))
 ```
 
 ### 17.6 Extensible Value Testing

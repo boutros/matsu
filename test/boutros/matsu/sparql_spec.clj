@@ -116,7 +116,7 @@
         (query
           (select :title)
           (where :x [:dc "title"] :title
-                 (filter- (regex :title "^SPARQL"))))
+                 (filter (regex :title "^SPARQL"))))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { ?x dc:title ?title FILTER regex(?title, \"^SPARQL\") }"))
 
@@ -124,7 +124,7 @@
         (query
           (select :title)
           (where :x [:dc "title"] :title
-                 (filter- (regex :title "web" "i"))))
+                 (filter (regex :title "web" "i"))))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { ?x dc:title ?title FILTER regex(?title, \"web\", \"i\") }"))
 
@@ -726,7 +726,7 @@
           (select :name :mbox)
           (where :x [:foaf "name"] :name
                  \; [:foaf "mbox"] :mbox \.
-                 (filter- (is-iri :mbox))))
+                 (filter (is-iri :mbox))))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE { ?x foaf:name ?name ; foaf:mbox ?mbox . FILTER isIRI(?mbox) }"))
 
@@ -737,7 +737,7 @@
                  :annot [:dc "creator"] :c \.
                  (optional :c [:foaf "given"] :given
                             \; [:foaf "family"] :family) \.
-                 (filter- (is-blank :c))))
+                 (filter (is-blank :c))))
 
         "PREFIX a: <http://www.w3.org/2000/10/annotation-ns#> PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?given ?family WHERE { ?annot a:annotates <http://www.w3.org/TR/rdf-sparql-query/> . ?annot dc:creator ?c . OPTIONAL { ?c foaf:given ?given ; foaf:family ?family } . FILTER isBlank(?c) }"))
 
@@ -746,7 +746,7 @@
           (select :name :mbox)
           (where :x [:foaf "name"] :name
                  \; [:foaf "mbox"] :mbox \.
-                 (filter- (is-literal :mbox))))
+                 (filter (is-literal :mbox))))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE { ?x foaf:name ?name ; foaf:mbox ?mbox . FILTER isLiteral(?mbox) }"))
 
@@ -755,7 +755,7 @@
           (select :name :mbox)
           (where :x [:foaf "name"] :name
                  \; [:foaf "mbox"] :mbox \.
-                 (filter- (regex (str2 :mbox) "@work\\.example$"))))
+                 (filter (regex (str2 :mbox) "@work\\.example$"))))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE { ?x foaf:name ?name ; foaf:mbox ?mbox . FILTER regex(str(?mbox), \"@work\\.example$\") }"))
 
@@ -782,7 +782,7 @@
         (select :title)
         (where :x [:dc "title"] ["That Seventies Show" :en]
                \; [:dc "title"] :title \.
-               (filter- (lang-matches (lang :title) "FR"))))
+               (filter (lang-matches (lang :title) "FR"))))
 
       "PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { ?x dc:title \"That Seventies Show\"@en ; dc:title ?title . FILTER langMatches(lang(?title), \"FR\") }"))
 
@@ -790,7 +790,7 @@
         (query
           (select :title)
           (where :x [:dc "title"] :title \.
-                 (filter- (lang-matches (lang :title) "*"))))
+                 (filter (lang-matches (lang :title) "*"))))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { ?x dc:title ?title . FILTER langMatches(lang(?title), \"*\") }"))
 
@@ -798,7 +798,7 @@
         (query
           (select :name)
           (where :x [:foaf "name"] :name
-                 (filter- (regex :name "^ali" "i"))))
+                 (filter (regex :name "^ali" "i"))))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name FILTER regex(?name, \"^ali\", \"i\") }"))
 
