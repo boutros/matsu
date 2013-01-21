@@ -1243,7 +1243,7 @@ LIMIT 2
 ```clojure
 (query
   (construct [[]] [:foaf "name"] :name)
-  (where (raw "[]") [:foaf "name"] :name
+  (where [[]] [:foaf "name"] :name
          \; [:site "hits"] :hits \.)
   (order-by-desc :hits)
   (limit 2))
