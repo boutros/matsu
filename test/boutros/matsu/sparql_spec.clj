@@ -560,9 +560,9 @@
 
   (is (=
         (query
-          (construct :x [:vcard "N"] '_:v \.
-                     '_:v [:vcard "givenName"] :gname \.
-                     '_:v [:vcard "familyName"] :fname)
+          (construct :x [:vcard "N"] [[:v]] \.
+                     [[:v]] [:vcard "givenName"] :gname \.
+                     [[:v]] [:vcard "familyName"] :fname)
           (where (union
                    (group :x [:foaf "firstname"] :gname)
                    (group :x [:foaf "givenname"] :gname)) \.
@@ -592,8 +592,8 @@
 
   (is (=
         (query
-          (construct (raw "[]") [:foaf "name"] :name)
-          (where (raw "[]") [:foaf "name"] :name
+          (construct [[]] [:foaf "name"] :name)
+          (where [[]] [:foaf "name"] :name
                  \; [:site "hits"] :hits \.)
           (order-by-desc :hits)
           (limit 2))

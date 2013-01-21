@@ -21,6 +21,8 @@
     [string keyword] => string with language tag
     [keyword]        => <keyword> - to be used with BASE
     [map keyword]    => (:content map) AS keyword
+    [[:keyword]]     => _:keyword (blank node)
+    [[]]             => []
 
   Maps are expaned and compiled according to its contents, tag, bounds and
   separator"
@@ -38,6 +40,7 @@
     ;(= java.util.Date (type x)) (str \" x \" "^^xsd:dateTime")
     (vector? x) (let [[a b] x]
                   (cond
+                    (vector? a) (if (seq a) (str '_ (first a)) "[]")
                     (not b) (str \< (name a) \>)
                     (string? a) (str \" a "\"@" (name b))
                     (and (map? a)

@@ -1179,12 +1179,12 @@ WHERE
     { ?x foaf:surname   ?fname } UNION  { ?x foaf:family_name ?fname } .
  }
 ```
-TODO think about how to to deal with blank nodes, for now, just quote:
+Blank nodes are created with double brackets:
 ```clojure
 (query
-  (construct :x [:vcard "N"] '_:v \.
-             '_:v [:vcard "givenName"] :gname \.
-             '_:v [:vcard "familyName"] :fname)
+  (construct :x [:vcard "N"] [[:v]] \.
+             [[:v]] [:vcard "givenName"] :gname \.
+             [[:v]] [:vcard "familyName"] :fname)
   (where (union
            (group :x [:foaf "firstname"] :gname)
            (group :x [:foaf "givenname"] :gname)) \.
@@ -1239,10 +1239,10 @@ WHERE
 ORDER BY desc(?hits)
 LIMIT 2
 ```
-Hm, not possible except wit `raw`. (I've never seen this being used 'in the wild'.)
+
 ```clojure
 (query
-  (construct (raw "[]") [:foaf "name"] :name)
+  (construct [[]] [:foaf "name"] :name)
   (where (raw "[]") [:foaf "name"] :name
          \; [:site "hits"] :hits \.)
   (order-by-desc :hits)
@@ -1421,7 +1421,7 @@ WHERE { ?x foaf:name  ?name1 ;
         FILTER (?mbox1 = ?mbox2 && ?name1 != ?name2)
       }
 ```
-Not pretty but, possible: (might get rid of the quoting with more macro trixtery)
+
 ```clojure
 (query
   (select :name1 :name2)
