@@ -1483,7 +1483,7 @@ WHERE { ?a  :label        ?aLabel .
 
         FILTER ( sameTerm(?aWeight, ?bWeight) && !sameTerm(?aDisp, ?bDisp)) }
 ```
-TODO find a way to handle `&&`
+
 ```clojure
 (query
   (base (URI. "http://example.org/WMterms#"))
@@ -1494,8 +1494,7 @@ TODO find a way to handle `&&`
          :b [:label] :bLabel \.
          :b [:weight] :bWeight \.
          :b [:displacement] :bDisp \.
-         (filter (same-term :aWeight :bWeight) &&
-                 (!same-term :aDisp :bDisp))))
+         (filter (same-term :aWeight :bWeight) && (!same-term :aDisp :bDisp))))
 ```
 
 ```sparql
