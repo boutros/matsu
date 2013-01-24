@@ -1,4 +1,4 @@
-(ns boutros.matsu.sparql-spec
+(ns boutros.matsu.w3c-query-test
   (:refer-clojure :exclude [filter concat group-by max min count])
   (:require [boutros.matsu.core :refer [register-namespaces]])
   (:use clojure.test

@@ -1,18 +1,18 @@
 (ns boutros.matsu.sparql
   "Matsu SPARQL query DSL functions"
   (:refer-clojure :exclude [filter concat group-by max min count])
-  (:require [boutros.matsu.compiler :refer [compile-query]]
+  (:require [clojure.walk :refer [postwalk-replace]]
+            [boutros.matsu.compiler :refer [compile-query]]
             [boutros.matsu.core :refer [empty-query]]))
 
 
 ;; ----------------------------------------------------------------------------
-;; Shortcuts
+;; Vars (shortcuts)
 ;; ----------------------------------------------------------------------------
 
 (def a \a) ; abberviation for rdf:type
 
-;; vars to avoid quoting in the queries.
-;; TODO: think of other way to solve this
+;; Vars to avoid quoting in queries:
 
 (def && '&&)
 
@@ -61,6 +61,11 @@
 (defn raw [string]
   {:tag "" :sep "" :bounds "" :content string })
 
+(defn group
+  "Delimits a graph pattern within curly braces. (Not a SPARQL keyword.)"
+  [& more]
+  {:tag "" :content (vec more) :bounds ["{ " " }"] :sep " "})
+
 ;; Namespaces-related
 
 (defn base [q uri]
@@ -71,14 +76,6 @@
 (defn select [q & more]
   (assoc q :query-form {:tag "SELECT" :bounds [" "] :sep " "
                         :content (vec more)}))
-
-(defn select-distinct [q & more]
-  (assoc q :query-form {:tag "SELECT DISTINCT" :content (vec more)
-                        :bounds [" "] :sep " "}))
-
-(defn select-reduced [q & more]
-  (assoc q :query-form {:tag "SELECT REDUCED" :content (vec more)
-                        :bounds [" "] :sep " "}))
 
 (defn construct [q & more]
   (assoc q :query-form {:tag "CONSTRUCT" :content (vec more)
@@ -102,11 +99,6 @@
   [q & more]
   (assoc q :where {:tag "" :content (vec more) :bounds ["{ " " } "] :sep " "}))
 
-(defn group
-  "Delimits a graph pattern within curly braces. (Not a SPARQL keyword.)"
-  [& more]
-  {:tag "" :content (vec more) :bounds ["{ " " }"] :sep " "})
-
 (defn optional [& more]
   {:tag "OPTIONAL " :content (vec more) :bounds ["{ " " }"] :sep " "})
 
@@ -119,14 +111,13 @@
 ;; Negation
 
 (def no-bounds
-  "If filter is followed by one of these functions, don't use parentheses."
+  "Don't use parentheses if FILTER is to be followed by one of these functions."
   #{"regex" "isIRI" "isLiteral" "isBlank" "langMatches"})
 
 (defn filter [& more]
   (if (and (map? (first more)) (contains? no-bounds (:tag (first more))))
     {:tag "FILTER" :content (vec more) :bounds [" " ""] :sep " "}
     {:tag "FILTER" :content (vec more) :bounds ["(" ")"] :sep " "}))
-
 
 (defn filter-not-exists [& more]
   {:tag "FILTER NOT EXISTS " :content (vec more) :bounds ["{ " " }"] :sep " "})
@@ -146,7 +137,15 @@
   (assoc q :from-named {:tag "" :bounds ["" " "] :sep " "
                         :content (interleave (repeat (raw "FROM NAMED")) (vec graphs))}))
 
-;; Solution sequences
+;; Solution sequences and modifiers
+
+(defn select-distinct [q & more]
+  (assoc q :query-form {:tag "SELECT DISTINCT" :content (vec more)
+                        :bounds [" "] :sep " "}))
+
+(defn select-reduced [q & more]
+  (assoc q :query-form {:tag "SELECT REDUCED" :content (vec more)
+                        :bounds [" "] :sep " "}))
 
 (defn limit [q n]
   (assoc q :limit {:tag "LIMIT" :bounds [" "] :sep " " :content [n]}))
@@ -162,8 +161,9 @@
   (assoc q :order-by
     {:tag "ORDER BY" :bounds [" "] :sep " " :content (vec expr)}))
 
-(defn order-by-desc [q v]
-  (order-by q (desc v)))
+(defn order-by-desc [q v] (order-by q (desc v)))
+
+(defn order-by-asc [q v] (order-by q (asc v)))
 
 ;; Aggregation
 

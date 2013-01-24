@@ -58,7 +58,7 @@
 
 (def replacement-map
   "Used to replace clojure fn symbols with characters inside expressions"
-  {= \= > \> < \< * \*})
+  {= \= > \> < \< * \* + \+ - \- >= '>= <= '<=})
 
 (defn- compiler [q part]
   (when-let [m (part q)]
