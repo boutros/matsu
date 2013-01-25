@@ -191,7 +191,6 @@ There might be other limitations, especially when dealing with SPARQL expression
 * Property path syntax
 * Specifying variables with `VALUES` in data block
 * Federated queries (SERVICE)
-* CONSTRUCT short form (CONSTRUCT WHERE { ... })
 * Syntacic sugar (macros)
 
 ## Contribute

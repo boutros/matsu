@@ -602,6 +602,13 @@
 
   (is (=
         (query
+          (construct)
+          (where :x [:foaf :name] :name))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> CONSTRUCT WHERE { ?x foaf:name ?name }"))
+
+  (is (=
+        (query
           (construct :x [:foaf :name] :name)
           (where :x [:foaf :name] :name))
 

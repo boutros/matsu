@@ -1255,7 +1255,9 @@ CONSTRUCT WHERE { ?x foaf:name ?name }
 ```
 
 ```clojure
-(query ...) ; Not possible yet, use the form below
+(query
+  (construct)
+  (where :x [:foaf :name] :name))
 ```
 
 ```sparql
