@@ -14,6 +14,7 @@
        true                        true
        false                       false
        (URI. "http://dbpedia.org") "<http://dbpedia.org>"
-       [:foaf :mbox]              "foaf:mbox"
+       [:foaf :mbox]               "foaf:mbox"
+       ["42" "somedatatype"]        "\"42\"^^somedatatype"
        [:keyword]                  "<keyword>"
        [[]]                        "[]"))

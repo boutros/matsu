@@ -18,6 +18,7 @@
   Vectors are interpreted differently according to their contents:
 
     [keyword keyword] => prefixed name
+    [literal string] => literal^^string (typed literal)
     [string keyword] => string with language tag
     [keyword]        => <keyword> - to be used with BASE
     [map keyword]    => (:content map) AS keyword
@@ -42,7 +43,8 @@
                   (cond
                     (vector? a) (if (seq a) (str '_ (first a)) "[]")
                     (not b) (str \< (name a) \>)
-                    (string? a) (str \" a "\"@" (name b))
+                    (and (keyword? b) (string? a)) (str \" a "\"@" (name b))
+                    (every? string? x) (str (encode a) "^^" b)
                     (and (map? a)
                          (keyword? b)) (into ["("]
                                              (conj (sub-compiler a) " AS " (encode b) ")" ))

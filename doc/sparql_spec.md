@@ -95,7 +95,7 @@ SELECT ?v WHERE { ?v ?p "abc"^^<http://example.org/datatype#specialDatatype> }
 ```clojure
 (query
   (select :v)
-  (where :v :p (raw "\"abc\"^^<http://example.org/datatype#specialDatatype>")))
+  (where :v :p ["abc" "<http://example.org/datatype#specialDatatype>"]))
 ```
 
 ### 2.4 Blank Node Labels in Query Results
@@ -1224,7 +1224,7 @@ CONSTRUCT { ?s ?p ?o } WHERE
     (graph :g (group :s :p :o) \.)
     :g [:dc :publisher] (URI. "http://www.w3.org/") \.
     :g [:dc :date] :date \.
-    (filter (raw "app:customDate(?date)") > (raw "\"2005-02-28T00:00:00Z\"^^xsd:dateTime")) \.))
+    (filter (raw "app:customDate(?date)") > ["2005-02-28T00:00:00Z" "xsd:dateTime"]) \.))
 ```
 
 ```sparql
@@ -1372,7 +1372,7 @@ WHERE { ?annot  a:annotates  <http://www.w3.org/TR/rdf-sparql-query/> .
   (select :annot)
   (where :annot [:a :annotates] (URI. "http://www.w3.org/TR/rdf-sparql-query/") \.
          :annot [:dc :date] :date \.
-         (filter :date > (raw "\"2005-01-01T00:00:00Z\"^^xsd:dateTime"))))
+         (filter :date > ["2005-01-01T00:00:00Z" "xsd:dateTime"])))
 ```
 
 ### 17.4 Function Definitions

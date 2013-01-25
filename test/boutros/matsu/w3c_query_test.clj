@@ -73,7 +73,7 @@
   (is (=
         (query
           (select :v)
-          (where :v :p (raw "\"abc\"^^<http://example.org/datatype#specialDatatype>")))
+          (where :v :p ["abc" "<http://example.org/datatype#specialDatatype>"]))
 
         "SELECT ?v WHERE { ?v ?p \"abc\"^^<http://example.org/datatype#specialDatatype> }"))
 
@@ -586,7 +586,7 @@
             (graph :g (group :s :p :o) \.)
             :g [:dc :publisher] (URI. "http://www.w3.org/") \.
             :g [:dc :date] :date \.
-            (filter (raw "app:customDate(?date)") > (raw "\"2005-02-28T00:00:00Z\"^^xsd:dateTime")) \.))
+            (filter (raw "app:customDate(?date)") > ["2005-02-28T00:00:00Z" "xsd:dateTime"]) \.))
 
         "PREFIX app: <http://example.org/ns#> PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> CONSTRUCT { ?s ?p ?o } WHERE { GRAPH ?g { ?s ?p ?o } . ?g dc:publisher <http://www.w3.org/> . ?g dc:date ?date . FILTER(app:customDate(?date) > \"2005-02-28T00:00:00Z\"^^xsd:dateTime) . }"))
 
@@ -662,7 +662,7 @@
           (select :annot)
           (where :annot [:a :annotates] (URI. "http://www.w3.org/TR/rdf-sparql-query/") \.
                  :annot [:dc :date] :date \.
-                 (filter :date > (raw "\"2005-01-01T00:00:00Z\"^^xsd:dateTime"))))
+                 (filter :date > ["2005-01-01T00:00:00Z" "xsd:dateTime"])))
 
         "PREFIX a: <http://www.w3.org/2000/10/annotation-ns#> PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> SELECT ?annot WHERE { ?annot a:annotates <http://www.w3.org/TR/rdf-sparql-query/> . ?annot dc:date ?date . FILTER(?date > \"2005-01-01T00:00:00Z\"^^xsd:dateTime) }"))
 
