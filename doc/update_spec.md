@@ -48,7 +48,9 @@ DELETE DATA
 ```
 
 ```clojure
-(query)
+(query
+  (delete-data (URI. "http://example/book2") [:dc "title"] "David Copperfield"
+               \; [:dc "creator"] "Edmund Wells" \.))
 ```
 
 ### Example 4
@@ -64,7 +66,7 @@ INSERT DATA
 ```
 
 ```clojure
-(query)
+(query) ; TBD
 ```
 
 ### Example 5

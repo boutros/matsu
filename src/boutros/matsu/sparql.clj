@@ -267,3 +267,7 @@
 (defn insert-data [q & more]
   (assoc q :insert {:tag "INSERT DATA" :bounds [" { " " }"] :sep " "
                     :content (vec more)}))
+
+(defn delete-data [q & more]
+  (assoc q :insert {:tag "DELETE DATA" :bounds [" { " " }"] :sep " "
+                    :content (vec more)}))

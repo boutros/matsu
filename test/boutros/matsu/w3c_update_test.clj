@@ -26,3 +26,12 @@
 
         "PREFIX ns: <http://example.org/ns#> INSERT DATA { GRAPH <http://example/bookStore> { <http://example/book1> ns:price 42 } }")))
 
+(deftest example-3
+  (is (=
+        (query
+          (delete-data (URI. "http://example/book2") [:dc "title"] "David Copperfield"
+                       \; [:dc "creator"] "Edmund Wells" \.))
+
+        "PREFIX dc: <http://purl.org/dc/elements/1.1/> DELETE DATA { <http://example/book2> dc:title \"David Copperfield\" ; dc:creator \"Edmund Wells\" . }")))
+
+(deftest example-4)
