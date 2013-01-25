@@ -1,6 +1,6 @@
 #SPARQL 1.1 Update
 
-An attempt to translate all the example queries from the [SPARQL 1.1  UPDATEspecification from W3C](http://www.w3.org/TR/sparql11-update/) into Matsu syntax. This document corresponds with the tests in `/test/boutros/matsu/update_spec.clj`.
+An attempt to translate all the example queries from the [SPARQL 1.1  UPDATEspecification from W3C](http://www.w3.org/TR/sparql11-update/) into Matsu syntax. This document corresponds with the tests in `/test/boutros/matsu/w3c_update_test.clj`.
 
 ### Example 1
 
@@ -14,7 +14,9 @@ INSERT DATA
 ```
 
 ```clojure
-(query)
+(query
+  (insert-data (URI. "http://example/book1") [:dc "title"] "A new book"
+               \; [:dc "creator"] "A.N.Other" \.))
 ```
 
 ### Example 2
@@ -27,7 +29,10 @@ INSERT DATA
 ```
 
 ```clojure
-(query)
+(query
+  (insert-data
+    (graph (URI. "http://example/bookStore")
+           (group (URI. "http://example/book1") [:ns "price"] 42))))
 ```
 
 ### Example 3

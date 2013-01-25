@@ -261,3 +261,9 @@
 ;; Functions on Dates and Times
 
 ;; Hash functions
+
+;; SPARQL UPDATE
+
+(defn insert-data [q & more]
+  (assoc q :insert {:tag "INSERT DATA" :bounds [" { " " }"] :sep " "
+                    :content (vec more)}))

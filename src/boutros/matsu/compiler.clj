@@ -101,7 +101,7 @@
   [q]
   (let [base (:base q) local-prefixes (:local-prefixes q)]
     (->> (conj []
-               (for [part [:query-form :from :from-named :where :order-by
+               (for [part [:query-form :from :from-named :delete :insert :where :order-by
                            :limit :offset :group-by :having]]
                 (compiler q part)))
          (flatten)
