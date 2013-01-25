@@ -9,7 +9,7 @@
   (:refer-clojure :exclude [filter concat group-by max min count])
   (:require [clj-http.client :as client]
             [boutros.matsu.sparql :refer :all]
-            [boutros.matus.core :refer [register-namespaces]]
+            [boutros.matsu.core :refer [register-namespaces]]
             [clojure.xml :as xml]
             [clojure.zip :as zip :refer [down right left node children]]
             [cheshire.core :refer [parse-string]]
@@ -34,8 +34,8 @@
 
 ;; Is the Amazon river longer than the Nile River?
 (defquery amazon-vs-nile
-  (ask [:dbpedia "Amazon_River"] [:prop "length"] :amazon \.
-       [:dbpedia "Nile"] [:prop "length"] :nile \.
+  (ask [:dbpedia :Amazon_River] [:prop :length] :amazon \.
+       [:dbpedia :Nile] [:prop :length] :nile \.
        (filter :amazon > :nile)))
 
 ;; send HTTP request
@@ -50,7 +50,7 @@
 ;; When was Jimi Hendrix born?
 (defquery hendrix
   (select-distinct :bday)
-  (where [:dbpedia "Jimi_Hendrix"] [:prop "dateOfBirth"] :bday))
+  (where [:dbpedia :Jimi_Hendrix] [:prop :dateOfBirth] :bday))
 
 (def req
   (client/get dbpedia
@@ -65,7 +65,7 @@
 ;; Let's find Elvis' birthday this time
 (defquery elvis
   (select :bday)
-  (where [:dbpedia "Elvis_Presley"] [:prop "dateOfBirth"] :bday))
+  (where [:dbpedia :Elvis_Presley] [:prop :dateOfBirth] :bday))
 
 (def req
   (client/get dbpedia
@@ -83,10 +83,10 @@
 ;; limit to 10, ordered by longest running time:
 (defquery movies
   (select-distinct :title)
-  (where :p [:prop "birthPlace"] [:dbpedia "Tokyo"] \.
-         :movie [:prop "starring"] :p \;
-                [:rdfs "label"] :title \;
-                [:prop "runtime"] :runtime
+  (where :p [:prop :birthPlace] [:dbpedia :Tokyo] \.
+         :movie [:prop :starring] :p \;
+                [:rdfs :label] :title \;
+                [:prop :runtime] :runtime
          (filter (lang-matches (lang :title) "en")))
   (order-by-desc :runtime)
   (limit 10))

@@ -49,7 +49,7 @@ You can also supply query-local prefixes which will override the global `prefixe
 ```clojure
 (query-with-prefixes {:foaf "<mylocalfoaf>"}
   (select :person)
-  (where :person [:foaf "name"] "Petter"))
+  (where :person [:foaf :name] "Petter"))
 ```
 ```sparql
 PREFIX foaf: <mylocalfoaf>
@@ -64,7 +64,7 @@ Matsu makes it possible to create complex, nested queries:
   (from-named (URI. "http://example.org/foaf/aliceFoaf")
               (URI. "http://example.org/foaf/bobFoaf"))
   (where
-    (graph [:data "aliceFoaf"]
+    (graph [:data :aliceFoaf]
            (group :alice [:foaf :mbox] (URI. "mailto:alice@work.example") \;
                          [:foaf :knows] :whom \.
                   :whom  [:foaf :mbox] :mbox \;
