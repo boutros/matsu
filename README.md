@@ -164,8 +164,8 @@ There might be other limitations, especially when dealing with SPARQL expression
 
 ## Todos
 * SPARQL update
+* Better BIND syntax
 * Datetime encoding, java Date. to ^^xsd:dateTime
-* Typed literal syntax (maybe fn encode-typed?)
 * Subqueries
 * Property path syntax
 * Specifying variables with `VALUES` in data block
