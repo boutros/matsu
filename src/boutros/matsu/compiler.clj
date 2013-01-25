@@ -17,7 +17,7 @@
 
   Vectors are interpreted differently according to their contents:
 
-    [keyword string] => prefixed name
+    [keyword keyword] => prefixed name
     [string keyword] => string with language tag
     [keyword]        => <keyword> - to be used with BASE
     [map keyword]    => (:content map) AS keyword
