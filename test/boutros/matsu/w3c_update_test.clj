@@ -37,12 +37,31 @@
 (deftest example-4)
 
 (deftest example-5
-  (is
-    (=
-      (query
-        (with (URI. "http://example/addresses"))
-        (delete :person [:foaf :givenName] "Bill")
-        (insert :person [:foaf :givenName] "William")
-        (where :person [:foaf :givenName] "Bill"))
+  (is (=
+        (query
+          (with (URI. "http://example/addresses"))
+          (delete :person [:foaf :givenName] "Bill")
+          (insert :person [:foaf :givenName] "William")
+          (where :person [:foaf :givenName] "Bill"))
 
-      "PREFIX foaf: <http://xmlns.com/foaf/0.1/> WITH <http://example/addresses> DELETE { ?person foaf:givenName \"Bill\" } INSERT { ?person foaf:givenName \"William\" } WHERE { ?person foaf:givenName \"Bill\" }")))
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> WITH <http://example/addresses> DELETE { ?person foaf:givenName \"Bill\" } INSERT { ?person foaf:givenName \"William\" } WHERE { ?person foaf:givenName \"Bill\" }")))
+
+(deftest example-6
+  (is (=
+        (query
+          (delete :book :p :v)
+          (where :book [:dc :date] :date \.
+                 (filter :date > ["1970-01-01T00:00:00-02:00" "xsd:dateTime"])
+                 :book :p :v))
+
+        "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> DELETE { ?book ?p ?v } WHERE { ?book dc:date ?date . FILTER(?date > \"1970-01-01T00:00:00-02:00\"^^xsd:dateTime) ?book ?p ?v }")))
+
+(deftest example-7
+  (is (=
+        (query
+          (with (URI. "http://example/addresses"))
+          (delete :person :property :value)
+          (where :person :property :value
+                 \; [:foaf :givenName] "Fred"))
+
+        "PREFIX foaf: <http://xmlns.com/foaf/0.1/> WITH <http://example/addresses> DELETE { ?person ?property ?value } WHERE { ?person ?property ?value ; foaf:givenName \"Fred\" }")))
