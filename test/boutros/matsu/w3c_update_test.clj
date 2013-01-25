@@ -36,4 +36,13 @@
 
 (deftest example-4)
 
-(deftest example-5)
+(deftest example-5
+  (is
+    (=
+      (query
+        (with (URI. "http://example/addresses"))
+        (delete :person [:foaf :givenName] "Bill")
+        (insert :person [:foaf :givenName] "William")
+        (where :person [:foaf :givenName] "Bill"))
+
+      "PREFIX foaf: <http://xmlns.com/foaf/0.1/> WITH <http://example/addresses> DELETE { ?person foaf:givenName \"Bill\" } INSERT { ?person foaf:givenName \"William\" } WHERE { ?person foaf:givenName \"Bill\" }")))

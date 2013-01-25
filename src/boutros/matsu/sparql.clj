@@ -264,10 +264,21 @@
 
 ;; SPARQL UPDATE
 
+(defn with [q uri]
+  (assoc q :with {:tag "WITH" :bounds [" "] :sep " " :content [uri]}))
+
 (defn insert-data [q & more]
   (assoc q :insert {:tag "INSERT DATA" :bounds [" { " " }"] :sep " "
                     :content (vec more)}))
 
 (defn delete-data [q & more]
   (assoc q :insert {:tag "DELETE DATA" :bounds [" { " " }"] :sep " "
+                    :content (vec more)}))
+
+(defn insert [q & more]
+  (assoc q :insert {:tag "INSERT" :bounds [" { " " } "] :sep " "
+                    :content (vec more)}))
+
+(defn delete [q & more]
+  (assoc q :delete {:tag "DELETE" :bounds [" { " " } "] :sep " "
                     :content (vec more)}))

@@ -50,8 +50,9 @@ DELETE DATA
 
 ```clojure
 (query
-  (delete-data (URI. "http://example/book2") [:dc :title] "David Copperfield"
-               \; [:dc :creator] "Edmund Wells" \.))
+  (delete-data
+    (URI. "http://example/book2") [:dc :title] "David Copperfield"
+          \; [:dc :creator] "Edmund Wells" \.))
 ```
 
 ### Example 4
@@ -84,7 +85,11 @@ WHERE
 ```
 
 ```clojure
-(query)
+(query
+  (with (URI. "http://example/addresses"))
+  (delete :person [:foaf :givenName] "Bill")
+  (insert :person [:foaf :givenName] "William")
+  (where :person [:foaf :givenName] "Bill"))
 ```
 ### Example 6
 

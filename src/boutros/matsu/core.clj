@@ -17,6 +17,7 @@
   The :content field can contain other such maps, so the datastructure
   can be arbitrarily deeply nested."
   {:local-prefixes {}
+   :with nil
    :delete nil
    :insert nil
    :base nil

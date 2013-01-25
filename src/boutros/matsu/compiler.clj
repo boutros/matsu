@@ -104,8 +104,8 @@
   [q]
   (let [base (:base q) local-prefixes (:local-prefixes q)]
     (->> (conj []
-               (for [part [:query-form :from :from-named :delete :insert :where :order-by
-                           :limit :offset :group-by :having]]
+               (for [part [:query-form :from :from-named :with :delete :insert
+                           :where :order-by :limit :offset :group-by :having]]
                 (compiler q part)))
          (flatten)
          (string/join)
