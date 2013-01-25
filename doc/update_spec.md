@@ -150,7 +150,15 @@ WHERE
 ```
 
 ```clojure
-(query)
+(query
+  (insert
+    (graph (URI. "http://example/bookStore2"))
+    (group :book :p :v))
+  (where
+    (graph (URI. "http://example/bookStore"))
+    (group :book [:dc :date] :date \.
+           (filter :date > ["1970-01-01T00:00:00-02:00" "xsd:dateTime"])
+           :book :p :v)))
 ```
 ### Example 9
 
@@ -173,7 +181,15 @@ WHERE
 ```
 
 ```clojure
-(query)
+(query
+  (insert
+    (graph (URI. "http://example/addresses"))
+    (group :person [:foaf :name] :name \.
+           :person [:foaf :mbox] :email))
+  (where
+    (graph (URI. "http://example/people"))
+    (group :person [:foaf :name] :name \.
+           (optional :person [:foaf :mbox] :email))))
 ```
 ### Example 10
 
@@ -204,7 +220,7 @@ WHERE
 ```
 
 ```clojure
-(query)
+(query) ; currently not possible
 ```
 ### Example 11
 
@@ -216,7 +232,10 @@ DELETE WHERE { ?person foaf:givenName 'Fred';
 ```
 
 ```clojure
-(query)
+(query
+  (delete)
+  (where :person [:foaf :givenName] "Fred"
+         \; :property :value))
 ```
 
 ### Example 12
@@ -233,4 +252,15 @@ DELETE WHERE {
     ?person ?property2 ?value2
   }
 }
+```
+
+```clojure
+(query
+  (delete)
+  (where
+    (graph (URI. "http://example.com/names"))
+    (group :person [:foaf :givenName] "Fred"
+           \; :property1 :value1)
+    (graph (URI. "http://example.com/addresses"))
+    (group :person :property2 :value2)))
 ```

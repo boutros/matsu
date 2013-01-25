@@ -120,6 +120,28 @@ You can bind queries to vars with `defquery` and use them as basis for other que
 SELECT * WHERE { ?s ?p ?o } LIMIT 5
 ```
 
+### SPARQL Update
+`INSERT` and `DELETE` supported:
+
+```clojure
+(query
+  (with (URI. "http://example/addresses"))
+  (delete :person [:foaf :givenName] "Bill")
+  (insert :person [:foaf :givenName] "William")
+  (where :person [:foaf :givenName] "Bill"))
+```
+
+```sparql
+PREFIX foaf:  <http://xmlns.com/foaf/0.1/>
+
+WITH <http://example/addresses>
+DELETE { ?person foaf:givenName 'Bill' }
+INSERT { ?person foaf:givenName 'William' }
+WHERE
+  { ?person foaf:givenName 'Bill'
+  }
+```
+
 ### Interpolating raw strings in the query
 While the aim of matsu is to cover the full SPARQL 1.1 specification, there will no doubt be cases where it falls short. In such cases you can always insert a raw string into your query with `raw`:
 
@@ -163,7 +185,6 @@ WHERE {
 There might be other limitations, especially when dealing with SPARQL expressions. But most, if not all of the limitations can be circumvented by interpolating raw strings into the query with the `raw` function.
 
 ## Todos
-* SPARQL update
 * Better BIND syntax
 * Datetime encoding, java Date. to ^^xsd:dateTime
 * Subqueries

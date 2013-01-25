@@ -218,8 +218,8 @@
 (defn lang-matches [& more]
   {:tag "langMatches" :content (vec more) :bounds ["(" ")"] :sep ", "})
 
-;; TODO: STRLEN, SUBSTR, UCASE, LCASE, STRSTARS, STRENDS, CONTAINS, STRBEFORE,
-;;       STRAFTER, ENCODE_FOR_URI, REPLACE
+; TODO: STRLEN, SUBSTR, UCASE, LCASE, STRSTARS, STRENDS, CONTAINS, STRBEFORE,
+;       STRAFTER, ENCODE_FOR_URI, REPLACE
 
 
 ;; Functions on RDF terms
@@ -254,13 +254,13 @@
 (defn datatype [literal]
   {:tag "datatype" :content [literal] :bounds ["(" ")"] :sep ""})
 
-;; TODO: datatype, IRI, BNODE, STRDT, STRLANG, UUID, STRUUID
+; TODO: datatype, IRI, BNODE, STRDT, STRLANG, UUID, STRUUID
 
-;; Functions on Numerics
+; TODO: Functions on Numerics
 
-;; Functions on Dates and Times
+; TODO: Functions on Dates and Times
 
-;; Hash functions
+; TODO: Hash functions
 
 ;; SPARQL UPDATE
 
@@ -282,3 +282,5 @@
 (defn delete [q & more]
   (assoc q :delete {:tag "DELETE" :bounds [" { " " } "] :sep " "
                     :content (vec more)}))
+
+; TODO clear, load, create, move, copy, drop, add
