@@ -33,7 +33,7 @@ INSERT DATA
 (query
   (insert-data
     (graph (URI. "http://example/bookStore")
-           (group (URI. "http://example/book1") [:ns "price"] 42))))
+           (group (URI. "http://example/book1") [:ns :price] 42))))
 ```
 
 ### Example 3
@@ -50,8 +50,8 @@ DELETE DATA
 
 ```clojure
 (query
-  (delete-data (URI. "http://example/book2") [:dc "title"] "David Copperfield"
-               \; [:dc "creator"] "Edmund Wells" \.))
+  (delete-data (URI. "http://example/book2") [:dc :title] "David Copperfield"
+               \; [:dc :creator] "Edmund Wells" \.))
 ```
 
 ### Example 4

@@ -13,8 +13,8 @@
 (deftest example-1
   (is (=
         (query
-          (insert-data (URI. "http://example/book1") [:dc "title"] "A new book"
-                       \; [:dc "creator"] "A.N.Other" \.))
+          (insert-data (URI. "http://example/book1") [:dc :title] "A new book"
+                       \; [:dc :creator] "A.N.Other" \.))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> INSERT DATA { <http://example/book1> dc:title \"A new book\" ; dc:creator \"A.N.Other\" . }")))
 
@@ -22,16 +22,18 @@
   (is (=
         (query
           (insert-data (graph (URI. "http://example/bookStore")
-                              (group (URI. "http://example/book1") [:ns "price"] 42))))
+                              (group (URI. "http://example/book1") [:ns :price] 42))))
 
         "PREFIX ns: <http://example.org/ns#> INSERT DATA { GRAPH <http://example/bookStore> { <http://example/book1> ns:price 42 } }")))
 
 (deftest example-3
   (is (=
         (query
-          (delete-data (URI. "http://example/book2") [:dc "title"] "David Copperfield"
-                       \; [:dc "creator"] "Edmund Wells" \.))
+          (delete-data (URI. "http://example/book2") [:dc :title] "David Copperfield"
+                       \; [:dc :creator] "Edmund Wells" \.))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> DELETE DATA { <http://example/book2> dc:title \"David Copperfield\" ; dc:creator \"Edmund Wells\" . }")))
 
 (deftest example-4)
+
+(deftest example-5)

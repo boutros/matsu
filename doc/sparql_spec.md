@@ -51,8 +51,8 @@ WHERE
 ```clojure
 (query
   (select :name :mbox)
-  (where :x [:foaf "name"] :name \.
-         :x [:foaf "mbox"] :mbox))
+  (where :x [:foaf :name] :name \.
+         :x [:foaf :mbox] :mbox))
 ```
 
 ### 2.3 Matching RDF Literals
@@ -109,7 +109,7 @@ WHERE  { ?x foaf:name ?name }
 ```clojure
 (query
   (select :x :name)
-  (where :x [:foaf "name"] :name))
+  (where :x [:foaf :name] :name))
 ```
 
 ### 2.5 Creating Values with Expressions
@@ -123,8 +123,8 @@ WHERE  { ?P foaf:givenName ?G ; foaf:surname ?S }
 ```clojure
 (query
   (select [(concat :G " " :S) :name])
-  (where :P [:foaf "givenName"] :G
-         \; [:foaf "surname"] :S))
+  (where :P [:foaf :givenName] :G
+         \; [:foaf :surname] :S))
 ```
 
 ```sparql
@@ -140,8 +140,8 @@ WHERE  {
 ```clojure
 (query
   (select :name)
-  (where :P [:foaf "givenName"] :G
-         \; [:foaf "surname"] :S
+  (where :P [:foaf :givenName] :G
+         \; [:foaf :surname] :S
          (bind [(concat :G " " :S) :name])))
 ```
 
@@ -157,8 +157,8 @@ WHERE  { ?x org:employeeName ?name }
 
 ```clojure
 (query
-  (construct :x [:foaf "name"] :name)
-  (where :x [:org "employeeName"] :name))
+  (construct :x [:foaf :name] :name)
+  (where :x [:org :employeeName] :name))
 ```
 
 ## 3 RDF Term Constraints (Informative)
@@ -176,7 +176,7 @@ WHERE   { ?x dc:title ?title
 ```clojure
 (query
   (select :title)
-  (where :x [:dc "title"] :title
+  (where :x [:dc :title] :title
          (filter (regex :title "^SPARQL"))))
 ```
 
@@ -192,7 +192,7 @@ WHERE   { ?x dc:title ?title
 ```clojure
 (query
   (select :title)
-  (where :x [:dc "title"] :title
+  (where :x [:dc :title] :title
          (filter (regex :title "web" "i"))))
 ```
 
@@ -210,9 +210,9 @@ WHERE   { ?x ns:price ?price .
 ```clojure
 (query
   (select :title :price)
-    (where :x [:ns "price"] :price \.
+    (where :x [:ns :price] :price \.
            (filter :price < 30.5)
-           :x [:dc "title"] :title \.))
+           :x [:dc :title] :title \.))
 ```
 
 ## SPARQL Syntax
@@ -228,7 +228,7 @@ WHERE   { <http://example.org/book/book1> dc:title ?title }
 ```clojure
 (query
   (select :title)
-  (where (URI. "http://example.org/book/book1") [:dc "title"] :title))
+  (where (URI. "http://example.org/book/book1") [:dc :title] :title))
 ```
 
 ```sparql
@@ -259,7 +259,7 @@ WHERE   { <book1>  dc:title  ?title }
   (query
     (base (URI. "http://example.org/book"))
     (select :title)
-    (where [book1] [:dc "title"] :title))
+    (where [book1] [:dc :title] :title))
 ```
 
 ## 5 Graph Patterns
@@ -278,8 +278,8 @@ WHERE  {
 ```clojure
 (query
   (select :name :mbox)
-  (where :x [:foaf "name"] :name \.
-         :x [:foaf "mbox"] :mbox \.))
+  (where :x [:foaf :name] :name \.
+         :x [:foaf :mbox] :mbox \.))
 ```
 
 ```sparql
@@ -293,8 +293,8 @@ WHERE  { { ?x foaf:name ?name . }
 ```clojure
 (query
   (select :name :mbox)
-  (where (group :x [:foaf "name"] :name \.)
-         (group :x [:foaf "mbox"] :mbox \.)))
+  (where (group :x [:foaf :name] :name \.)
+         (group :x [:foaf :mbox] :mbox \.)))
 ```
 
 
@@ -313,8 +313,8 @@ WHERE  { ?x foaf:name  ?name .
 ```clojure
 (query
   (select :name :mbox)
-  (where :x [:foaf "name"] :name \.
-         (optional :x [:foaf "mbox"] :mbox)))
+  (where :x [:foaf :name] :name \.
+         (optional :x [:foaf :mbox] :mbox)))
 ```
 
 ### 6.2 Constraints in Optional Pattern Matching
@@ -331,8 +331,8 @@ WHERE   { ?x dc:title ?title .
 ```clojure
 (query
   (select :title :price)
-  (where :x [:dc "title"] :title \.
-         (optional :x [:ns "price"] :price \. (filter :price < 30))))
+  (where :x [:dc :title] :title \.
+         (optional :x [:ns :price] :price \. (filter :price < 30))))
 ```
 
 ### 6.3 Multiple Optional Graph Patterns
@@ -349,9 +349,9 @@ WHERE  { ?x foaf:name  ?name .
 ```clojure
 (query
   (select :name :mbox :hpage)
-  (where :x [:foaf "name"] :name \.
-         (optional :x [:foaf "mbox"] :mbox) \.
-         (optional :x [:foaf "homepage"] :hpage)))
+  (where :x [:foaf :name] :name \.
+         (optional :x [:foaf :mbox] :mbox) \.
+         (optional :x [:foaf :homepage] :hpage)))
 ```
 
 ## 7 Matching Alternatives
@@ -367,8 +367,8 @@ WHERE  { { ?book dc10:title  ?title } UNION { ?book dc11:title  ?title } }
 ```clojure
 (query
   (select :title)
-  (where (union (group :book [:dc10 "title"] :title)
-                (group :book [:dc11 "title"] :title))))
+  (where (union (group :book [:dc10 :title] :title)
+                (group :book [:dc11 :title] :title))))
 ```
 
 ```sparql
@@ -382,8 +382,8 @@ WHERE  { { ?book dc10:title ?x } UNION { ?book dc11:title  ?y } }
 ```clojure
 (query
   (select :x :y)
-  (where (union (group :book [:dc10 "title"] :x)
-                (group :book [:dc11 "title"] :y))))
+  (where (union (group :book [:dc10 :title] :x)
+                (group :book [:dc11 :title] :y))))
 ```
 
 ```sparql
@@ -400,8 +400,8 @@ WHERE  { { ?book dc10:title ?title .  ?book dc10:creator ?author }
 ```clojure
 (query
   (select :title :author)
-  (where (union (group :book [:dc10 "title"] :title \. :book [:dc10 "creator"] :author)
-                (group :book [:dc11 "title"] :title \. :book [:dc11 "creator"] :author))))
+  (where (union (group :book [:dc10 :title] :title \. :book [:dc10 :creator] :author)
+                (group :book [:dc11 :title] :title \. :book [:dc11 :creator] :author))))
 ```
 ## 8 Negation
 
@@ -422,8 +422,8 @@ WHERE
 ```clojure
 (query
   (select :person)
-  (where :person [:rdf "type"] [:foaf "Person"] \.
-         (filter-not-exists :person [:foaf "name"] :name)))
+  (where :person [:rdf :type] [:foaf :Person] \.
+         (filter-not-exists :person [:foaf :name] :name)))
 ```
 
 ```sparql
@@ -441,8 +441,8 @@ WHERE
 ```clojure
 (query
   (select :person)
-  (where :person [:rdf "type"] [:foaf "Person"] \.
-         (filter-exists :person [:foaf "name"] :name)))
+  (where :person [:rdf :type] [:foaf :Person] \.
+         (filter-exists :person [:foaf :name] :name)))
 ```
 
 ### 8.2 Removing Possible Solutions
@@ -464,7 +464,7 @@ WHERE {
 (query
   (select-distinct :s)
   (where :s :p :o \.
-         (minus :s [:foaf "givenName"] "Bob" \.)))
+         (minus :s [:foaf :givenName] "Bob" \.)))
 ```
 
 ### 8.3 Relationship and differences between NOT EXISTS and MINUS
@@ -599,10 +599,10 @@ Not quite possible yet without resorting to `raw`:
 ```clojure
 (query
   (select :title :price)
-  (where (group :x [:ns "price"] :p \.
-                :x [:ns "discount"] :discount
+  (where (group :x [:ns :price] :p \.
+                :x [:ns :discount] :discount
                 (bind [(raw "?p*(1-?discount)") :price]))
-         (group :x [:dc "title"] :title \.)
+         (group :x [:dc :title] :title \.)
          (filter :price < 20)))
 ```
 
@@ -805,7 +805,7 @@ WHERE   { ?x foaf:name ?name }
 (query
   (select :name)
   (from (URI. "http://example.org/foaf/aliceFoaf"))
-  (where :x [:foaf "name"] :name))
+  (where :x [:foaf :name] :name))
 ```
 
 ```sparql
@@ -829,8 +829,8 @@ WHERE
   (from (URI. "http://example.org/dft.ttl"))
   (from-named (URI. "http://example.org/bob")
               (URI. "http://example.org/alice"))
-  (where :g [:dc "publisher"] :who \.
-         (graph :g (group :x [:foaf "mbox"] :mbox))))
+  (where :g [:dc :publisher] :who \.
+         (graph :g (group :x [:foaf :mbox] :mbox))))
 ```
 
 ### 13.3 Querying the Dataset
@@ -858,8 +858,8 @@ WHERE
   (from-named (URI. "http://example.org/foaf/aliceFoaf")
               (URI. "http://example.org/foaf/bobFoaf"))
   (where (graph :src
-                (group :x [:foaf "mbox"] (URI. "mailto:bob@work.example") \.
-                       :x [:foaf "nick"] :bobNick))))
+                (group :x [:foaf :mbox] (URI. "mailto:bob@work.example") \.
+                       :x [:foaf :nick] :bobNick))))
 ```
 
 ```sparql
@@ -882,9 +882,9 @@ WHERE
   (select :nick)
   (from-named (URI. "http://example.org/foaf/aliceFoaf")
               (URI. "http://example.org/foaf/bobFoaf"))
-  (where (graph [:data "bobFoaf"]
-                (group :x [:foaf "mbox"] (URI. "mailto:bob@work.example") \.
-                       :x [:foaf "nick"] :nick))))
+  (where (graph [:data :bobFoaf]
+                (group :x [:foaf :mbox] (URI. "mailto:bob@work.example") \.
+                       :x [:foaf :nick] :nick))))
 ```
 
 ```sparql
@@ -919,16 +919,16 @@ WHERE
   (from-named (URI. "http://example.org/foaf/aliceFoaf")
               (URI. "http://example.org/foaf/bobFoaf"))
   (where
-    (graph [:data "aliceFoaf"]
-           (group :alice [:foaf "mbox"] (URI. "mailto:alice@work.example")
-                  \; [:foaf "knows"] :whom \.
-                  :whom [:foaf "mbox"] :mbox
-                  \; [:rdfs "seeAlso"] :ppd \.
-                  :ppd a [:foaf "PersonalProfileDocument"] \.)
+    (graph [:data :aliceFoaf]
+           (group :alice [:foaf :mbox] (URI. "mailto:alice@work.example")
+                  \; [:foaf :knows] :whom \.
+                  :whom [:foaf :mbox] :mbox
+                  \; [:rdfs :seeAlso] :ppd \.
+                  :ppd a [:foaf :PersonalProfileDocument] \.)
            \.)
     (graph :ppd
-           (group :w [:foaf "mbox"] :mbox
-                  \; [:foaf "nick"] :nick))))
+           (group :w [:foaf :mbox] :mbox
+                  \; [:foaf :nick] :nick))))
 ```
 
 ```sparql
@@ -948,11 +948,11 @@ WHERE
 (query
   (select :name :mbox :date)
   (where
-    :g [:dc "publisher"] :name
-    \; [:dc "date"] :date \.
+    :g [:dc :publisher] :name
+    \; [:dc :date] :date \.
     (graph :g
-           (group :person [:foaf "name"] :name
-                  \; [:foaf "mbox"] :mbox))))
+           (group :person [:foaf :name] :name
+                  \; [:foaf :mbox] :mbox))))
 ```
 
 ## 14 Basic Federated Query
@@ -974,7 +974,7 @@ ORDER BY ?name
 ```clojure
 (query
   (select :name)
-  (where :x [:foaf "name"] :name)
+  (where :x [:foaf :name] :name)
   (order-by :name))
 ```
 
@@ -991,7 +991,7 @@ ORDER BY DESC(?emp)
 (query
   (base (URI. "http://example.org/ns#"))
   (select :name)
-  (where :x [:foaf "name"] :name
+  (where :x [:foaf :name] :name
          \; [:empId] :emp)
   (order-by (desc :emp))) ; or (order-by-desc :emp)
 ```
@@ -1009,7 +1009,7 @@ ORDER BY ?name DESC(?emp)
 (query
   (base (URI. "http://example.org/ns#"))
   (select :name)
-  (where :x [:foaf "name"] :name
+  (where :x [:foaf :name] :name
          \; [:empId] :emp)
   (order-by :name (desc :emp)))
 ```
@@ -1026,7 +1026,7 @@ WHERE
 ```clojure
 (query
   (select :name)
-  (where :x [:foaf "name"] :name))
+  (where :x [:foaf :name] :name))
 ```
 
 ### 15.3 Duplicate Solutions
@@ -1039,7 +1039,7 @@ SELECT DISTINCT ?name WHERE { ?x foaf:name ?name }
 ```clojure
 (query
   (select-distinct :name)
-  (where :x [:foaf "name"] :name))
+  (where :x [:foaf :name] :name))
 ```
 
 ```sparql
@@ -1050,7 +1050,7 @@ SELECT REDUCED ?name WHERE { ?x foaf:name ?name }
 ```clojure
 (query
   (select-reduced :name)
-  (where :x [:foaf "name"] :name))
+  (where :x [:foaf :name] :name))
 ```
 
 ### 15.4 OFFSET
@@ -1068,7 +1068,7 @@ OFFSET  10
 ```clojure
 (query
   (select :name)
-  (where :x [:foaf "name"] :name)
+  (where :x [:foaf :name] :name)
   (order-by :name)
   (limit 5)
   (offset 10))
@@ -1087,7 +1087,7 @@ LIMIT 20
 ```clojure
 (query
   (select :name)
-  (where :x [:foaf "name"] :name)
+  (where :x [:foaf :name] :name)
   (limit 20))
 ```
 
@@ -1109,10 +1109,10 @@ WHERE
 ```clojure
 (query
   (select :nameX :nameY :nickY)
-  (where :x [:foaf "knows"] :y
-         \; [:foaf "name"] :nameX \.
-         :y [:foaf "name"] :nameY \.
-         (optional :y [:foaf "nick"] :nickY)))
+  (where :x [:foaf :knows] :y
+         \; [:foaf :name] :nameX \.
+         :y [:foaf :name] :nameY \.
+         (optional :y [:foaf :nick] :nickY)))
 ```
 
 ```sparql
@@ -1128,9 +1128,9 @@ SELECT  ?title (?p*(1-?discount) AS ?price)
 ```clojure
 (query
   (select :title [(raw "?p*(1-?discount)") :price])
-  (where :x [:ns "price"] :p \.
-         :x [:dc "title"] :title \.
-         :x [:ns "discount"] :discount))
+  (where :x [:ns :price] :p \.
+         :x [:dc :title] :title \.
+         :x [:ns :discount] :discount))
 ```
 
 ```sparql
@@ -1146,9 +1146,9 @@ SELECT  ?title (?p AS ?fullPrice) (?fullPrice*(1-?discount) AS ?customerPrice)
 ```clojure
 (query
   (select :title [(raw "?p AS ?fullPrice) (?fullPrice*(1-?discount)") :customerPrice])
-  (where :x [:ns "price"] :p \.
-         :x [:dc "title"] :title \.
-         :x [:ns "discount"] :discount))
+  (where :x [:ns :price] :p \.
+         :x [:dc :title] :title \.
+         :x [:ns :discount] :discount))
 ```
 
 ### 16.2 CONSTRUCT
@@ -1162,8 +1162,8 @@ WHERE       { ?x foaf:name ?name }
 
 ```clojure
 (query
-  (construct (URI. "http://example.org/person#Alice") [:vcard "FN"] :name)
-  (where :x [:foaf "name"] :name))
+  (construct (URI. "http://example.org/person#Alice") [:vcard :FN] :name)
+  (where :x [:foaf :name] :name))
 ```
 
 ```sparql
@@ -1182,15 +1182,15 @@ WHERE
 Blank nodes are created with double brackets:
 ```clojure
 (query
-  (construct :x [:vcard "N"] [[:v]] \.
-             [[:v]] [:vcard "givenName"] :gname \.
-             [[:v]] [:vcard "familyName"] :fname)
+  (construct :x [:vcard :N] [[:v]] \.
+             [[:v]] [:vcard :givenName] :gname \.
+             [[:v]] [:vcard :familyName] :fname)
   (where (union
-           (group :x [:foaf "firstname"] :gname)
-           (group :x [:foaf "givenname"] :gname)) \.
+           (group :x [:foaf :firstname] :gname)
+           (group :x [:foaf :givenname] :gname)) \.
          (union
-           (group :x [:foaf "surname"] :fname)
-           (group :x [:foaf "family_name"] :fname)) \.))
+           (group :x [:foaf :surname] :fname)
+           (group :x [:foaf :family_name] :fname)) \.))
 ```
 
 ```sparql
@@ -1222,9 +1222,9 @@ CONSTRUCT { ?s ?p ?o } WHERE
   (construct :s :p :o)
   (where
     (graph :g (group :s :p :o) \.)
-    :g [:dc "publisher"] (URI. "http://www.w3.org/") \.
-    :g [:dc "date"] :date \.
-    (filter [:app "customDate(?date)"] > (raw "\"2005-02-28T00:00:00Z\"^^xsd:dateTime")) \.))
+    :g [:dc :publisher] (URI. "http://www.w3.org/") \.
+    :g [:dc :date] :date \.
+    (filter (raw "app:customDate(?date)") > (raw "\"2005-02-28T00:00:00Z\"^^xsd:dateTime")) \.))
 ```
 
 ```sparql
@@ -1242,9 +1242,9 @@ LIMIT 2
 
 ```clojure
 (query
-  (construct [[]] [:foaf "name"] :name)
-  (where [[]] [:foaf "name"] :name
-         \; [:site "hits"] :hits \.)
+  (construct [[]] [:foaf :name] :name)
+  (where [[]] [:foaf :name] :name
+         \; [:site :hits] :hits \.)
   (order-by-desc :hits)
   (limit 2))
 ```
@@ -1268,8 +1268,8 @@ WHERE
 
 ```clojure
 (query
-  (construct :x [:foaf "name"] :name)
-  (where :x [:foaf "name"] :name))
+  (construct :x [:foaf :name] :name)
+  (where :x [:foaf :name] :name))
 ```
 
 ### 16.3 ASK
@@ -1281,7 +1281,7 @@ ASK  { ?x foaf:name  "Alice" }
 
 ```clojure
 (query
-  (ask :x [:foaf "name"] "Alice"))
+  (ask :x [:foaf :name] "Alice"))
 ```
 
 ```sparql
@@ -1292,8 +1292,8 @@ ASK  { ?x foaf:name  "Alice" ;
 
 ```clojure
 (query
-  (ask :x [:foaf "name"] "Alice"
-       \; [:foaf "mbox"] (URI. "mailto:alice@work.example")))
+  (ask :x [:foaf :name] "Alice"
+       \; [:foaf :mbox] (URI. "mailto:alice@work.example")))
 ```
 
 ### 16.4 DESCRIBE (Informative)
@@ -1316,7 +1316,7 @@ WHERE    { ?x foaf:mbox <mailto:alice@org> }
 ```clojure
 (query
   (describe :x)
-  (where :x [:foaf "mbox"] (URI. "mailto:alice@org")))
+  (where :x [:foaf :mbox] (URI. "mailto:alice@org")))
 ```
 
 ```sparql
@@ -1328,7 +1328,7 @@ WHERE    { ?x foaf:name "Alice" }
 ```clojure
 (query
   (describe :x)
-  (where :x [:foaf "name"] "Alice"))
+  (where :x [:foaf :name] "Alice"))
 ```
 
 ```sparql
@@ -1340,7 +1340,7 @@ WHERE    {?x foaf:knows ?y}
 ```clojure
 (query
   (describe :x :y (URI. "http://example.org/"))
-  (where :x [:foaf "knows"] :y))
+  (where :x [:foaf :knows] :y))
 ```
 
 ```sparql
@@ -1351,7 +1351,7 @@ DESCRIBE ?x WHERE { ?x ent:employeeId "1234" }
 ```clojure
 (query
   (describe :x)
-  (where :x [:ent "employeeId"] "1234"))
+  (where :x [:ent :employeeId] "1234"))
 ```
 
 ## 17 Expressions and Testing Values
@@ -1370,8 +1370,8 @@ WHERE { ?annot  a:annotates  <http://www.w3.org/TR/rdf-sparql-query/> .
 ```clojure
 (query
   (select :annot)
-  (where :annot [:a "annotates"] (URI. "http://www.w3.org/TR/rdf-sparql-query/") \.
-         :annot [:dc "date"] :date \.
+  (where :annot [:a :annotates] (URI. "http://www.w3.org/TR/rdf-sparql-query/") \.
+         :annot [:dc :date] :date \.
          (filter :date > (raw "\"2005-01-01T00:00:00Z\"^^xsd:dateTime"))))
 ```
 
@@ -1389,8 +1389,8 @@ SELECT ?givenName
 ```clojure
 (query
   (select :givenName)
-  (where :x [:foaf "givenName"] :givenName \.
-         (optional :x [:dc "date"] :date) \.
+  (where :x [:foaf :givenName] :givenName \.
+         (optional :x [:dc :date] :date) \.
          (filter (bound :date))))
 ```
 
@@ -1406,8 +1406,8 @@ SELECT ?name
 ```clojure
 (query
   (select :name)
-  (where :x [:foaf "givenName"] :name \.
-         (optional :x [:dc "date"] :date) \.
+  (where :x [:foaf :givenName] :name \.
+         (optional :x [:dc :date] :date) \.
          (filter (!bound :date))))
 ```
 
@@ -1425,10 +1425,10 @@ WHERE { ?x foaf:name  ?name1 ;
 ```clojure
 (query
   (select :name1 :name2)
-  (where :x [:foaf "name"] :name1
-         \; [:foaf "mbox"] :mbox1 \.
-         :y [:foaf "name"] :name2
-         \; [:foaf "mbox"] :mbox2 \.
+  (where :x [:foaf :name] :name1
+         \; [:foaf :mbox] :mbox1 \.
+         :y [:foaf :name] :name2
+         \; [:foaf :mbox] :mbox2 \.
          (filter :mbox1 = :mbox2 && :name1 != :name2)))
 ```
 
@@ -1462,10 +1462,10 @@ WHERE { ?x foaf:name  ?name1 ;
 ```clojure
   (query
   (select :name1 :name2)
-  (where :x [:foaf "name"] :name1
-         \; [:foaf "mbox"] :mbox1 \.
-         :y [:foaf "name"] :name2
-         \; [:foaf "mbox"] :mbox2 \.
+  (where :x [:foaf :name] :name1
+         \; [:foaf :mbox] :mbox1 \.
+         :y [:foaf :name] :name2
+         \; [:foaf :mbox] :mbox2 \.
          (filter (same-term :mbox1, :mbox2) && (!same-term :name1 :name2))))
 ```
 
@@ -1508,8 +1508,8 @@ SELECT ?name ?mbox
 ```clojure
 (query
   (select :name :mbox)
-  (where :x [:foaf "name"] :name
-         \; [:foaf "mbox"] :mbox \.
+  (where :x [:foaf :name] :name
+         \; [:foaf :mbox] :mbox \.
          (filter (is-iri :mbox))))
 ```
 
@@ -1529,10 +1529,10 @@ WHERE { ?annot  a:annotates  <http://www.w3.org/TR/rdf-sparql-query/> .
 ```clojure
 (query
   (select :given :family)
-  (where :annot [:a "annotates"] (URI. "http://www.w3.org/TR/rdf-sparql-query/") \.
-         :annot [:dc "creator"] :c \.
-         (optional :c [:foaf "given"] :given
-                    \; [:foaf "family"] :family) \.
+  (where :annot [:a :annotates] (URI. "http://www.w3.org/TR/rdf-sparql-query/") \.
+         :annot [:dc :creator] :c \.
+         (optional :c [:foaf :given] :given
+                    \; [:foaf :family] :family) \.
          (filter (is-blank :c))))
 ```
 
@@ -1547,8 +1547,8 @@ WHERE { ?x foaf:name  ?name ;
 ```clojure
 (query
   (select :name :mbox)
-  (where :x [:foaf "name"] :name
-         \; [:foaf "mbox"] :mbox \.
+  (where :x [:foaf :name] :name
+         \; [:foaf :mbox] :mbox \.
          (filter (is-literal :mbox))))
 ```
 
@@ -1564,8 +1564,8 @@ I didn't want to do without `clojure.core/str`, so I named the `str` function `s
 ```clojure
 (query
   (select :name :mbox)
-  (where :x [:foaf "name"] :name
-         \; [:foaf "mbox"] :mbox \.
+  (where :x [:foaf :name] :name
+         \; [:foaf :mbox] :mbox \.
          (filter (regex (str2 :mbox) "@work\\.example$"))))
 ```
 
@@ -1580,8 +1580,8 @@ SELECT ?name ?mbox
 ```clojure
 (query
   (select :name :mbox)
-  (where :x [:foaf "name"] :name
-          \; [:foaf "mbox"] :mbox \.
+  (where :x [:foaf :name] :name
+          \; [:foaf :mbox] :mbox \.
           (filter (lang :name) = "es")))
 ```
 
@@ -1597,9 +1597,9 @@ SELECT ?name ?shoeSize
 ```clojure
 (query
   (select :name :shoeSize)
-  (where :x [:foaf "name"] :name
-         \; [:eg "shoeSize"] :shoeSize \.
-         (filter (datatype :shoeSize) = [:xsd "integer"])))
+  (where :x [:foaf :name] :name
+         \; [:eg :shoeSize] :shoeSize \.
+         (filter (datatype :shoeSize) = [:xsd :integer])))
 ```
 
 
@@ -1614,8 +1614,8 @@ SELECT ?title
 ```clojure
 (query
   (select :title)
-  (where :x [:dc "title"] ["That Seventies Show" :en]
-         \; [:dc "title"] :title \.
+  (where :x [:dc :title] ["That Seventies Show" :en]
+         \; [:dc :title] :title \.
          (filter (lang-matches (lang :title) "FR"))))
 ```
 
@@ -1629,7 +1629,7 @@ SELECT ?title
 ```clojure
 (query
   (select :title)
-  (where :x [:dc "title"] :title \.
+  (where :x [:dc :title] :title \.
          (filter (lang-matches (lang :title) "*"))))
 ```
 
@@ -1643,7 +1643,7 @@ SELECT ?name
 ```clojure
 (query
   (select :name)
-  (where :x [:foaf "name"] :name
+  (where :x [:foaf :name] :name
          (filter (regex :name "^ali" "i"))))
 ```
 
@@ -1695,7 +1695,7 @@ WHERE {
 ```clojure
 (query
   (select [(sum :val) :sum] [(count :a) :count])
-  (where :a [:rdf "value"] :val \.)
+  (where :a [:rdf :value] :val \.)
   (group-by :a))
 ```
 

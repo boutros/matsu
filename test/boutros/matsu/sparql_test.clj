@@ -35,7 +35,7 @@
   (is (=
         (query-with-prefixes {:foaf "<mylocalfoaf>"}
           (select :person)
-          (where :person [:foaf "name"] "Petter"))
+          (where :person [:foaf :name] "Petter"))
         "PREFIX foaf: <mylocalfoaf> SELECT ?person WHERE { ?person foaf:name \"Petter\" }")))
 
 ;; SPARQL Query DSL functions

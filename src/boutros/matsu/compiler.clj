@@ -46,7 +46,8 @@
                     (and (map? a)
                          (keyword? b)) (into ["("]
                                              (conj (sub-compiler a) " AS " (encode b) ")" ))
-                    :else (str (name a) \: b)))
+                    (every? keyword? x) (str (name a) \: (name b))
+                    :else "cannot encode!"))
     (map? x) (sub-compiler x)
     :else (throw (Exception.
                    (format "Don't know how to encode %s in an SPARQL context" x)))))

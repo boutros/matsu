@@ -7,4 +7,4 @@
   (is (thrown? IllegalArgumentException
                (query
                  (select *)
-                 (where [:missing "dada"] :p :o)))))
+                 (where [:missing :dada] :p :o)))))

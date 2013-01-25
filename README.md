@@ -18,8 +18,8 @@ Matsu is a DSL for constructing SPARQL queries:
 ```clojure
 (query
   (select :person)
-  (where :person a [:foaf "Person"]
-         \; [:foaf "mbox"] (URI. "mailto:me@me.com") \.))
+  (where :person a [:foaf :Person]
+         \; [:foaf :mbox] (URI. "mailto:me@me.com") \.))
 ```
 
 Which would yield the following string:
@@ -65,15 +65,15 @@ Matsu makes it possible to create complex, nested queries:
               (URI. "http://example.org/foaf/bobFoaf"))
   (where
     (graph [:data "aliceFoaf"]
-           (group :alice [:foaf "mbox"] (URI. "mailto:alice@work.example") \;
-                         [:foaf "knows"] :whom \.
-                  :whom  [:foaf "mbox"] :mbox \;
-                         [:rdfs "seeAlso"] :ppd \.
-                  :ppd a [:foaf "PersonalProfileDocument"] \.)
+           (group :alice [:foaf :mbox] (URI. "mailto:alice@work.example") \;
+                         [:foaf :knows] :whom \.
+                  :whom  [:foaf :mbox] :mbox \;
+                         [:rdfs :seeAlso] :ppd \.
+                  :ppd a [:foaf :PersonalProfileDocument] \.)
            \.)
     (graph :ppd
-           (group :w [:foaf "mbox"] :mbox \;
-                     [:foaf "nick"] :nick))))
+           (group :w [:foaf :mbox] :mbox \;
+                     [:foaf :nick] :nick))))
 ```
 
 Yielding the following SPARQL string:
@@ -126,10 +126,10 @@ While the aim of matsu is to cover the full SPARQL 1.1 specification, there will
 ```clojure
 (query
   (select :title :price)
-  (where (group :x [:ns "price"] :p \.
-                :x [:ns "discount"] :discount
+  (where (group :x [:ns :price] :p \.
+                :x [:ns :discount] :discount
                 (bind [(raw "?p*(1-?discount)") :price]))
-         (group :x [:dc "title"] :title \.)
+         (group :x [:dc :title] :title \.)
          (filter :price < 20)))
 ```
 

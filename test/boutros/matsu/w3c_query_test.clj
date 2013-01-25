@@ -44,8 +44,8 @@
   (is (=
         (query
           (select :name :mbox)
-          (where :x [:foaf "name"] :name \.
-                 :x [:foaf "mbox"] :mbox))
+          (where :x [:foaf :name] :name \.
+                 :x [:foaf :mbox] :mbox))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE { ?x foaf:name ?name . ?x foaf:mbox ?mbox }"))
 
@@ -80,31 +80,31 @@
   (is (=
         (query
           (select :x :name)
-          (where :x [:foaf "name"] :name))
+          (where :x [:foaf :name] :name))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?x ?name WHERE { ?x foaf:name ?name }"))
 
   (is (=
         (query
           (select [(concat :G " " :S) :name])
-          (where :P [:foaf "givenName"] :G
-                 \; [:foaf "surname"] :S))
+          (where :P [:foaf :givenName] :G
+                 \; [:foaf :surname] :S))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT (CONCAT(?G, \" \", ?S) AS ?name) WHERE { ?P foaf:givenName ?G ; foaf:surname ?S }"))
 
   (is (=
         (query
           (select :name)
-          (where :P [:foaf "givenName"] :G
-                 \; [:foaf "surname"] :S
+          (where :P [:foaf :givenName] :G
+                 \; [:foaf :surname] :S
                  (bind [(concat :G " " :S) :name])))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?P foaf:givenName ?G ; foaf:surname ?S BIND(CONCAT(?G, \" \", ?S) AS ?name) }"))
 
   (is (=
         (query
-          (construct :x [:foaf "name"] :name)
-          (where :x [:org "employeeName"] :name))
+          (construct :x [:foaf :name] :name)
+          (where :x [:org :employeeName] :name))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX org: <http://example.com/ns#> CONSTRUCT { ?x foaf:name ?name } WHERE { ?x org:employeeName ?name }")))
 
@@ -115,7 +115,7 @@
   (is (=
         (query
           (select :title)
-          (where :x [:dc "title"] :title
+          (where :x [:dc :title] :title
                  (filter (regex :title "^SPARQL"))))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { ?x dc:title ?title FILTER regex(?title, \"^SPARQL\") }"))
@@ -123,7 +123,7 @@
   (is (=
         (query
           (select :title)
-          (where :x [:dc "title"] :title
+          (where :x [:dc :title] :title
                  (filter (regex :title "web" "i"))))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { ?x dc:title ?title FILTER regex(?title, \"web\", \"i\") }"))
@@ -131,9 +131,9 @@
   (is (=
         (query
           (select :title :price)
-          (where :x [:ns "price"] :price \.
+          (where :x [:ns :price] :price \.
                  (filter :price < 30.5)
-                 :x [:dc "title"] :title \.))
+                 :x [:dc :title] :title \.))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ?price WHERE { ?x ns:price ?price . FILTER(?price < 30.5) ?x dc:title ?title . }")))
 
@@ -143,7 +143,7 @@
   (is (=
         (query
           (select :title)
-          (where (URI. "http://example.org/book/book1") [:dc "title"] :title))
+          (where (URI. "http://example.org/book/book1") [:dc :title] :title))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { <http://example.org/book/book1> dc:title ?title }"))
 
@@ -151,7 +151,7 @@
         (query
           (base (URI. "http://example.org/book/"))
           (select :title)
-          (where [:book1] [:dc "title"] :title))
+          (where [:book1] [:dc :title] :title))
 
         "BASE <http://example.org/book/> PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { <book1> dc:title ?title }")))
 
@@ -161,16 +161,16 @@
   (is (=
         (query
           (select :name :mbox)
-          (where :x [:foaf "name"] :name \.
-                 :x [:foaf "mbox"] :mbox \.))
+          (where :x [:foaf :name] :name \.
+                 :x [:foaf :mbox] :mbox \.))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE { ?x foaf:name ?name . ?x foaf:mbox ?mbox . }"))
 
   (is (=
         (query
           (select :name :mbox)
-          (where (group :x [:foaf "name"] :name \.)
-                 (group :x [:foaf "mbox"] :mbox \.)))
+          (where (group :x [:foaf :name] :name \.)
+                 (group :x [:foaf :mbox] :mbox \.)))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE { { ?x foaf:name ?name . } { ?x foaf:mbox ?mbox . } }")))
 
@@ -180,25 +180,25 @@
   (is (=
         (query
           (select :name :mbox)
-          (where :x [:foaf "name"] :name \.
-                 (optional :x [:foaf "mbox"] :mbox)))
+          (where :x [:foaf :name] :name \.
+                 (optional :x [:foaf :mbox] :mbox)))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE { ?x foaf:name ?name . OPTIONAL { ?x foaf:mbox ?mbox } }"))
 
   (is (=
         (query
           (select :title :price)
-          (where :x [:dc "title"] :title \.
-                 (optional :x [:ns "price"] :price \. (filter :price < 30))))
+          (where :x [:dc :title] :title \.
+                 (optional :x [:ns :price] :price \. (filter :price < 30))))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ?price WHERE { ?x dc:title ?title . OPTIONAL { ?x ns:price ?price . FILTER(?price < 30) } }" ))
 
   (is (=
         (query
           (select :name :mbox :hpage)
-          (where :x [:foaf "name"] :name \.
-                 (optional :x [:foaf "mbox"] :mbox) \.
-                 (optional :x [:foaf "homepage"] :hpage)))
+          (where :x [:foaf :name] :name \.
+                 (optional :x [:foaf :mbox] :mbox) \.
+                 (optional :x [:foaf :homepage] :hpage)))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox ?hpage WHERE { ?x foaf:name ?name . OPTIONAL { ?x foaf:mbox ?mbox } . OPTIONAL { ?x foaf:homepage ?hpage } }")))
 
@@ -208,23 +208,23 @@
   (is (=
       (query
         (select :title)
-        (where (union (group :book [:dc10 "title"] :title)
-                      (group :book [:dc11 "title"] :title))))
+        (where (union (group :book [:dc10 :title] :title)
+                      (group :book [:dc11 :title] :title))))
 
       "PREFIX dc10: <http://purl.org/dc/elements/1.0/> PREFIX dc11: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { { ?book dc10:title ?title } UNION { ?book dc11:title ?title } }"))
 
   (is (=
         (query
           (select :x :y)
-          (where (union (group :book [:dc10 "title"] :x)
-                        (group :book [:dc11 "title"] :y))))
+          (where (union (group :book [:dc10 :title] :x)
+                        (group :book [:dc11 :title] :y))))
 
         "PREFIX dc10: <http://purl.org/dc/elements/1.0/> PREFIX dc11: <http://purl.org/dc/elements/1.1/> SELECT ?x ?y WHERE { { ?book dc10:title ?x } UNION { ?book dc11:title ?y } }"))
   (is (=
         (query
           (select :title :author)
-          (where (union (group :book [:dc10 "title"] :title \. :book [:dc10 "creator"] :author)
-                        (group :book [:dc11 "title"] :title \. :book [:dc11 "creator"] :author))))
+          (where (union (group :book [:dc10 :title] :title \. :book [:dc10 :creator] :author)
+                        (group :book [:dc11 :title] :title \. :book [:dc11 :creator] :author))))
 
         "PREFIX dc10: <http://purl.org/dc/elements/1.0/> PREFIX dc11: <http://purl.org/dc/elements/1.1/> SELECT ?title ?author WHERE { { ?book dc10:title ?title . ?book dc10:creator ?author } UNION { ?book dc11:title ?title . ?book dc11:creator ?author } }")))
 
@@ -234,15 +234,15 @@
   (is (=
         (query
           (select :person)
-          (where :person [:rdf "type"] [:foaf "Person"] \.
-                 (filter-not-exists :person [:foaf "name"] :name)))
+          (where :person [:rdf :type] [:foaf :Person] \.
+                 (filter-not-exists :person [:foaf :name] :name)))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> SELECT ?person WHERE { ?person rdf:type foaf:Person . FILTER NOT EXISTS { ?person foaf:name ?name } }"))
   (is (=
         (query
           (select :person)
-          (where :person [:rdf "type"] [:foaf "Person"] \.
-                 (filter-exists :person [:foaf "name"] :name)))
+          (where :person [:rdf :type] [:foaf :Person] \.
+                 (filter-exists :person [:foaf :name] :name)))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> SELECT ?person WHERE { ?person rdf:type foaf:Person . FILTER EXISTS { ?person foaf:name ?name } }"))
 
@@ -250,7 +250,7 @@
         (query
           (select-distinct :s)
           (where :s :p :o \.
-                 (minus :s [:foaf "givenName"] "Bob" \.)))
+                 (minus :s [:foaf :givenName] "Bob" \.)))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT DISTINCT ?s WHERE { ?s ?p ?o . MINUS { ?s foaf:givenName \"Bob\" . } }"))
 
@@ -314,10 +314,10 @@
   (is (=
         (query
           (select :title :price)
-          (where (group :x [:ns "price"] :p \.
-                        :x [:ns "discount"] :discount
+          (where (group :x [:ns :price] :p \.
+                        :x [:ns :discount] :discount
                         (bind [(raw "?p*(1-?discount)") :price]))
-                 (group :x [:dc "title"] :title \.)
+                 (group :x [:dc :title] :title \.)
                  (filter :price < 20)))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title ?price WHERE { { ?x ns:price ?p . ?x ns:discount ?discount BIND(?p*(1-?discount) AS ?price) } { ?x dc:title ?title . } FILTER(?price < 20) }")))
@@ -381,7 +381,7 @@
         (query
           (select :name)
           (from (URI. "http://example.org/foaf/aliceFoaf"))
-          (where :x [:foaf "name"] :name))
+          (where :x [:foaf :name] :name))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name FROM <http://example.org/foaf/aliceFoaf> WHERE { ?x foaf:name ?name }"))
 
@@ -391,8 +391,8 @@
           (from (URI. "http://example.org/dft.ttl"))
           (from-named (URI. "http://example.org/bob")
                       (URI. "http://example.org/alice"))
-          (where :g [:dc "publisher"] :who \.
-                 (graph :g (group :x [:foaf "mbox"] :mbox))))
+          (where :g [:dc :publisher] :who \.
+                 (graph :g (group :x [:foaf :mbox] :mbox))))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?who ?g ?mbox FROM <http://example.org/dft.ttl> FROM NAMED <http://example.org/bob> FROM NAMED <http://example.org/alice> WHERE { ?g dc:publisher ?who . GRAPH ?g { ?x foaf:mbox ?mbox } }"))
 
@@ -402,8 +402,8 @@
           (from-named (URI. "http://example.org/foaf/aliceFoaf")
                       (URI. "http://example.org/foaf/bobFoaf"))
           (where (graph :src
-                        (group :x [:foaf "mbox"] (URI. "mailto:bob@work.example") \.
-                               :x [:foaf "nick"] :bobNick))))
+                        (group :x [:foaf :mbox] (URI. "mailto:bob@work.example") \.
+                               :x [:foaf :nick] :bobNick))))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?src ?bobNick FROM NAMED <http://example.org/foaf/aliceFoaf> FROM NAMED <http://example.org/foaf/bobFoaf> WHERE { GRAPH ?src { ?x foaf:mbox <mailto:bob@work.example> . ?x foaf:nick ?bobNick } }"))
 
@@ -412,9 +412,9 @@
           (select :nick)
           (from-named (URI. "http://example.org/foaf/aliceFoaf")
                       (URI. "http://example.org/foaf/bobFoaf"))
-          (where (graph [:data "bobFoaf"]
-                        (group :x [:foaf "mbox"] (URI. "mailto:bob@work.example") \.
-                               :x [:foaf "nick"] :nick))))
+          (where (graph [:data :bobFoaf]
+                        (group :x [:foaf :mbox] (URI. "mailto:bob@work.example") \.
+                               :x [:foaf :nick] :nick))))
 
         "PREFIX data: <http://example.org/foaf/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?nick FROM NAMED <http://example.org/foaf/aliceFoaf> FROM NAMED <http://example.org/foaf/bobFoaf> WHERE { GRAPH data:bobFoaf { ?x foaf:mbox <mailto:bob@work.example> . ?x foaf:nick ?nick } }"))
 
@@ -424,16 +424,16 @@
           (from-named (URI. "http://example.org/foaf/aliceFoaf")
                       (URI. "http://example.org/foaf/bobFoaf"))
           (where
-            (graph [:data "aliceFoaf"]
-                   (group :alice [:foaf "mbox"] (URI. "mailto:alice@work.example")
-                          \; [:foaf "knows"] :whom \.
-                          :whom [:foaf "mbox"] :mbox
-                          \; [:rdfs "seeAlso"] :ppd \.
-                          :ppd a [:foaf "PersonalProfileDocument"] \.)
+            (graph [:data :aliceFoaf]
+                   (group :alice [:foaf :mbox] (URI. "mailto:alice@work.example")
+                          \; [:foaf :knows] :whom \.
+                          :whom [:foaf :mbox] :mbox
+                          \; [:rdfs :seeAlso] :ppd \.
+                          :ppd a [:foaf :PersonalProfileDocument] \.)
                    \.)
             (graph :ppd
-                   (group :w [:foaf "mbox"] :mbox
-                          \; [:foaf "nick"] :nick))))
+                   (group :w [:foaf :mbox] :mbox
+                          \; [:foaf :nick] :nick))))
 
         "PREFIX data: <http://example.org/foaf/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?mbox ?nick ?ppd FROM NAMED <http://example.org/foaf/aliceFoaf> FROM NAMED <http://example.org/foaf/bobFoaf> WHERE { GRAPH data:aliceFoaf { ?alice foaf:mbox <mailto:alice@work.example> ; foaf:knows ?whom . ?whom foaf:mbox ?mbox ; rdfs:seeAlso ?ppd . ?ppd a foaf:PersonalProfileDocument . } . GRAPH ?ppd { ?w foaf:mbox ?mbox ; foaf:nick ?nick } }"))
 
@@ -441,11 +441,11 @@
         (query
           (select :name :mbox :date)
           (where
-            :g [:dc "publisher"] :name
-            \; [:dc "date"] :date \.
+            :g [:dc :publisher] :name
+            \; [:dc :date] :date \.
             (graph :g
-                   (group :person [:foaf "name"] :name
-                          \; [:foaf "mbox"] :mbox))))
+                   (group :person [:foaf :name] :name
+                          \; [:foaf :mbox] :mbox))))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox ?date WHERE { ?g dc:publisher ?name ; dc:date ?date . GRAPH ?g { ?person foaf:name ?name ; foaf:mbox ?mbox } }")))
 
@@ -455,7 +455,7 @@
   (is (=
         (query
           (select :name)
-          (where :x [:foaf "name"] :name)
+          (where :x [:foaf :name] :name)
           (order-by :name))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name } ORDER BY ?name"))
@@ -464,7 +464,7 @@
         (query
           (base (URI. "http://example.org/ns#"))
           (select :name)
-          (where :x [:foaf "name"] :name
+          (where :x [:foaf :name] :name
                  \; [:empId] :emp)
           (order-by (desc :emp))) ; or (order-by-desc :emp)
 
@@ -474,7 +474,7 @@
         (query
           (base (URI. "http://example.org/ns#"))
           (select :name)
-          (where :x [:foaf "name"] :name
+          (where :x [:foaf :name] :name
                  \; [:empId] :emp)
           (order-by :name (desc :emp)))
 
@@ -483,28 +483,28 @@
   (is (=
         (query
           (select :name)
-          (where :x [:foaf "name"] :name))
+          (where :x [:foaf :name] :name))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name }"))
 
   (is (=
         (query
           (select-distinct :name)
-          (where :x [:foaf "name"] :name))
+          (where :x [:foaf :name] :name))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT DISTINCT ?name WHERE { ?x foaf:name ?name }"))
 
   (is (=
         (query
           (select-reduced :name)
-          (where :x [:foaf "name"] :name))
+          (where :x [:foaf :name] :name))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT REDUCED ?name WHERE { ?x foaf:name ?name }"))
 
   (is (=
         (query
           (select :name)
-          (where :x [:foaf "name"] :name)
+          (where :x [:foaf :name] :name)
           (order-by :name)
           (limit 5)
           (offset 10))
@@ -514,7 +514,7 @@
   (is (=
         (query
           (select :name)
-          (where :x [:foaf "name"] :name)
+          (where :x [:foaf :name] :name)
           (limit 20))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name } LIMIT 20")))
@@ -526,49 +526,49 @@
   (is (=
         (query
           (select :nameX :nameY :nickY)
-          (where :x [:foaf "knows"] :y
-                 \; [:foaf "name"] :nameX \.
-                 :y [:foaf "name"] :nameY \.
-                 (optional :y [:foaf "nick"] :nickY)))
+          (where :x [:foaf :knows] :y
+                 \; [:foaf :name] :nameX \.
+                 :y [:foaf :name] :nameY \.
+                 (optional :y [:foaf :nick] :nickY)))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?nameX ?nameY ?nickY WHERE { ?x foaf:knows ?y ; foaf:name ?nameX . ?y foaf:name ?nameY . OPTIONAL { ?y foaf:nick ?nickY } }"))
 
   (is (=
         (query
           (select :title [(raw "?p*(1-?discount)") :price])
-          (where :x [:ns "price"] :p \.
-                 :x [:dc "title"] :title \.
-                 :x [:ns "discount"] :discount))
+          (where :x [:ns :price] :p \.
+                 :x [:dc :title] :title \.
+                 :x [:ns :discount] :discount))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title (?p*(1-?discount) AS ?price) WHERE { ?x ns:price ?p . ?x dc:title ?title . ?x ns:discount ?discount }"))
 
   (is (=
         (query
           (select :title [(raw "?p AS ?fullPrice) (?fullPrice*(1-?discount)") :customerPrice])
-          (where :x [:ns "price"] :p \.
-                 :x [:dc "title"] :title \.
-                 :x [:ns "discount"] :discount))
+          (where :x [:ns :price] :p \.
+                 :x [:dc :title] :title \.
+                 :x [:ns :discount] :discount))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX ns: <http://example.org/ns#> SELECT ?title (?p AS ?fullPrice) (?fullPrice*(1-?discount) AS ?customerPrice) WHERE { ?x ns:price ?p . ?x dc:title ?title . ?x ns:discount ?discount }"))
 
   (is (=
         (query
-          (construct (URI. "http://example.org/person#Alice") [:vcard "FN"] :name)
-          (where :x [:foaf "name"] :name))
+          (construct (URI. "http://example.org/person#Alice") [:vcard :FN] :name)
+          (where :x [:foaf :name] :name))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX vcard: <http://www.w3.org/2001/vcard-rdf/3.0#> CONSTRUCT { <http://example.org/person#Alice> vcard:FN ?name } WHERE { ?x foaf:name ?name }"))
 
   (is (=
         (query
-          (construct :x [:vcard "N"] [[:v]] \.
-                     [[:v]] [:vcard "givenName"] :gname \.
-                     [[:v]] [:vcard "familyName"] :fname)
+          (construct :x [:vcard :N] [[:v]] \.
+                     [[:v]] [:vcard :givenName] :gname \.
+                     [[:v]] [:vcard :familyName] :fname)
           (where (union
-                   (group :x [:foaf "firstname"] :gname)
-                   (group :x [:foaf "givenname"] :gname)) \.
+                   (group :x [:foaf :firstname] :gname)
+                   (group :x [:foaf :givenname] :gname)) \.
                  (union
-                   (group :x [:foaf "surname"] :fname)
-                   (group :x [:foaf "family_name"] :fname)) \.))
+                   (group :x [:foaf :surname] :fname)
+                   (group :x [:foaf :family_name] :fname)) \.))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX vcard: <http://www.w3.org/2001/vcard-rdf/3.0#> CONSTRUCT { ?x vcard:N _:v . _:v vcard:givenName ?gname . _:v vcard:familyName ?fname } WHERE { { ?x foaf:firstname ?gname } UNION { ?x foaf:givenname ?gname } . { ?x foaf:surname ?fname } UNION { ?x foaf:family_name ?fname } . }"))
 
@@ -584,17 +584,17 @@
           (construct :s :p :o)
           (where
             (graph :g (group :s :p :o) \.)
-            :g [:dc "publisher"] (URI. "http://www.w3.org/") \.
-            :g [:dc "date"] :date \.
-            (filter [:app "customDate(?date)"] > (raw "\"2005-02-28T00:00:00Z\"^^xsd:dateTime")) \.))
+            :g [:dc :publisher] (URI. "http://www.w3.org/") \.
+            :g [:dc :date] :date \.
+            (filter (raw "app:customDate(?date)") > (raw "\"2005-02-28T00:00:00Z\"^^xsd:dateTime")) \.))
 
         "PREFIX app: <http://example.org/ns#> PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> CONSTRUCT { ?s ?p ?o } WHERE { GRAPH ?g { ?s ?p ?o } . ?g dc:publisher <http://www.w3.org/> . ?g dc:date ?date . FILTER(app:customDate(?date) > \"2005-02-28T00:00:00Z\"^^xsd:dateTime) . }"))
 
   (is (=
         (query
-          (construct [[]] [:foaf "name"] :name)
-          (where [[]] [:foaf "name"] :name
-                 \; [:site "hits"] :hits \.)
+          (construct [[]] [:foaf :name] :name)
+          (where [[]] [:foaf :name] :name
+                 \; [:site :hits] :hits \.)
           (order-by-desc :hits)
           (limit 2))
 
@@ -602,21 +602,21 @@
 
   (is (=
         (query
-          (construct :x [:foaf "name"] :name)
-          (where :x [:foaf "name"] :name))
+          (construct :x [:foaf :name] :name)
+          (where :x [:foaf :name] :name))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> CONSTRUCT { ?x foaf:name ?name } WHERE { ?x foaf:name ?name }"))
 
   (is (=
         (query
-          (ask :x [:foaf "name"] "Alice"))
+          (ask :x [:foaf :name] "Alice"))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> ASK { ?x foaf:name \"Alice\" }"))
 
   (is (=
         (query
-          (ask :x [:foaf "name"] "Alice"
-               \; [:foaf "mbox"] (URI. "mailto:alice@work.example")))
+          (ask :x [:foaf :name] "Alice"
+               \; [:foaf :mbox] (URI. "mailto:alice@work.example")))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> ASK { ?x foaf:name \"Alice\" ; foaf:mbox <mailto:alice@work.example> }"))
 
@@ -629,28 +629,28 @@
   (is (=
         (query
           (describe :x)
-          (where :x [:foaf "mbox"] (URI. "mailto:alice@org")))
+          (where :x [:foaf :mbox] (URI. "mailto:alice@org")))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> DESCRIBE ?x WHERE { ?x foaf:mbox <mailto:alice@org> }"))
 
   (is (=
         (query
           (describe :x)
-          (where :x [:foaf "name"] "Alice"))
+          (where :x [:foaf :name] "Alice"))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> DESCRIBE ?x WHERE { ?x foaf:name \"Alice\" }"))
 
   (is (=
         (query
           (describe :x :y (URI. "http://example.org/"))
-          (where :x [:foaf "knows"] :y))
+          (where :x [:foaf :knows] :y))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> DESCRIBE ?x ?y <http://example.org/> WHERE { ?x foaf:knows ?y }"))
 
   (is (=
         (query
           (describe :x)
-          (where :x [:ent "employeeId"] "1234"))
+          (where :x [:ent :employeeId] "1234"))
 
         "PREFIX ent: <http://org.example.com/employees#> DESCRIBE ?x WHERE { ?x ent:employeeId \"1234\" }")))
 
@@ -660,8 +660,8 @@
   (is (=
         (query
           (select :annot)
-          (where :annot [:a "annotates"] (URI. "http://www.w3.org/TR/rdf-sparql-query/") \.
-                 :annot [:dc "date"] :date \.
+          (where :annot [:a :annotates] (URI. "http://www.w3.org/TR/rdf-sparql-query/") \.
+                 :annot [:dc :date] :date \.
                  (filter :date > (raw "\"2005-01-01T00:00:00Z\"^^xsd:dateTime"))))
 
         "PREFIX a: <http://www.w3.org/2000/10/annotation-ns#> PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> SELECT ?annot WHERE { ?annot a:annotates <http://www.w3.org/TR/rdf-sparql-query/> . ?annot dc:date ?date . FILTER(?date > \"2005-01-01T00:00:00Z\"^^xsd:dateTime) }"))
@@ -669,8 +669,8 @@
   (is (=
         (query
           (select :givenName)
-          (where :x [:foaf "givenName"] :givenName \.
-                 (optional :x [:dc "date"] :date) \.
+          (where :x [:foaf :givenName] :givenName \.
+                 (optional :x [:dc :date] :date) \.
                  (filter (bound :date))))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?givenName WHERE { ?x foaf:givenName ?givenName . OPTIONAL { ?x dc:date ?date } . FILTER(bound(?date)) }"))
@@ -678,8 +678,8 @@
   (is (=
         (query
           (select :name)
-          (where :x [:foaf "givenName"] :name \.
-                 (optional :x [:dc "date"] :date) \.
+          (where :x [:foaf :givenName] :name \.
+                 (optional :x [:dc :date] :date) \.
                  (filter (!bound :date))))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:givenName ?name . OPTIONAL { ?x dc:date ?date } . FILTER(!bound(?date)) }"))
@@ -687,10 +687,10 @@
   (is (=
         (query
           (select :name1 :name2)
-          (where :x [:foaf "name"] :name1
-                 \; [:foaf "mbox"] :mbox1 \.
-                 :y [:foaf "name"] :name2
-                 \; [:foaf "mbox"] :mbox2 \.
+          (where :x [:foaf :name] :name1
+                 \; [:foaf :mbox] :mbox1 \.
+                 :y [:foaf :name] :name2
+                 \; [:foaf :mbox] :mbox2 \.
                  (filter :mbox1 = :mbox2 && :name1 != :name2)))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name1 ?name2 WHERE { ?x foaf:name ?name1 ; foaf:mbox ?mbox1 . ?y foaf:name ?name2 ; foaf:mbox ?mbox2 . FILTER(?mbox1 = ?mbox2 && ?name1 != ?name2) }"))
@@ -698,10 +698,10 @@
   (is (=
         (query
           (select :name1 :name2)
-          (where :x [:foaf "name"] :name1
-                 \; [:foaf "mbox"] :mbox1 \.
-                 :y [:foaf "name"] :name2
-                 \; [:foaf "mbox"] :mbox2 \.
+          (where :x [:foaf :name] :name1
+                 \; [:foaf :mbox] :mbox1 \.
+                 :y [:foaf :name] :name2
+                 \; [:foaf :mbox] :mbox2 \.
                  (filter (same-term :mbox1, :mbox2) '&& (!same-term :name1 :name2))))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name1 ?name2 WHERE { ?x foaf:name ?name1 ; foaf:mbox ?mbox1 . ?y foaf:name ?name2 ; foaf:mbox ?mbox2 . FILTER(sameTerm(?mbox1, ?mbox2) && !sameTerm(?name1, ?name2)) }"))
@@ -724,8 +724,8 @@
   (is (=
         (query
           (select :name :mbox)
-          (where :x [:foaf "name"] :name
-                 \; [:foaf "mbox"] :mbox \.
+          (where :x [:foaf :name] :name
+                 \; [:foaf :mbox] :mbox \.
                  (filter (is-iri :mbox))))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE { ?x foaf:name ?name ; foaf:mbox ?mbox . FILTER isIRI(?mbox) }"))
@@ -733,10 +733,10 @@
   (is (=
         (query
           (select :given :family)
-          (where :annot [:a "annotates"] (URI. "http://www.w3.org/TR/rdf-sparql-query/") \.
-                 :annot [:dc "creator"] :c \.
-                 (optional :c [:foaf "given"] :given
-                            \; [:foaf "family"] :family) \.
+          (where :annot [:a :annotates] (URI. "http://www.w3.org/TR/rdf-sparql-query/") \.
+                 :annot [:dc :creator] :c \.
+                 (optional :c [:foaf :given] :given
+                            \; [:foaf :family] :family) \.
                  (filter (is-blank :c))))
 
         "PREFIX a: <http://www.w3.org/2000/10/annotation-ns#> PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?given ?family WHERE { ?annot a:annotates <http://www.w3.org/TR/rdf-sparql-query/> . ?annot dc:creator ?c . OPTIONAL { ?c foaf:given ?given ; foaf:family ?family } . FILTER isBlank(?c) }"))
@@ -744,8 +744,8 @@
   (is (=
         (query
           (select :name :mbox)
-          (where :x [:foaf "name"] :name
-                 \; [:foaf "mbox"] :mbox \.
+          (where :x [:foaf :name] :name
+                 \; [:foaf :mbox] :mbox \.
                  (filter (is-literal :mbox))))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE { ?x foaf:name ?name ; foaf:mbox ?mbox . FILTER isLiteral(?mbox) }"))
@@ -753,8 +753,8 @@
   (is (=
         (query
           (select :name :mbox)
-          (where :x [:foaf "name"] :name
-                 \; [:foaf "mbox"] :mbox \.
+          (where :x [:foaf :name] :name
+                 \; [:foaf :mbox] :mbox \.
                  (filter (regex (str2 :mbox) "@work\\.example$"))))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE { ?x foaf:name ?name ; foaf:mbox ?mbox . FILTER regex(str(?mbox), \"@work\\.example$\") }"))
@@ -762,8 +762,8 @@
   (is (=
         (query
           (select :name :mbox)
-          (where :x [:foaf "name"] :name
-                  \; [:foaf "mbox"] :mbox \.
+          (where :x [:foaf :name] :name
+                  \; [:foaf :mbox] :mbox \.
                   (filter (lang :name) = "es")))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox WHERE { ?x foaf:name ?name ; foaf:mbox ?mbox . FILTER(lang(?name) = \"es\") }"))
@@ -771,17 +771,17 @@
   (is (=
         (query
           (select :name :shoeSize)
-          (where :x [:foaf "name"] :name
-                 \; [:eg "shoeSize"] :shoeSize \.
-                 (filter (datatype :shoeSize) = [:xsd "integer"])))
+          (where :x [:foaf :name] :name
+                 \; [:eg :shoeSize] :shoeSize \.
+                 (filter (datatype :shoeSize) = [:xsd :integer])))
 
         "PREFIX eg: <http://biometrics.example/ns#> PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX xsd: <http://www.w3.org/2001/XMLSchema#> SELECT ?name ?shoeSize WHERE { ?x foaf:name ?name ; eg:shoeSize ?shoeSize . FILTER(datatype(?shoeSize) = xsd:integer) }"))
 
   (is (=
       (query
         (select :title)
-        (where :x [:dc "title"] ["That Seventies Show" :en]
-               \; [:dc "title"] :title \.
+        (where :x [:dc :title] ["That Seventies Show" :en]
+               \; [:dc :title] :title \.
                (filter (lang-matches (lang :title) "FR"))))
 
       "PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { ?x dc:title \"That Seventies Show\"@en ; dc:title ?title . FILTER langMatches(lang(?title), \"FR\") }"))
@@ -789,7 +789,7 @@
   (is (=
         (query
           (select :title)
-          (where :x [:dc "title"] :title \.
+          (where :x [:dc :title] :title \.
                  (filter (lang-matches (lang :title) "*"))))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> SELECT ?title WHERE { ?x dc:title ?title . FILTER langMatches(lang(?title), \"*\") }"))
@@ -797,7 +797,7 @@
   (is (=
         (query
           (select :name)
-          (where :x [:foaf "name"] :name
+          (where :x [:foaf :name] :name
                  (filter (regex :name "^ali" "i"))))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name WHERE { ?x foaf:name ?name FILTER regex(?name, \"^ali\", \"i\") }"))
@@ -805,7 +805,7 @@
   (is (=
         (query
           (select [(sum :val) :sum] [(count :a) :count])
-          (where :a [:rdf "value"] :val \.)
+          (where :a [:rdf :value] :val \.)
           (group-by :a))
 
         "PREFIX rdf: <http://www.w3.org/1999/02/22-rdf-syntax-ns#> SELECT (SUM(?val) AS ?sum) (COUNT(?a) AS ?count) WHERE { ?a rdf:value ?val . } GROUP BY ?a"))
