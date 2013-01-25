@@ -15,8 +15,9 @@ INSERT DATA
 
 ```clojure
 (query
-  (insert-data (URI. "http://example/book1") [:dc "title"] "A new book"
-               \; [:dc "creator"] "A.N.Other" \.))
+  (insert-data
+    (URI. "http://example/book1") [:dc "title"] "A new book"
+    \; [:dc "creator"] "A.N.Other" \.))
 ```
 
 ### Example 2
