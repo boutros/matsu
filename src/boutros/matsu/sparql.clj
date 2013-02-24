@@ -283,4 +283,5 @@
   (assoc q :delete {:tag "DELETE" :bounds [" { " " } "] :sep " "
                     :content (vec more)}))
 
+;; SPARQL Grahp managment
 ; TODO clear, load, create, move, copy, drop, add
