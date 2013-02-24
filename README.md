@@ -36,7 +36,7 @@ WHERE
 
 Althught without newlines or indentation. A pretty-printer might be added in the future.
 
-As you can see, dots and semicolons must be supplied as chars (or quoted). I haven't found a way around this. Maybe add an alternate syntax with the letters `d` for dots and `c` for semicolons?
+Dots and semicolons must be supplied as chars (or quoted).
 
 The prefixes are automatically infered provided that they exists in the global `prefixes` map. An exception will be thrown if the prefix cannot be resolved. You add prefixes using `register-namespaces`:
 ```clojure
@@ -173,10 +173,10 @@ WHERE {
 ```
 
 ## More examples
-
-+ See [/doc/example.clj](https://github.com/boutros/matsu/blob/master/doc/example.clj) for an example REPL session using matsu to query the DBpedia SPARQL endpoint.
-
-+ An attempt to to generate all the example queries from the WC3 SPARQL 1.1. specification using the matsu DSL: [/doc/sparql_spec.md](https://github.com/boutros/matsu/blob/master/doc/sparql_spec.md)
+See the [doc](https://github.com/boutros/matsu/blob/master/doc) directory for more examples:
++ [/doc/example.clj](https://github.com/boutros/matsu/blob/master/doc/example.clj) - an example REPL session using matsu to query the DBpedia SPARQL endpoint.
++ [/doc/update_spec.md](https://github.com/boutros/matsu/blob/master/doc/update_spec.md) - An attempt to to generate all the example queries from the WC3 SPARQL 1.1. specification using the matsu DSL:
++ [/doc/sparql_spec.md](https://github.com/boutros/matsu/blob/master/doc/sparql_spec.md) - The example queries from the WC3 SPARQL Update specification
 
 ## Limitations
 * Single colon keyword prefix is not possible, use the equivalent `BASE`-form instead
