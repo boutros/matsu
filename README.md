@@ -175,8 +175,8 @@ WHERE {
 ## More examples
 See the [doc](https://github.com/boutros/matsu/blob/master/doc) directory for more examples:
 + [/doc/example.clj](https://github.com/boutros/matsu/blob/master/doc/example.clj) - an example REPL session using matsu to query the DBpedia SPARQL endpoint.
-+ [/doc/update_spec.md](https://github.com/boutros/matsu/blob/master/doc/update_spec.md) - An attempt to to generate all the example queries from the WC3 SPARQL 1.1. specification using the matsu DSL:
-+ [/doc/sparql_spec.md](https://github.com/boutros/matsu/blob/master/doc/sparql_spec.md) - The example queries from the WC3 SPARQL Update specification
++ [/doc/update_spec.md](https://github.com/boutros/matsu/blob/master/doc/update_spec.md) - The example queries from the WC3 SPARQL 1.1 specification
++ [/doc/sparql_spec.md](https://github.com/boutros/matsu/blob/master/doc/sparql_spec.md) - The example queries from the WC3 SPARQL 1.1 Update specification
 
 ## Limitations
 * Single colon keyword prefix is not possible, use the equivalent `BASE`-form instead
