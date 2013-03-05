@@ -192,6 +192,8 @@ There might be other limitations, especially when dealing with SPARQL expression
 * Specifying variables with `VALUES` in data block
 * Federated queries (SERVICE)
 * Syntacic sugar (macros)
+* Queries made with `defquery` should be able to take parameters
+* Namespaces for vendor-spesific syntax, f.ex: Virtuoso's `bif:contains`
 
 ## Contribute
 
