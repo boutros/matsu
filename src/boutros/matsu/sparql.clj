@@ -191,7 +191,7 @@
   {:tag "sql:GROUP_CONCAT" :bounds ["(" ")"] :sep ", " :content [v sep]})
 
 (defn sample [v]
-  {:tag "sql:SAMPLE" :bounds ["(" ")"] :sep ", " :content [v]})
+  {:tag "sql:SAMPLE" :bounds ["(" ")"] :sep "" :content [v]})
 
 ;; Assingment
 
