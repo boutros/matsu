@@ -9,7 +9,8 @@
 ;; Setup
 
 (register-namespaces {:dbpedia "<http://dbpedia.org/resource/>"
-                      :foaf    "<http://xmlns.com/foaf/0.1/>"})
+                      :foaf    "<http://xmlns.com/foaf/0.1/>"
+                      :sql     "sql"})
 
 ;; Main Macros
 
@@ -244,7 +245,21 @@
             (where :s :p :o))
           "SELECT (AVG(?o) AS ?avg) WHERE { ?s ?p ?o }")))
 
-  ;; todo min, max, count, group-concat, sample
+  (testing "group-concat"
+    (is (=
+          (query
+            (select [(group-concat :s "|") :s])
+            (where :s :p :o))
+          "PREFIX sql: sql SELECT (sql:GROUP_CONCAT(?s, \"|\") AS ?s) WHERE { ?s ?p ?o }")))
+
+  (testing "sample"
+    (is (=
+          (query
+            (select [(sample :s) :s])
+            (where :s :p :o))
+          "PREFIX sql: sql SELECT (sql:SAMPLE(?s) AS ?s) WHERE { ?s ?p ?o }")))
+
+  ;; todo min, max, count
   )
 
 (deftest assignment

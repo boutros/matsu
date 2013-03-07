@@ -187,9 +187,11 @@
 
 (defn count [v] {:tag "COUNT" :bounds ["(" ")"] :sep " " :content [v]})
 
-;(defn group-concat)
+(defn group-concat [v sep]
+  {:tag "sql:GROUP_CONCAT" :bounds ["(" ")"] :sep ", " :content [v sep]})
 
-;(defn sample)
+(defn sample [v]
+  {:tag "sql:SAMPLE" :bounds ["(" ")"] :sep ", " :content [v]})
 
 ;; Assingment
 
