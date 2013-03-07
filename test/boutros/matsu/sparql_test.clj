@@ -9,8 +9,7 @@
 ;; Setup
 
 (register-namespaces {:dbpedia "<http://dbpedia.org/resource/>"
-                      :foaf    "<http://xmlns.com/foaf/0.1/>"
-                      :sql     "sql"})
+                      :foaf    "<http://xmlns.com/foaf/0.1/>"})
 
 ;; Main Macros
 
@@ -250,14 +249,14 @@
           (query
             (select [(group-concat :s "|") :s])
             (where :s :p :o))
-          "PREFIX sql: sql SELECT (sql:GROUP_CONCAT(?s, \"|\") AS ?s) WHERE { ?s ?p ?o }")))
+          "SELECT (sql:GROUP_CONCAT(?s, \"|\") AS ?s) WHERE { ?s ?p ?o }")))
 
   (testing "sample"
     (is (=
           (query
             (select [(sample :s) :s])
             (where :s :p :o))
-          "PREFIX sql: sql SELECT (sql:SAMPLE(?s) AS ?s) WHERE { ?s ?p ?o }")))
+          "SELECT (sql:SAMPLE(?s) AS ?s) WHERE { ?s ?p ?o }")))
 
   ;; todo min, max, count
   )

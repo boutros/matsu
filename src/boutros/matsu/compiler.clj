@@ -85,7 +85,7 @@
   [m s]
   (str
     (apply str (apply sorted-set
-                      (for [[_ p] (re-seq #"(\b[a-zA-Z0-9]+):[a-zA-Z]" s) :when (not= p (name :mailto))]
+                      (for [[_ p] (re-seq #"(\b[a-zA-Z0-9]+):[a-zA-Z]" s) :when (not-any? #(= p %) #{"mailto" "sql" "bif"})]
                         (str "PREFIX " p ": " (ns-or-error (keyword p) m) " " ))))
     s))
 
