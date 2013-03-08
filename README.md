@@ -4,12 +4,12 @@ A Clojure SPARQL query constructor
 
 ## Status
 
-Everything is ALPHA and subject to change. That said, I'm begining to become reasonably satisfied with the DSL syntax as it is now.
+I'm using matsu in my own applications, but the DSL syntax might still change somewhat. Any feedback appreciated.
 
 ## Installation
-There's a snapshot version on clojars. Add the following to your project.clj:
+Add the following to your project.clj:
 ```
-[matsu "0.1.0-SNAPSHOT"]
+[matsu "0.1.0"]
 ```
 ## Usage
 
