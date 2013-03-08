@@ -830,7 +830,7 @@ WHERE
   (from-named (URI. "http://example.org/bob")
               (URI. "http://example.org/alice"))
   (where :g [:dc :publisher] :who \.
-         (graph :g (group :x [:foaf :mbox] :mbox))))
+         (graph :g :x [:foaf :mbox] :mbox)))
 ```
 
 ### 13.3 Querying the Dataset
@@ -858,8 +858,8 @@ WHERE
   (from-named (URI. "http://example.org/foaf/aliceFoaf")
               (URI. "http://example.org/foaf/bobFoaf"))
   (where (graph :src
-                (group :x [:foaf :mbox] (URI. "mailto:bob@work.example") \.
-                       :x [:foaf :nick] :bobNick))))
+                :x [:foaf :mbox] (URI. "mailto:bob@work.example") \.
+                :x [:foaf :nick] :bobNick)))
 ```
 
 ```sparql
@@ -883,8 +883,8 @@ WHERE
   (from-named (URI. "http://example.org/foaf/aliceFoaf")
               (URI. "http://example.org/foaf/bobFoaf"))
   (where (graph [:data :bobFoaf]
-                (group :x [:foaf :mbox] (URI. "mailto:bob@work.example") \.
-                       :x [:foaf :nick] :nick))))
+                :x [:foaf :mbox] (URI. "mailto:bob@work.example") \.
+                :x [:foaf :nick] :nick)))
 ```
 
 ```sparql
@@ -920,15 +920,14 @@ WHERE
               (URI. "http://example.org/foaf/bobFoaf"))
   (where
     (graph [:data :aliceFoaf]
-           (group :alice [:foaf :mbox] (URI. "mailto:alice@work.example")
-                  \; [:foaf :knows] :whom \.
-                  :whom [:foaf :mbox] :mbox
-                  \; [:rdfs :seeAlso] :ppd \.
-                  :ppd a [:foaf :PersonalProfileDocument] \.)
-           \.)
+           :alice [:foaf :mbox] (URI. "mailto:alice@work.example")
+           \; [:foaf :knows] :whom \.
+           :whom [:foaf :mbox] :mbox
+           \; [:rdfs :seeAlso] :ppd \.
+           :ppd a [:foaf :PersonalProfileDocument] \.) \.
     (graph :ppd
-           (group :w [:foaf :mbox] :mbox
-                  \; [:foaf :nick] :nick))))
+           :w [:foaf :mbox] :mbox
+           \; [:foaf :nick] :nick)))
 ```
 
 ```sparql
@@ -951,8 +950,8 @@ WHERE
     :g [:dc :publisher] :name
     \; [:dc :date] :date \.
     (graph :g
-           (group :person [:foaf :name] :name
-                  \; [:foaf :mbox] :mbox))))
+           :person [:foaf :name] :name
+           \; [:foaf :mbox] :mbox)))
 ```
 
 ## 14 Basic Federated Query
@@ -1182,15 +1181,15 @@ WHERE
 Blank nodes are created with double brackets:
 ```clojure
 (query
-  (construct :x [:vcard :N] [[:v]] \.
-             [[:v]] [:vcard :givenName] :gname \.
-             [[:v]] [:vcard :familyName] :fname)
-  (where (union
-           (group :x [:foaf :firstname] :gname)
-           (group :x [:foaf :givenname] :gname)) \.
-         (union
-           (group :x [:foaf :surname] :fname)
-           (group :x [:foaf :family_name] :fname)) \.))
+  (insert
+    (graph (URI. "http://example/bookStore2")
+          :book :p :v))
+  (where
+    (graph (URI. "http://example/bookStore")
+           :book [:dc :date] :date \.
+           (filter :date > ["1970-01-01T00:00:00-02:00" "xsd:dateTime"])
+           :book :p :v)))
+
 ```
 
 ```sparql
@@ -1200,7 +1199,7 @@ CONSTRUCT { ?s ?p ?o } WHERE { GRAPH <http://example.org/aGraph> { ?s ?p ?o } . 
 ```clojure
 (query
   (construct :s :p :o)
-  (where (graph (URI. "http://example.org/aGraph") (group :s :p :o) \.)))
+  (where (graph (URI. "http://example.org/aGraph") :s :p :o ) \.))
 ```
 
 ```sparql
@@ -1221,7 +1220,7 @@ CONSTRUCT { ?s ?p ?o } WHERE
 (query
   (construct :s :p :o)
   (where
-    (graph :g (group :s :p :o) \.)
+    (graph :g :s :p :o) \.
     :g [:dc :publisher] (URI. "http://www.w3.org/") \.
     :g [:dc :date] :date \.
     (filter (raw "app:customDate(?date)") > ["2005-02-28T00:00:00Z" "xsd:dateTime"]) \.))

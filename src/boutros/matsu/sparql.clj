@@ -2,7 +2,7 @@
   "Matsu SPARQL query DSL functions"
   (:refer-clojure :exclude [filter concat group-by max min count])
   (:require [clojure.walk :refer [postwalk-replace]]
-            [boutros.matsu.compiler :refer [compile-query]]
+            [boutros.matsu.compiler :refer [compile-query encode]]
             [boutros.matsu.core :refer [empty-query]]))
 
 
@@ -105,8 +105,8 @@
 (defn union [& more]
   {:tag "" :content (interpose 'UNION (vec more)) :bounds [""] :sep " "})
 
-(defn graph [& more]
-  {:tag "GRAPH " :content (vec more) :bounds [""] :sep " "})
+(defn graph [g & more]
+  {:tag (str "GRAPH " (encode g)) :content (vec more) :bounds [" { " " }"] :sep " "})
 
 ;; Negation
 

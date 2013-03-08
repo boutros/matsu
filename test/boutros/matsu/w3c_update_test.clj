@@ -22,7 +22,7 @@
   (is (=
         (query
           (insert-data (graph (URI. "http://example/bookStore")
-                              (group (URI. "http://example/book1") [:ns :price] 42))))
+                               (URI. "http://example/book1") [:ns :price] 42)))
 
         "PREFIX ns: <http://example.org/ns#> INSERT DATA { GRAPH <http://example/bookStore> { <http://example/book1> ns:price 42 } }")))
 
@@ -70,11 +70,11 @@
   (is (=
         (query
           (insert
-            (graph (URI. "http://example/bookStore2"))
-            (group :book :p :v))
+            (graph (URI. "http://example/bookStore2")
+                  :book :p :v))
           (where
-            (graph (URI. "http://example/bookStore"))
-            (group :book [:dc :date] :date \.
+            (graph (URI. "http://example/bookStore")
+                   :book [:dc :date] :date \.
                    (filter :date > ["1970-01-01T00:00:00-02:00" "xsd:dateTime"])
                    :book :p :v)))
 
@@ -84,12 +84,12 @@
   (is (=
         (query
           (insert
-            (graph (URI. "http://example/addresses"))
-            (group :person [:foaf :name] :name \.
+            (graph (URI. "http://example/addresses")
+                   :person [:foaf :name] :name \.
                    :person [:foaf :mbox] :email))
           (where
-            (graph (URI. "http://example/people"))
-            (group :person [:foaf :name] :name \.
+            (graph (URI. "http://example/people")
+                   :person [:foaf :name] :name \.
                    (optional :person [:foaf :mbox] :email))))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> INSERT { GRAPH <http://example/addresses> { ?person foaf:name ?name . ?person foaf:mbox ?email } } WHERE { GRAPH <http://example/people> { ?person foaf:name ?name . OPTIONAL { ?person foaf:mbox ?email } } }")))
@@ -110,10 +110,10 @@
         (query
           (delete)
           (where
-            (graph (URI. "http://example.com/names"))
-            (group :person [:foaf :givenName] "Fred"
+            (graph (URI. "http://example.com/names")
+                   :person [:foaf :givenName] "Fred"
                    \; :property1 :value1)
-            (graph (URI. "http://example.com/addresses"))
-            (group :person :property2 :value2)))
+            (graph (URI. "http://example.com/addresses")
+                   :person :property2 :value2)))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> DELETE WHERE { GRAPH <http://example.com/names> { ?person foaf:givenName \"Fred\" ; ?property1 ?value1 } GRAPH <http://example.com/addresses> { ?person ?property2 ?value2 } }")))

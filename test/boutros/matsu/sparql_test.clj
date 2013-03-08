@@ -106,8 +106,7 @@
     (is (=
           (query
             (select *)
-            (where (graph (URI. "someuri"))
-                   (group :s :p :o) \.))
+            (where (graph (URI. "someuri") :s :p :o) \.))
           "SELECT * WHERE { GRAPH <someuri> { ?s ?p ?o } . }"))))
 
 (deftest negation

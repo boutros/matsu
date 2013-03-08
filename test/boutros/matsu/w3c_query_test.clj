@@ -392,7 +392,7 @@
           (from-named (URI. "http://example.org/bob")
                       (URI. "http://example.org/alice"))
           (where :g [:dc :publisher] :who \.
-                 (graph :g (group :x [:foaf :mbox] :mbox))))
+                 (graph :g :x [:foaf :mbox] :mbox)))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?who ?g ?mbox FROM <http://example.org/dft.ttl> FROM NAMED <http://example.org/bob> FROM NAMED <http://example.org/alice> WHERE { ?g dc:publisher ?who . GRAPH ?g { ?x foaf:mbox ?mbox } }"))
 
@@ -402,8 +402,8 @@
           (from-named (URI. "http://example.org/foaf/aliceFoaf")
                       (URI. "http://example.org/foaf/bobFoaf"))
           (where (graph :src
-                        (group :x [:foaf :mbox] (URI. "mailto:bob@work.example") \.
-                               :x [:foaf :nick] :bobNick))))
+                        :x [:foaf :mbox] (URI. "mailto:bob@work.example") \.
+                        :x [:foaf :nick] :bobNick)))
 
         "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?src ?bobNick FROM NAMED <http://example.org/foaf/aliceFoaf> FROM NAMED <http://example.org/foaf/bobFoaf> WHERE { GRAPH ?src { ?x foaf:mbox <mailto:bob@work.example> . ?x foaf:nick ?bobNick } }"))
 
@@ -413,8 +413,8 @@
           (from-named (URI. "http://example.org/foaf/aliceFoaf")
                       (URI. "http://example.org/foaf/bobFoaf"))
           (where (graph [:data :bobFoaf]
-                        (group :x [:foaf :mbox] (URI. "mailto:bob@work.example") \.
-                               :x [:foaf :nick] :nick))))
+                        :x [:foaf :mbox] (URI. "mailto:bob@work.example") \.
+                        :x [:foaf :nick] :nick)))
 
         "PREFIX data: <http://example.org/foaf/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?nick FROM NAMED <http://example.org/foaf/aliceFoaf> FROM NAMED <http://example.org/foaf/bobFoaf> WHERE { GRAPH data:bobFoaf { ?x foaf:mbox <mailto:bob@work.example> . ?x foaf:nick ?nick } }"))
 
@@ -425,15 +425,14 @@
                       (URI. "http://example.org/foaf/bobFoaf"))
           (where
             (graph [:data :aliceFoaf]
-                   (group :alice [:foaf :mbox] (URI. "mailto:alice@work.example")
-                          \; [:foaf :knows] :whom \.
-                          :whom [:foaf :mbox] :mbox
-                          \; [:rdfs :seeAlso] :ppd \.
-                          :ppd a [:foaf :PersonalProfileDocument] \.)
-                   \.)
+                   :alice [:foaf :mbox] (URI. "mailto:alice@work.example")
+                   \; [:foaf :knows] :whom \.
+                   :whom [:foaf :mbox] :mbox
+                   \; [:rdfs :seeAlso] :ppd \.
+                   :ppd a [:foaf :PersonalProfileDocument] \.) \.
             (graph :ppd
-                   (group :w [:foaf :mbox] :mbox
-                          \; [:foaf :nick] :nick))))
+                   :w [:foaf :mbox] :mbox
+                   \; [:foaf :nick] :nick)))
 
         "PREFIX data: <http://example.org/foaf/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> PREFIX rdfs: <http://www.w3.org/2000/01/rdf-schema#> SELECT ?mbox ?nick ?ppd FROM NAMED <http://example.org/foaf/aliceFoaf> FROM NAMED <http://example.org/foaf/bobFoaf> WHERE { GRAPH data:aliceFoaf { ?alice foaf:mbox <mailto:alice@work.example> ; foaf:knows ?whom . ?whom foaf:mbox ?mbox ; rdfs:seeAlso ?ppd . ?ppd a foaf:PersonalProfileDocument . } . GRAPH ?ppd { ?w foaf:mbox ?mbox ; foaf:nick ?nick } }"))
 
@@ -444,8 +443,8 @@
             :g [:dc :publisher] :name
             \; [:dc :date] :date \.
             (graph :g
-                   (group :person [:foaf :name] :name
-                          \; [:foaf :mbox] :mbox))))
+                   :person [:foaf :name] :name
+                   \; [:foaf :mbox] :mbox)))
 
         "PREFIX dc: <http://purl.org/dc/elements/1.1/> PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?name ?mbox ?date WHERE { ?g dc:publisher ?name ; dc:date ?date . GRAPH ?g { ?person foaf:name ?name ; foaf:mbox ?mbox } }")))
 
@@ -575,7 +574,7 @@
   (is (=
         (query
           (construct :s :p :o)
-          (where (graph (URI. "http://example.org/aGraph") (group :s :p :o) \.)))
+          (where (graph (URI. "http://example.org/aGraph") :s :p :o ) \.))
 
         "CONSTRUCT { ?s ?p ?o } WHERE { GRAPH <http://example.org/aGraph> { ?s ?p ?o } . }"))
 
@@ -583,7 +582,7 @@
         (query
           (construct :s :p :o)
           (where
-            (graph :g (group :s :p :o) \.)
+            (graph :g :s :p :o) \.
             :g [:dc :publisher] (URI. "http://www.w3.org/") \.
             :g [:dc :date] :date \.
             (filter (raw "app:customDate(?date)") > ["2005-02-28T00:00:00Z" "xsd:dateTime"]) \.))
