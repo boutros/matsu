@@ -36,7 +36,7 @@
     (float? x) x                      ;(str  \" x \" "^^xsd:decimal")
     (true? x) x                       ;"\"true\"^^xsd:boolean"
     (false? x) x                      ;"\"false\"^^xsd:boolean"
-    (string? x) (str \" x \" )
+    (string? x) (str \" (string/replace x #"\""  "\\\\\"" ) \" ) ; escape "
     (= java.net.URI (type x)) (str "<" x ">")
     ;(= java.util.Date (type x)) (str \" x \" "^^xsd:dateTime")
     (vector? x) (let [[a b] x]

@@ -10,6 +10,7 @@
        23                          23
        9.9                         9.9
        "string"                    "\"string\""
+       "string with \"quotes\""    "\"string with \\\"quotes\\\"\""
        ["une pipe" :fr]            "\"une pipe\"@fr"
        true                        true
        false                       false
