@@ -18,4 +18,5 @@
        [:foaf :mbox]               "foaf:mbox"
        ["42" "somedatatype"]        "\"42\"^^somedatatype"
        [:keyword]                  "<keyword>"
-       [[]]                        "[]"))
+       [[]]                        "[]"
+       (range 2)                   '(0 \space 1)))

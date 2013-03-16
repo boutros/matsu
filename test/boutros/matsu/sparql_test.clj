@@ -40,6 +40,17 @@
 
 ;; SPARQL Query DSL functions
 
+(deftest composable
+  (testing "that lazy-seqs are compiled"
+    (is (=
+          (query
+            (select :s)
+            (where :s :p :o \.
+                   (filter
+                     (interpose || (for [l ["en" "de"]]
+                       (lang-matches (lang :o) l))))))
+    "SELECT ?s WHERE { ?s ?p ?o . FILTER(langMatches(lang(?o), \"en\") || langMatches(lang(?o), \"de\")) }"))))
+
 (deftest query-forms
   (testing "select"
     (is (=
