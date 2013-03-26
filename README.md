@@ -8,7 +8,7 @@ I'm using matsu in my own applications, but the DSL syntax might still change so
 
 ## Installation
 Add the following to your project.clj:
-```
+```clojure
 [matsu "0.1.0"]          ; stable
 [matsu "0.1.1-SNAPSHOT"] ; dev
 ```
@@ -173,8 +173,8 @@ WHERE {
 ## More examples
 See the [doc](https://github.com/boutros/matsu/blob/master/doc) directory for more examples:
 + [/doc/example.clj](https://github.com/boutros/matsu/blob/master/doc/example.clj) - an example REPL session using matsu to query the DBpedia SPARQL endpoint.
-+ [/doc/update_spec.md](https://github.com/boutros/matsu/blob/master/doc/update_spec.md) - The example queries from the WC3 SPARQL 1.1 specification
-+ [/doc/sparql_spec.md](https://github.com/boutros/matsu/blob/master/doc/sparql_spec.md) - The example queries from the WC3 SPARQL 1.1 Update specification
++ [/doc/sparql_spec.md](https://github.com/boutros/matsu/blob/master/doc/sparql_spec.md) - The example queries from the WC3 SPARQL 1.1 specification
++ [/doc/update_spec.md](https://github.com/boutros/matsu/blob/master/doc/update_spec.md) - The example queries from the WC3 SPARQL 1.1 Update specification
 
 ## Limitations
 * Single colon keyword prefix is not possible, use the equivalent `BASE`-form instead
