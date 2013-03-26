@@ -9,7 +9,8 @@ I'm using matsu in my own applications, but the DSL syntax might still change so
 ## Installation
 Add the following to your project.clj:
 ```
-[matsu "0.1.0"]
+[matsu "0.1.0"]          ; stable
+[matsu "0.1.1-SNAPSHOT"] ; dev
 ```
 ## Usage
 
@@ -18,8 +19,8 @@ Matsu is a DSL for constructing SPARQL queries:
 ```clojure
 (query
   (select :person)
-  (where :person a [:foaf :Person]
-         \; [:foaf :mbox] (URI. "mailto:me@me.com") \.))
+  (where :person a [:foaf :Person] \;
+         [:foaf :mbox] (URI. "mailto:me@me.com") \.))
 ```
 
 Which would yield the following string:
@@ -29,14 +30,12 @@ PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 SELECT ?person
 WHERE
   {
-    ?person a foaf:Person
-    ; foaf:mbox <mailto:me@me.com> .
+     ?person a foaf:Person ;
+             foaf:mbox <mailto:me@me.com> .
   }
 ```
 
-Althught without newlines or indentation. A pretty-printer might be added in the future.
-
-Dots and semicolons must be supplied as chars (or quoted).
+`query` by default outputs a string without newlines or indentation, but there is a pretty-printer provided in the `util` namespace which aims to produce a formatted query like the one seen above. While far from perfect, I find it very helpfull when debugging long and complex queries.
 
 The prefixes are automatically infered provided that they exists in the global `prefixes` map. An exception will be thrown if the prefix cannot be resolved. You add prefixes using `register-namespaces`:
 ```clojure

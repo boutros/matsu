@@ -1,4 +1,5 @@
 ### 0.1.1-SNAPSHOT
+* feature: pretty-printer
 * feature: compiler encodes lazy-seqs
 * fix: ensure proper escaping of double quotes in strings
 
