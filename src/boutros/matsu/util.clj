@@ -12,7 +12,7 @@
 ;; http://www.w3.org/TR/sparql11-query/#sparqlGrammar
 
 (def before2 #{"SELECT" "INSERT" "DELETE" "WHERE"})
-(def before #{"BASE" "PREFIX" "FROM" "OPTIONAL" "WITH"})
+(def before #{"BASE" "PREFIX" "FROM" "OPTIONAL" "WITH" "MODIFY"})
 (def after #{ ";" "." })
 (def both #{ "{" "}" })
 
