@@ -33,10 +33,10 @@
     (char? x) x
     (symbol? x) x
     (keyword? x) (str \? (name x))
-    (integer? x) x                    ;(str  \" x \" "^^xsd:integer")
-    (float? x) x                      ;(str  \" x \" "^^xsd:decimal")
-    (true? x) x                       ;"\"true\"^^xsd:boolean"
-    (false? x) x                      ;"\"false\"^^xsd:boolean"
+    (integer? x) x
+    (float? x) x
+    (true? x) x
+    (false? x) x
     (string? x) (str \" (string/replace x #"\""  "\\\\\"" ) \" ) ; escape "
     (= java.net.URI (type x)) (str "<" x ">")
     (= org.joda.time.DateTime (type x)) (encode [(str x) "xsd:dateTime"])
