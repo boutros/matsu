@@ -32,7 +32,7 @@
    :limit nil})
 
 ;; a global map of the current registered prefixes
-(def prefixes (atom {}))
+(def prefixes (atom {:xsd "<http://www.w3.org/2001/XMLSchema#>"}))
 
 
 ;; ----------------------------------------------------------------------------
