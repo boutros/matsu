@@ -72,14 +72,14 @@
     (sub-compiler m)))
 
 (defn- sub-compiler [m]
-  (conj []
-        (:tag m)
-        (when (seq (:content m)) (first (:bounds m)))
-        (interpose
-          (:sep m)
-          (let [content (:content m)]
-            (map encode (postwalk-replace replacement-map content))))
-        (if (seq (:content m)) (last (:bounds m)) " ")))
+  (vector
+    (:tag m)
+    (when (seq (:content m)) (first (:bounds m)))
+    (interpose
+      (:sep m)
+      (let [content (:content m)]
+        (map encode (postwalk-replace replacement-map content))))
+    (if (seq (:content m)) (last (:bounds m)) " ")))
 
 ;; Functions to add namespaces to query string
 
