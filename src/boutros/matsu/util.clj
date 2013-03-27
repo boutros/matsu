@@ -11,8 +11,8 @@
 ;; grammar described here:
 ;; http://www.w3.org/TR/sparql11-query/#sparqlGrammar
 
-(def before2 #{"SELECT" "INSERT" "DELETE" "WHERE"})
-(def before #{"BASE" "PREFIX" "FROM" "OPTIONAL" "WITH" "MODIFY"})
+(def before2 #{"SELECT" "INSERT" "DELETE" "WHERE" "WITH" "MODIFY"})
+(def before #{"BASE" "PREFIX" "FROM" "OPTIONAL"})
 (def after #{ ";" "." })
 (def both #{ "{" "}" })
 
