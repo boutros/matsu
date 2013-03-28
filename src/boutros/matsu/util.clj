@@ -39,10 +39,10 @@
                          (str indent "   ")
                          false)
             remove-indent (if (re-matches #"\}" (str line))
-                            (apply str (drop 3 indent))
+                            (string/join (drop 3 indent))
                             false)
             semicolon (if (re-find #";" (str line))
-                        (apply str
+                        (string/join
                                (repeat
                                  (inc
                                    (clojure.core/count
