@@ -1181,15 +1181,15 @@ WHERE
 Blank nodes are created with double brackets:
 ```clojure
 (query
-  (insert
-    (graph (URI. "http://example/bookStore2")
-          :book :p :v))
-  (where
-    (graph (URI. "http://example/bookStore")
-           :book [:dc :date] :date \.
-           (filter :date > ["1970-01-01T00:00:00-02:00" "xsd:dateTime"])
-           :book :p :v)))
-
+  (construct :x [:vcard :N] [[:v]] \.
+             [[:v]] [:vcard :givenName] :gname \.
+             [[:v]] [:vcard :familyName] :fname)
+  (where (union
+           (group :x [:foaf :firstname] :gname)
+           (group :x [:foaf :givenname] :gname)) \.
+         (union
+           (group :x [:foaf :surname] :fname)
+           (group :x [:foaf :family_name] :fname)) \.))
 ```
 
 ```sparql
