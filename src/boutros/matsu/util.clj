@@ -42,12 +42,14 @@
                             (string/join (drop 3 indent))
                             false)
             semicolon (if (re-find #";" (str line))
-                        (string/join
-                               (repeat
-                                 (inc
-                                   (clojure.core/count
-                                     (re-find #"[^\s]*" (str line))))
-                                 " "))
+                        (if (= same-subject "")
+                          (string/join
+                                 (repeat
+                                   (inc
+                                     (clojure.core/count
+                                       (re-find #"[^\s]*" (str line))))
+                                   " "))
+                          same-subject)
                         "")
             indentstring (if remove-indent remove-indent indent)]
         (if (empty? lines)

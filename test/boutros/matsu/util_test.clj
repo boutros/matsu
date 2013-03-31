@@ -28,17 +28,18 @@ WHERE
   (is
     (= (pprint
          (query
-           (select :name :mbox :date)
+           (select :name :mbox :date :known)
            (where
              :g [:dc :publisher] :name \;
                 [:dc :date] :date \.
              (graph :g
                     :person [:foaf :name] :name \;
-                      [:foaf :mbox] :mbox))))
+                      [:foaf :mbox] :mbox \;
+                      [:foaf :knows] :known))))
 "PREFIX dc: <http://purl.org/dc/elements/1.1/>
 PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 
-SELECT ?name ?mbox ?date
+SELECT ?name ?mbox ?date ?known
 
 WHERE
 {
@@ -47,7 +48,8 @@ WHERE
    GRAPH ?g
    {
       ?person foaf:name ?name ;
-              foaf:mbox ?mbox
+              foaf:mbox ?mbox ;
+              foaf:knows ?known
    }
 }"))
 
