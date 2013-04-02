@@ -13,23 +13,15 @@
 
 ;; Main Macros
 
-(defquery q1
-  (select :s))
+(defquery who [name email]
+  (select :who)
+  (where :who [:foaf :name] name \;
+              [:foaf :mbox] email))
 
-(defquery q2
-  (from (URI. "http://dbpedia.org/resource")))
-
-(deftest saved-queries
-  (testing "query based on saved queries"
+(deftest query-with-args
     (is (=
-          (query q1
-            (where :s :p :o \.))
-          "SELECT ?s WHERE { ?s ?p ?o . }"))
-    (is (=
-          (query q2
-            (select \*)
-            (where :s :p :o))
-          "SELECT * FROM <http://dbpedia.org/resource> WHERE { ?s ?p ?o }"))))
+          (who "petter" "boutros@dott.com")
+          "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?who WHERE { ?who foaf:name \"petter\" ; foaf:mbox \"boutros@dott.com\" }")))
 
 (deftest local-prefixes
   (is (=

@@ -25,10 +25,11 @@
 ;; ----------------------------------------------------------------------------
 
 (defmacro defquery
-  "Defines a query-map and binds it to a var"
-  [name & body]
-  `(let [q# (-> (~empty-query) ~@body)]
-    (def ~name q#)))
+  "Defines a query-map and binds it to a function taking [args]"
+  [name args & body]
+  `(defn ~name [~@args]
+     (query
+       (-> (~empty-query) ~@body))))
 
 (defmacro query
   "Let you craft a SPARQL-query by composing functions

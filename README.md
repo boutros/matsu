@@ -102,20 +102,26 @@ WHERE
 }
 ```
 
-### Working with saved queries
-You can bind queries to vars with `defquery` and use them as basis for other queries:
+### Queries with arguments
+`defquery` is a convenience macro that binds a query to a function, which allow for easy reuse of queries with variable arguments:
 
 ```clojure
-(defquery q1
-  (select *)
-  (where :s :p :o))
-
-(query q1
-   (limit 5))
+(defquery who [name email]
+  (select :who)
+  (where :who [:foaf :name] name \;
+              [:foaf :mbox] email))
 ```
 
+Typing `(who "petter" "petter@dott.com")` then yields:
+
 ```sparql
-SELECT * WHERE { ?s ?p ?o } LIMIT 5
+PREFIX foaf: <http://xmlns.com/foaf/0.1/>
+SELECT ?who
+WHERE
+{
+   ?who foaf:name \"petter\" ;
+        foaf:mbox \"petter@dott.com\"
+}"
 ```
 
 ### SPARQL Update
@@ -189,7 +195,6 @@ There might be other limitations, especially when dealing with SPARQL expression
 * Specifying variables with `VALUES` in data block
 * Federated queries (SERVICE)
 * Syntacic sugar (macros)
-* Queries made with `defquery` should be able to take parameters
 
 ## Contribute
 
