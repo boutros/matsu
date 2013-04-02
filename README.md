@@ -119,8 +119,8 @@ PREFIX foaf: <http://xmlns.com/foaf/0.1/>
 SELECT ?who
 WHERE
 {
-   ?who foaf:name \"petter\" ;
-        foaf:mbox \"petter@dott.com\"
+   ?who foaf:name "petter" ;
+        foaf:mbox "petter@dott.com\
 }
 ```
 
