@@ -64,14 +64,14 @@ Matsu makes it possible to create complex, nested queries:
               (URI. "http://example.org/foaf/bobFoaf"))
   (where
     (graph [:data :aliceFoaf]
-           :alice [:foaf :mbox] (URI. "mailto:alice@work.example")
-           \; [:foaf :knows] :whom \.
-           :whom [:foaf :mbox] :mbox
-           \; [:rdfs :seeAlso] :ppd \.
+           :alice [:foaf :mbox] (URI. "mailto:alice@work.example") \;
+                  [:foaf :knows] :whom \.
+           :whom [:foaf :mbox] :mbox \;
+                 [:rdfs :seeAlso] :ppd \.
            :ppd a [:foaf :PersonalProfileDocument] \.) \.
     (graph :ppd
-           :w [:foaf :mbox] :mbox
-           \; [:foaf :nick] :nick)))
+           :w [:foaf :mbox] :mbox \;
+              [:foaf :nick] :nick)))
 ```
 
 Yielding the following SPARQL string:
