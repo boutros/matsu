@@ -120,7 +120,7 @@ SELECT ?who
 WHERE
 {
    ?who foaf:name "petter" ;
-        foaf:mbox "petter@dott.com\
+        foaf:mbox "petter@dott.com"
 }
 ```
 
