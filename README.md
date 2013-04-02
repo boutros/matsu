@@ -121,7 +121,7 @@ WHERE
 {
    ?who foaf:name \"petter\" ;
         foaf:mbox \"petter@dott.com\"
-}"
+}
 ```
 
 ### SPARQL Update
