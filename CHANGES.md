@@ -1,4 +1,4 @@
-### 0.1.1-SNAPSHOT
+### 0.1.2
 * feature: queries made with defquery can take arguments
 * feature: compiler encodes from java.util.Date and org.joda.time.DateTime
            formats to xsd:dateTime
