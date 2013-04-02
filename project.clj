@@ -1,4 +1,4 @@
-(defproject matsu "0.1.2"
+(defproject matsu "0.1.3-SNAPSHOT"
   :description "SPARQL query DSL"
   :url "https://github.com/boutros/matsu"
   :license {:name "Eclipse Public License"
