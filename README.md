@@ -9,8 +9,8 @@ I'm using matsu in my own applications, but the DSL syntax might still change so
 ## Installation
 Add the following to your project.clj:
 ```clojure
-[matsu "0.1.0"]          ; stable
-[matsu "0.1.1-SNAPSHOT"] ; dev
+[matsu "0.1.2"]          ; stable
+[matsu "0.1.3-SNAPSHOT"] ; dev
 ```
 ## Usage
 
