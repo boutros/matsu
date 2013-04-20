@@ -30,6 +30,15 @@
           (where :person [:foaf :name] "Petter"))
         "PREFIX foaf: <mylocalfoaf> SELECT ?person WHERE { ?person foaf:name \"Petter\" }")))
 
+(deftest string-with-colon
+  "should not be infered as prefixed namespace"
+  (is
+    (=
+      (query
+        (select :s)
+        (where :s [:foaf :name] "my:name"))
+      "PREFIX foaf: <http://xmlns.com/foaf/0.1/> SELECT ?s WHERE { ?s foaf:name \"my:name\" }")))
+
 ;; SPARQL Query DSL functions
 
 (deftest composable

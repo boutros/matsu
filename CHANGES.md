@@ -1,4 +1,5 @@
 ### 0.1.3-SNAPSHOT
+* fix: don't infer namespace prefixes from inside quoted strings in the query
 
 ### 0.1.2
 * feature: queries made with defquery can take arguments

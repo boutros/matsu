@@ -189,6 +189,7 @@ See the [doc](https://github.com/boutros/matsu/blob/master/doc) directory for mo
 There might be other limitations, especially when dealing with SPARQL expressions. But most, if not all of the limitations can be circumvented by interpolating raw strings into the query with the `raw` function.
 
 ## Todos
+* Find a smarter (non-regex) way to infer namespaces from query
 * Better BIND syntax
 * Subqueries
 * Property path syntax
