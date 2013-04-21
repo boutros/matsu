@@ -13,6 +13,7 @@
        "string"                    "\"string\""
        "string with \"quotes\""    "\"string with \\\"quotes\\\"\""
        ["une pipe" :fr]            "\"une pipe\"@fr"
+       ["quotes \"and\" lang" :en] "\"quotes \\\"and\\\" lang\"@en"
        true                        true
        false                       false
        (URI. "http://dbpedia.org") "<http://dbpedia.org>"

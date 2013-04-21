@@ -1,4 +1,5 @@
 ### 0.1.3-SNAPSHOT
+* fix: doubled quotes wasn't escaped if string followed by language tag
 * fix: don't infer namespace prefixes from inside quoted strings in the query
 
 ### 0.1.2

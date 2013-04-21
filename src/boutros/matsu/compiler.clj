@@ -12,6 +12,11 @@
 
 (declare sub-compiler)
 
+(defn escape-str
+  "esacpes double quotes in strings"
+  [s]
+  (string/replace s #"\""  "\\\\\"" )) ; escape "
+
 (defn encode
   "Encodes keywords to ?-prefixed variables and other values to RDF literals
   when applicable.
@@ -37,7 +42,7 @@
     (float? x) x
     (true? x) x
     (false? x) x
-    (string? x) (str \" (string/replace x #"\""  "\\\\\"" ) \" ) ; escape "
+    (string? x) (str \" (escape-str x) \")
     (= java.net.URI (type x)) (str "<" x ">")
     (= org.joda.time.DateTime (type x)) (encode [(str x) "xsd:dateTime"])
     (= java.util.Date (type x)) (encode [(str (from-date x)) "xsd:dateTime"])
@@ -45,7 +50,7 @@
                   (cond
                     (vector? a) (if (seq a) (str '_ (first a)) "[]")
                     (not b) (str \< (name a) \>)
-                    (and (keyword? b) (string? a)) (str \" a "\"@" (name b))
+                    (and (keyword? b) (string? a)) (str \" (escape-str a) "\"@" (name b))
                     (every? string? x) (str (encode a) "^^" b)
                     (and (map? a)
                          (keyword? b)) (into ["("]
