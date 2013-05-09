@@ -35,6 +35,7 @@
   separator"
   [x]
   (cond
+    (nil? x) ""
     (char? x) x
     (symbol? x) x
     (keyword? x) (str \? (name x))

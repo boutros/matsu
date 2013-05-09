@@ -52,6 +52,16 @@
                        (lang-matches (lang :o) l))))))
     "SELECT ?s WHERE { ?s ?p ?o . FILTER(langMatches(lang(?o), \"en\") || langMatches(lang(?o), \"de\")) }"))))
 
+(deftest conditionals
+  "query should compose with conditionals"
+  (is
+    (=
+      (query
+        (select :s)
+        (where :s :p :o \;
+               (if (= 2 2) `(:p2 :o \.) `(:p3 :o3))))
+      "SELECT ?s WHERE { ?s ?p ?o ; ?p2 ?o . }")))
+
 (deftest query-forms
   (testing "select"
     (is (=

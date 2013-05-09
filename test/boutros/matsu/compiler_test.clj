@@ -6,6 +6,7 @@
 
 (deftest fn-encode
   (are [a b] (= (encode a) b)
+       nil                         ""
        \*                          \*
        :keyword                    "?keyword"
        23                          23

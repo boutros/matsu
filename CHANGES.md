@@ -1,4 +1,5 @@
 ### 0.1.3-SNAPSHOT
+* fix: encode nil as empty string, makes its easier to use conditionals in queries
 * fix: doubled quotes wasn't escaped if string followed by language tag
 * fix: don't infer namespace prefixes from inside quoted strings in the query
 
