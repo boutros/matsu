@@ -33,7 +33,7 @@
 
 
 ;; Is the Amazon river longer than the Nile River?
-(defquery amazon-vs-nile
+(defquery amazon-vs-nile []
   (ask [:dbpedia :Amazon_River] [:prop :length] :amazon \.
        [:dbpedia :Nile] [:prop :length] :nile \.
        (filter :amazon > :nile)))
@@ -41,20 +41,20 @@
 ;; send HTTP request
 (def req
   (client/get dbpedia
-              {:query-params {"query" (query amazon-vs-nile)}}))
+              {:query-params {"query" (amazon-vs-nile)}}))
 
 (:body req)
 ; => "false"
 
 
 ;; When was Jimi Hendrix born?
-(defquery hendrix
+(defquery hendrix []
   (select-distinct :bday)
   (where [:dbpedia :Jimi_Hendrix] [:prop :dateOfBirth] :bday))
 
 (def req
   (client/get dbpedia
-              {:query-params {"query" (query hendrix)}}))
+              {:query-params {"query" (hendrix)}}))
 
 ;; Dbpedia response format defaults to xml
 (-> (zip-str (:body req)) down right down down down down node)
@@ -63,14 +63,14 @@
 ;; Don't like to parse XML? You can also ask for JSON if you prefer
 
 ;; Let's find Elvis' birthday this time
-(defquery elvis
+(defquery elvis []
   (select :bday)
   (where [:dbpedia :Elvis_Presley] [:prop :dateOfBirth] :bday))
 
 (def req
   (client/get dbpedia
               {:query-params
-              { "query" (query elvis) "format" "application/sparql-results+json"}}))
+              { "query" (elvis) "format" "application/sparql-results+json"}}))
 
 
 (def answer (parse-string (:body req)))
@@ -81,7 +81,7 @@
 
 ;; Find movies starring actors born in Tokyo,
 ;; limit to 10, ordered by longest running time:
-(defquery movies
+(defquery movies []
   (select-distinct :title)
   (where :p [:prop :birthPlace] [:dbpedia :Tokyo] \.
          :movie [:prop :starring] :p \;
@@ -94,7 +94,7 @@
 (def req
   (client/get dbpedia
               {:query-params
-              { "query" (query movies) "format" "application/sparql-results+json"}}))
+              { "query" (movies) "format" "application/sparql-results+json"}}))
 
 (def answer (parse-string (:body req)))
 
@@ -113,7 +113,7 @@
 (def linkedmdb "http://linkedmdb.org/sparql")
 
 ;; Find actors who acted in both movies directed by Kubrick and by Spielberg
-(defquery actors
+(defquery actors []
   (base (URI. "http://data.linkedmdb.org/resource/movie/"))
   (select-distinct :actorname)
   (where :dir1 [:director_name] "Steven Spielberg" \.
@@ -127,7 +127,7 @@
 (def req
   (client/get linkedmdb
               {:accept "application/sparql-results+json"
-               :query-params { "query" (query actors)}}))
+               :query-params { "query" (actors)}}))
 
 (def answer (parse-string (:body req)))
 
