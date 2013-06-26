@@ -279,6 +279,12 @@
             (where :s :p :o))
           "SELECT (sql:SAMPLE(?s) AS ?s) WHERE { ?s ?p ?o }")))
 
+  (testing "count-distinct"
+    (is (=
+          (query
+            (select (count-distinct :s))
+            (where :s :p :o))
+          "SELECT COUNT(DISTINCT ?s) WHERE { ?s ?p ?o }")))
   ;; todo min, max, count
   )
 

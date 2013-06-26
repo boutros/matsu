@@ -188,6 +188,8 @@
 
 (defn count [v] {:tag "COUNT" :bounds ["(" ")"] :sep " " :content [v]})
 
+(defn count-distinct [v] {:tag "COUNT" :bounds ["(DISTINCT " ")"] :sep " " :content [v]})
+
 (defn group-concat [v sep]
   {:tag "sql:GROUP_CONCAT" :bounds ["(" ")"] :sep ", " :content [v sep]})
 
