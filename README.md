@@ -4,7 +4,7 @@ A Clojure SPARQL query constructor
 
 ## Status
 
-I'm using matsu in my own applications, but the DSL syntax might still change somewhat. Any feedback appreciated.
+2014-11-11: This library is no longer activly maintained
 
 ## Installation
 Add the following to your project.clj:
